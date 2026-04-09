@@ -1,79 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCCU Application Process Guide</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-        }
-        header {
-            background: #35424a;
-            color: #ffffff;
-            padding: 20px 0;
-            text-align: center;
-        }
-        h1 {
-            margin: 0;
-        }
-        .content {
-            padding: 20px;
-            background: #ffffff;
-            margin: 20px 0;
-            border-radius: 5px;
-            box-shadow: 0 0 10px #ccc;
-        }
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background: #35424a;
-            color: #ffffff;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-        button {
-            background-color: #35424a;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-    </style>
-    <script>
-        function showAlert() {
-            alert('Welcome to the CCCU Application Process!');
-        }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCCU Application Process — INUNI Agent Guide 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1D9E75;
+  --green-dark:#085041;
+  --green-light:#E1F5EE;
+  --blue:#185FA5;
+  --blue-light:#E6F1FB;
+  --purple:#534AB7;
+  --purple-light:#EEEDFE;
+  --amber:#BA7517;
+  --amber-light:#FAEEDA;
+  --red:#A32D2D;
+  --red-light:#FCEBEB;
+  --ink:#0f1410;
+  --ink2:#3a3f3c;
+  --ink3:#7a8078;
+  --surface:#f7f8f5;
+  --surface2:#eef0eb;
+  --line:rgba(0,0,0,0.08);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--surface);
+  color:var(--ink);
+  min-height:100vh;
+  padding:32px 16px;
+}
+.wrap{
+  max-width:720px;
+  margin:0 auto;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(0,0,0,0.07);
+}
+
+.masthead{
+  background:var(--green-dark);
+  padding:36px 36px 32px;
+  position:relative;
+  overflow:hidden;
+}
+.masthead::before{
+  content:'';position:absolute;
+  top:-80px;right:-80px;
+  width:280px;height:280px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.04);
+}
+.masthead::after{
+  content:'';position:absolute;
+  bottom:-50px;right:80px;
+  width:140px;height:140px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.03);
+}
+.mh-eyebrow{
+  display:flex;align-items:center;gap:10px;margin-bottom:24px;position:relative;z-index:1;
+}
+.mh-logo{
+  width:34px;height:34px;border-radius:8px;
+  background:#1D9E75;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.mh-logo svg{width:17px;height:17px}
+.mh-brand{font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);letter-spacing:.01em}
+.mh-spacer{flex:1}
+.mh-tag{
+  font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+  background:rgba(255,255,255,0.08);
+  padding:5px 12px;border-radius:20px;
+  white-space:nowrap;
+}
+.mh-title{
+  font-family:'DM Serif Display',serif;
+  font-size:32px;color:#fff;line-height:1.2;
+  margin-bottom:10px;font-weight:400;
+  position:relative;z-index:1;
+}
+.mh-title em{font-style:italic;color:#9FE1CB}
+.mh-sub{
+  font-size:13px;color:rgba(255,255,255,0.5);
+  line-height:1.65;max-width:500px;font-weight:300;
+  position:relative;z-index:1;
+}
+.mh-stats{
+  display:flex;gap:24px;margin-top:24px;
+  padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);
+  position:relative;z-index:1;
+  flex-wrap:wrap;
+}
+.mh-stat strong{
+  display:block;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,0.85);margin-bottom:2px;
+}
+.mh-stat span{font-size:11px;color:rgba(255,255,255,0.38);letter-spacing:.02em}
+
+.phase-strip{
+  display:flex;background:#0f1410;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.ps-item{
+  flex:1;padding:11px 6px;text-align:center;
+  font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  color:rgba(255,255,255,0.28);cursor:pointer;
+  transition:all .2s;
+  border-right:1px solid rgba(255,255,255,0.05);
+}
+.ps-item:last-child{border-right:none}
+.ps-item:hover{color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.04)}
+.ps-item.on{color:#fff;background:var(--green)}
+.ps-item.done{color:rgba(255,255,255,0.45);background:rgba(29,158,117,0.14)}
+
+.content{
+  padding:32px 36px;
+  background:#fff;
+}
+
+.stage-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.stage-num{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:500;color:#fff;flex-shrink:0;
+}
+.stage-phase{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.stage-title{
+  font-family:'DM Serif Display',serif;
+  font-size:26px;color:var(--ink);line-height:1.2;
+  margin-bottom:10px;font-weight:400;
+}
+.stage-intro{
+  font-size:13px;color:var(--ink2);line-height:1.7;
+  margin-bottom:26px;padding-bottom:22px;
+  border-bottom:1px solid var(--line);
+}
+
+.steps{display:flex;flex-direction:column}
+.step-row{display:flex;gap:0}
+.step-track{width:40px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.step-node{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:500;flex-shrink:0;margin-top:3px;
+  border:1.5px solid;
+}
+.step-vline{width:1px;flex:1;min-height:14px;background:var(--line);margin:3px 0}
+.step-row:last-child .step-vline{display:none}
+.step-card{
+  flex:1;margin-bottom:12px;padding:14px 16px;
+  border-radius:10px;border:1px solid var(--line);
+  background:#fff;transition:border-color .15s,transform .1s;
+}
+.step-card:hover{border-color:rgba(0,0,0,0.14);transform:translateX(2px)}
+.step-who{
+  display:inline-block;font-size:9px;font-weight:500;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 8px;border-radius:4px;margin-bottom:7px;
+}
+.who-student{background:#EEEDFE;color:#3C3489}
+.who-system{background:#f0f0ee;color:#5a5a55}
+.step-label{font-size:13px;font-weight:500;color:var(--ink);line-height:1.35;margin-bottom:5px}
+.step-detail{font-size:12px;color:var(--ink3);line-height:1.62}
+
+.notice{
+  border-radius:10px;padding:13px 15px;margin-top:12px;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.notice-icon{
+  width:22px;height:22px;flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;border-radius:6px;
+}
+.notice-icon svg{width:12px;height:12px}
+.notice-title{font-size:12px;font-weight:500;margin-bottom:3px}
+.notice-text{font-size:12px;line-height:1.58}
+.n-warn{background:#FAEEDA}
+.n-warn .notice-title,.n-warn .notice-text{color:#633806}
+.n-warn .notice-icon{background:#F5C06A}
+.n-danger{background:#FCEBEB}
+.n-danger .notice-title,.n-danger .notice-text{color:#791F1F}
+.n-danger .notice-icon{background:#F09595}
+.n-info{background:#E6F1FB}
+.n-info .notice-title,.n-info .notice-text{color:#0C447C}
+.n-info .notice-icon{background:#85B7EB}
+.n-success{background:#EAF3DE}
+.n-success .notice-title,.n-success .notice-text{color:#27500A}
+.n-success .notice-icon{background:#97C459}
+
+.cl-label{
+  font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink3);margin:20px 0 8px;
+}
+.cl-grid{display:flex;flex-direction:column;gap:5px}
+.cl-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;border-radius:8px;
+  border:1px solid var(--line);background:#fff;
+}
+.cl-row.cl-amber{background:#FAEEDA;border-color:rgba(186,117,23,0.2)}
+.cl-row.cl-blue{background:#E6F1FB;border-color:rgba(24,95,165,0.2)}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.cl-txt{font-size:12px;font-weight:500;color:var(--ink)}
+.cl-row.cl-amber .cl-txt{color:#633806}
+.cl-row.cl-blue .cl-txt{color:#0C447C}
+.cl-sub{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.5}
+.cl-row.cl-amber .cl-sub{color:#854F0B}
+.cl-row.cl-blue .cl-sub{color:#185FA5}
+
+.sla-strip{display:flex;gap:10px;margin-top:20px}
+.sla-box{
+  flex:1;padding:14px 16px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--line);
+}
+.sla-val{
+  font-family:'DM Serif Display',serif;
+  font-size:24px;color:var(--ink);font-weight:400;line-height:1;
+}
+.sla-lbl{font-size:11px;color:var(--ink3);margin-top:4px;letter-spacing:.02em}
+
+.nav-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 36px;
+  background:#fff;border-top:1px solid var(--line);
+}
+.nav-btn{
+  padding:10px 22px;border-radius:8px;
+  font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .15s;
+  border:1px solid var(--line);background:transparent;color:var(--ink);
+}
+.nav-btn:hover{background:var(--surface)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.nav-btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.nav-btn.primary:hover{background:var(--green-dark)}
+.nav-pg{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+
+@media(max-width:600px){
+  body{padding:0}
+  .wrap{border-radius:0;border:none}
+  .masthead{padding:24px 20px 20px}
+  .mh-title{font-size:26px}
+  .content{padding:24px 20px}
+  .nav-bar{padding:14px 20px}
+  .phase-strip{overflow-x:auto}
+  .ps-item{min-width:72px}
+  .sla-strip{flex-wrap:wrap}
+}
+</style>
 </head>
-<body onload="showAlert()">
-    <header>
-        <h1>CCCU Application Process Guide</h1>
-    </header>
-    <div class="container">
-        <div class="content">
-            <h2>Steps to Apply:</h2>
-            <ol>
-                <li>Research your course options.</li>
-                <li>Complete the online application form.</li>
-                <li>Prepare your supporting documents.</li>
-                <li>Submit your application.</li>
-                <li>Await a response from CCCU.</li>
-            </ol>
-        </div>
+<body>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="mh-eyebrow">
+      <div class="mh-logo">
+        <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.5 1.5L13.5 5.5V11.5L8.5 15.5L3.5 11.5V5.5L8.5 1.5Z" stroke="white" stroke-width="1.3" stroke-linejoin="round"/>
+          <circle cx="8.5" cy="8.5" r="2" fill="white"/>
+        </svg>
+      </div>
+      <span class="mh-brand">INUNI</span>
+      <span class="mh-spacer"></span>
+      <span class="mh-tag">Agent Guide &middot; 2026</span>
     </div>
-    <footer>
-        <p>&copy; 2026 CCCU. All rights reserved.</p>
-    </footer>
+    <div class="mh-title">CCCU Application<br><em>Process Overview</em></div>
+    <div class="mh-sub">End-to-end process for Canterbury Christ Church University applications via INUNI — from initial submission through to visa issuance.</div>
+    <div class="mh-stats">
+      <div class="mh-stat"><strong>6 stages</strong><span>Submission to enrolment</span></div>
+      <div class="mh-stat"><strong>UG &amp; PG</strong><span>All programmes</span></div>
+      <div class="mh-stat"><strong>2026 intake</strong><span>Current process</span></div>
+    </div>
+  </div>
+
+  <div class="phase-strip" id="phaseStrip"></div>
+  <div class="content" id="stageContent"></div>
+  <div class="nav-bar">
+    <button class="nav-btn" id="prevBtn" onclick="go(-1)">&#8592; Previous</button>
+    <span class="nav-pg" id="navPg"></span>
+    <button class="nav-btn primary" id="nextBtn" onclick="go(1)">Next &#8594;</button>
+  </div>
+
+</div>
+
+<script>
+const PHASES=[
+  {id:"submission",label:"Submission",color:"#1D9E75",title:"Application submission",
+    intro:"All CCCU applications are submitted through the GUS Gateway portal. A complete and accurate submission at this stage is the most significant factor in minimising processing delays.",
+    steps:[
+      {who:"system",label:"Application logged on GUS Gateway",detail:"GUS Gateway is the designated submission platform for all standard CCCU applications. Where a specific institution requires UCAS submission, service providers can contact their local INUNI account manager for guidance."},
+      {who:"system",label:"Application completeness review",detail:"All fields and supporting documents should be reviewed prior to submission. Applications submitted with missing information are subject to extended processing timelines."},
+      {who:"system",label:"Case assigned to the INUNI pre-admission office",detail:"Upon submission, the application is automatically assigned to the INUNI pre-admission office for initial review."}
+    ],
+    checklist:true,
+    notices:[{t:"warn",title:"Incomplete submissions",body:"Incomplete applications are the primary cause of processing delays. All available information and documentation should be included at the point of submission."}]
+  },
+  {id:"assessment",label:"Assessment",color:"#185FA5",title:"Initial assessment and COA letter",
+    intro:"Following submission, the INUNI pre-admission office conducts an initial review and issues a Confirmation of Assessment (COA) letter within 24 hours.",
+    steps:[
+      {who:"system",label:"Initial eligibility and completeness review",detail:"The INUNI pre-admission office assesses the application against CCCU eligibility criteria and reviews the completeness of submitted documentation."},
+      {who:"system",label:"COA letter issued within 24 hours",detail:"The COA letter confirms that the application has been received and assessed. It includes a record of any outstanding documents required to advance the case."},
+      {who:"student",label:"Consultation link issued to student",detail:"Concurrent with the COA, the student receives a direct link to access the INUNI consultation. No booking or waiting period is required — the student may proceed immediately upon receipt."}
+    ],
+    slas:[{val:"24 hrs",lbl:"COA turnaround"},{val:"Immediate",lbl:"Consultation access"}],
+    notices:[{t:"info",title:"COA letter — scope and purpose",body:"The COA is a confirmation of assessment, not a university offer. The university's formal decision is issued following successful completion of the consultation process."}]
+  },
+  {id:"consultation",label:"Consultation",color:"#534AB7",title:"Student consultation",
+    intro:"The INUNI consultation is a structured assessment session completed by the student in a single, uninterrupted sitting.",
+    steps:[
+      {who:"student",label:"Session initiated by student",detail:"The student accesses the consultation via the link issued with the COA letter. The session requires approximately 30–45 minutes of uninterrupted time."},
+      {who:"student",label:"CV and Statement of Purpose uploaded",detail:"The student uploads their CV and SoP within the session. The SoP is evaluated against CCCU's academic rubrics with up to two attempts to meet the required standard."},
+      {who:"student",label:"University knowledge assessment",detail:"The student is presented with key information relating to CCCU and their intended programme."},
+      {who:"student",label:"Identity and face verification",detail:"Identity is verified through a biometric and document check reviewed by a qualified assessor. The student must be present in person in a well-lit environment with original identity documentation."},
+      {who:"student",label:"Programme, destination and financial assessment",detail:"The student responds to structured questions regarding their programme selection, intended destination and financial arrangements."}
+    ],
+    notices:[
+      {t:"warn",title:"Session continuity requirement",body:"The consultation does not support a save or pause function. Once commenced, it must be completed in full within the same sitting."},
+      {t:"danger",title:"Identity verification integrity",body:"The verification system detects synthetic imagery including face swap technology. Detection results in immediate withdrawal of the application. This policy applies without exception."}
+    ]
+  },
+  {id:"documents",label:"Documents",color:"#BA7517",title:"Outstanding documentation",
+    intro:"Upon completion of the consultation, the student is presented with a summary of any documentation still required.",
+    steps:[
+      {who:"student",label:"Outstanding document summary presented to student",detail:"At the close of the session, the student is shown a list of any remaining required documents with submission instructions."},
+      {who:"student",label:"Documents submitted to the INUNI pre-admission office",detail:"Outstanding documents are submitted directly by the student to the INUNI pre-admission office, ensuring a clean chain of receipt."},
+      {who:"system",label:"Documents recorded on the student's case file",detail:"All received documentation is uploaded to the student's case record. Once complete, the application is referred to the university."}
+    ],
+    notices:[{t:"info",title:"Document resubmission",body:"Documentation provided at the point of application is retained on file. Resubmission is not required unless specifically requested — duplicates may cause delays."}]
+  },
+  {id:"decision",label:"Decision",color:"#1D9E75",title:"University review and decision",
+    intro:"With a complete case file, the application is formally referred to CCCU for a final decision. This applies to both undergraduate and postgraduate applications.",
+    steps:[
+      {who:"system",label:"Application referred to CCCU",detail:"The complete case is submitted to Canterbury Christ Church University for final review. A decision is ordinarily returned within 48 hours of referral."},
+      {who:"student",label:"Student accepts unconditional offer",detail:"Upon receiving an unconditional offer, the student confirms acceptance. This triggers the interview invitation from the university."},
+      {who:"system",label:"CCCU interview team sends invitation to student",detail:"The invitation is issued directly by CCCU to the student. The student cannot independently book the interview — they respond to confirm a preferred time and CCCU schedules accordingly. Applies to both UG and PG."},
+      {who:"system",label:"Interview conducted and formal decision issued",detail:"CCCU conducts the interview and issues a formal outcome. A successful result leads to deposit payment and CAS documentation."}
+    ],
+    slas:[{val:"Up to 48 hrs",lbl:"University decision"}],
+    notices:[
+      {t:"info",title:"Interview process — UG and PG",body:"The CCCU interview invitation is sent directly to the student upon acceptance of the unconditional offer. The student responds with a preferred time — there is no self-booking facility."},
+      {t:"warn",title:"If an invitation has not been received",body:"If a student has accepted their offer and has not received an invitation within a reasonable timeframe, this should be escalated to INUNI. The pre-admission office will liaise with CCCU on the student's behalf."}
+    ]
+  },
+  {id:"enrolment",label:"Enrolment",color:"#1D9E75",title:"Deposit, CAS and visa",
+    intro:"Following a successful university decision, the student proceeds to deposit payment, CAS completion and visa application.",
+    steps:[
+      {who:"student",label:"Deposit payment",detail:"The student pays the required deposit directly to CCCU to secure their place on the programme."},
+      {who:"student",label:"CAS documentation completed",detail:"All CAS-related documentation is completed in direct correspondence between the student and CCCU."},
+      {who:"student",label:"Visa application submitted upon CAS issuance",detail:"The UK student visa application must be submitted immediately upon receipt of the CAS. Processing timelines vary — early submission is essential."},
+      {who:"student",label:"Visa granted — student enrols",detail:"Upon visa approval, the student is cleared to travel and enrol. The application process is complete."}
+    ],
+    notices:[{t:"success",title:"Visa application timing",body:"The visa application should be submitted without delay following CAS issuance. UK processing times cannot accommodate late submissions where programme start dates are imminent."}]
+  }
+];
+
+const CL_REQ=[
+  {text:"Student personal details",sub:"Full legal name, date of birth, nationality, passport number"},
+  {text:"Academic history",sub:"All qualifications, institutions attended, grades achieved"},
+  {text:"Passport copy",sub:"Clear scan of the photo page, valid for a minimum of 12 months"}
+];
+const CL_DEF=[{text:"English language evidence",sub:"May be submitted at a later stage — required prior to final academic review by CCCU. IELTS, TOEFL or equivalent."}];
+const CL_CON=[
+  {text:"CV",sub:"Submitted by the student directly during the INUNI consultation session."},
+  {text:"Statement of Purpose",sub:"Submitted during consultation and assessed against CCCU academic rubrics."}
+];
+
+const NODE={
+  submission:{bg:"#E1F5EE",bd:"#9FE1CB",tx:"#085041"},
+  assessment:{bg:"#E6F1FB",bd:"#B5D4F4",tx:"#0C447C"},
+  consultation:{bg:"#EEEDFE",bd:"#CECBF6",tx:"#3C3489"},
+  documents:{bg:"#FAEEDA",bd:"#FAC775",tx:"#633806"},
+  decision:{bg:"#E1F5EE",bd:"#9FE1CB",tx:"#085041"},
+  enrolment:{bg:"#E1F5EE",bd:"#9FE1CB",tx:"#085041"}
+};
+
+const ICONS={
+  warn:`<svg viewBox="0 0 12 12" fill="none" width="12" height="12"><path d="M6 1L11 10H1L6 1Z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/><line x1="6" y1="4.5" x2="6" y2="7" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="8.5" r=".65" fill="white"/></svg>`,
+  danger:`<svg viewBox="0 0 12 12" fill="none" width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" rx="2" stroke="white" stroke-width="1.2"/><line x1="6" y1="4" x2="6" y2="6.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="8.2" r=".65" fill="white"/></svg>`,
+  info:`<svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4.5" stroke="white" stroke-width="1.2"/><line x1="6" y1="5" x2="6" y2="8.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="3.5" r=".65" fill="white"/></svg>`,
+  success:`<svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4.5" stroke="white" stroke-width="1.2"/><polyline points="3.5,6 5.2,7.8 8.5,4.2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+};
+
+let cur=0;
+
+function strip(){
+  document.getElementById('phaseStrip').innerHTML=PHASES.map((p,i)=>
+    `<div class="ps-item${i===cur?' on':i<cur?' done':''}" onclick="go2(${i})">${p.label}</div>`
+  ).join('');
+}
+
+function content(){
+  const p=PHASES[cur];
+  const nc=NODE[p.id];
+  let h=`
+    <div class="stage-eyebrow">
+      <div class="stage-num" style="background:${p.color}">${cur+1}</div>
+      <span class="stage-phase">${p.label}</span>
+    </div>
+    <div class="stage-title">${p.title}</div>
+    <div class="stage-intro">${p.intro}</div>
+    <div class="steps">`;
+
+  p.steps.forEach((s,i)=>{
+    const wlabel=s.who==='student'?'Student':'Process';
+    const wcls=s.who==='student'?'who-student':'who-system';
+    h+=`<div class="step-row">
+      <div class="step-track">
+        <div class="step-node" style="background:${nc.bg};border-color:${nc.bd};color:${nc.tx}">${i+1}</div>
+        <div class="step-vline"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-who ${wcls}">${wlabel}</div>
+        <div class="step-label">${s.label}</div>
+        <div class="step-detail">${s.detail}</div>
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  if(p.checklist){
+    h+=`<div class="cl-label">Required at submission</div><div class="cl-grid">`;
+    CL_REQ.forEach(c=>{h+=`<div class="cl-row"><div class="cl-dot" style="background:#1D9E75"></div><div><div class="cl-txt">${c.text}</div><div class="cl-sub">${c.sub}</div></div></div>`;});
+    h+=`</div><div class="cl-label">May be submitted at a later stage</div><div class="cl-grid">`;
+    CL_DEF.forEach(c=>{h+=`<div class="cl-row cl-amber"><div class="cl-dot" style="background:#BA7517"></div><div><div class="cl-txt">${c.text}</div><div class="cl-sub">${c.sub}</div></div></div>`;});
+    h+=`</div><div class="cl-label">Submitted by student during consultation</div><div class="cl-grid">`;
+    CL_CON.forEach(c=>{h+=`<div class="cl-row cl-blue"><div class="cl-dot" style="background:#185FA5"></div><div><div class="cl-txt">${c.text}</div><div class="cl-sub">${c.sub}</div></div></div>`;});
+    h+=`</div>`;
+  }
+
+  if(p.slas){
+    h+=`<div class="sla-strip">`;
+    p.slas.forEach(s=>{h+=`<div class="sla-box"><div class="sla-val">${s.val}</div><div class="sla-lbl">${s.lbl}</div></div>`;});
+    h+=`</div>`;
+  }
+
+  if(p.notices){
+    p.notices.forEach(n=>{
+      h+=`<div class="notice n-${n.t}">
+        <div class="notice-icon">${ICONS[n.t]||ICONS.info}</div>
+        <div><div class="notice-title">${n.title}</div><div class="notice-text">${n.body}</div></div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('stageContent').innerHTML=h;
+  document.getElementById('navPg').textContent=`${cur+1} / ${PHASES.length}`;
+  document.getElementById('prevBtn').disabled=cur===0;
+  const nb=document.getElementById('nextBtn');
+  nb.textContent=cur===PHASES.length-1?'Done':'Next \u2192';
+  nb.disabled=cur===PHASES.length-1;
+}
+
+function render(){strip();content();}
+function go(d){cur=Math.max(0,Math.min(PHASES.length-1,cur+d));render();}
+function go2(i){cur=i;render();}
+render();
+</script>
 </body>
 </html>
