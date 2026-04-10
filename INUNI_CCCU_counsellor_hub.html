@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCCU Agent Cheat Sheet — iNUNI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#003B6F;--c2:#1565A8;--c3:#4A9AD4;--c4:#E8F4FE;
+  --amber:#854F0B;--amber-l:#FAEEDA;--amber-m:#BA7517;
+  --green:#27500A;--green-l:#EAF3DE;--green-m:#3B6D11;
+  --coral:#712B13;--coral-l:#FAECE7;--coral-m:#993C1D;
+  --purple:#3C3489;--purple-l:#EEEDFE;--purple-m:#534AB7;
+  --teal:#085041;--teal-l:#E1F5EE;--teal-m:#0F6E56;
+  --r:10px;
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f5f5;
+  --color-text-primary:#1a1a1a;
+  --color-text-secondary:#555555;
+  --color-border-tertiary:rgba(0,0,0,0.1);
+  --color-border-secondary:rgba(0,0,0,0.2);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif
+}
+body{font-family:var(--font-sans);background:#f0f4f8;padding:1.5rem;color:var(--color-text-primary)}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* HERO */
+.hero{background:#003B6F;border-radius:16px;padding:0;margin-bottom:12px;overflow:hidden;display:flex;align-items:stretch;min-height:100px}
+.hero-stripe{width:6px;background:#4A9AD4;flex-shrink:0}
+.hero-body{flex:1;padding:1.1rem 1.3rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.hero-badge{background:#1565A8;border-radius:10px;padding:0.55rem 0.8rem;text-align:center;flex-shrink:0}
+.hero-badge-main{font-size:18px;font-weight:600;color:#fff;letter-spacing:1px;line-height:1}
+.hero-badge-sub{font-size:9px;color:#7ECBFF;margin-top:3px;letter-spacing:.5px}
+.hero-text{flex:1}
+.hero-title{font-size:16px;font-weight:600;color:#fff;line-height:1.2}
+.hero-sub{font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px}
+.hero-meta{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
+.hero-pill{font-size:10px;padding:4px 10px;border-radius:20px;white-space:nowrap;font-weight:600}
+.hp-gold{background:#FAEEDA;color:#633806}
+.hp-blue{background:#E6F1FB;color:#0C447C}
+.hp-green{background:#EAF3DE;color:#27500A}
+.hero-contact{font-size:10px;color:rgba(255,255,255,0.5);margin-top:4px;text-align:right}
+.hero-contact a{color:#7ECBFF;text-decoration:none;font-weight:600}
+
+/* STAT ROW */
+.statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.sc{border-radius:var(--r);padding:0.8rem 0.9rem;position:relative;overflow:hidden}
+.sc-1{background:#003B6F}
+.sc-2{background:#E8F4FE;border:0.5px solid #B5D4F4}
+.sc-3{background:#EAF3DE;border:0.5px solid #C0DD97}
+.sc-4{background:#FAEEDA;border:0.5px solid #FAC775}
+.sc-n{font-size:22px;font-weight:600}
+.sc-l{font-size:10px;margin-top:2px;line-height:1.3}
+.sc-1 .sc-n{color:#fff}.sc-1 .sc-l{color:rgba(255,255,255,0.65)}
+.sc-2 .sc-n{color:#0C447C}.sc-2 .sc-l{color:#185FA5}
+.sc-3 .sc-n{color:#27500A}.sc-3 .sc-l{color:#3B6D11}
+.sc-4 .sc-n{color:#633806}.sc-4 .sc-l{color:#854F0B}
+
+/* TABS */
+.tabbar{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:12px;border-bottom:1.5px solid #ddd;padding-bottom:0}
+.tab{font-size:12px;padding:8px 14px;border:none;background:none;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:all .15s;border-radius:6px 6px 0 0}
+.tab:hover{color:#003B6F;background:#f0f4f8}
+.tab.on{color:#003B6F;border-bottom-color:#003B6F;font-weight:600;background:transparent}
+
+/* PANELS */
+.panel{display:none}.panel.on{display:block}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px;margin-bottom:10px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:10px}
+
+/* CARDS */
+.card{background:var(--color-background-primary);border:0.5px solid #ddd;border-radius:var(--r);padding:1rem 1.1rem}
+.card-accent-blue{border-top:3px solid #1565A8}
+.card-accent-gold{border-top:3px solid #BA7517}
+.card-accent-green{border-top:3px solid #3B6D11}
+.card-accent-coral{border-top:3px solid #993C1D}
+.card-accent-purple{border-top:3px solid #534AB7}
+.card-accent-teal{border-top:3px solid #0F6E56}
+.ch{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;padding-bottom:7px;border-bottom:0.5px solid #ddd}
+
+/* ROWS */
+.row{display:flex;padding:6px 0;border-bottom:0.5px solid #eee;gap:8px;font-size:13px;align-items:flex-start}
+.row:last-child{border-bottom:none;padding-bottom:0}
+.rl{color:#666;min-width:108px;flex-shrink:0;font-size:12px;padding-top:1px}
+.rv{color:var(--color-text-primary);font-weight:500;flex:1;line-height:1.4}
+
+/* BADGES */
+.b{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;margin:2px 2px 2px 0}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-navy{background:#E6F1FB;color:#042C53}
+.b-green{background:#EAF3DE;color:#27500A}
+.b-gold{background:#FAEEDA;color:#633806}
+.b-coral{background:#FAECE7;color:#712B13}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-teal{background:#E1F5EE;color:#085041}
+.b-gray{background:#F1EFE8;color:#444441}
+
+/* USP */
+.usp{display:flex;gap:10px;padding:7px 0;border-bottom:0.5px solid #eee;align-items:flex-start}
+.usp:last-child{border-bottom:none;padding-bottom:0}
+.usp-dot{width:6px;height:6px;border-radius:50%;background:#1565A8;flex-shrink:0;margin-top:6px}
+.usp-t{font-size:13px;color:var(--color-text-primary);line-height:1.5;flex:1}
+.usp-t b{color:#003B6F;font-weight:600}
+
+/* CALLOUTS */
+.cb{border-radius:0 var(--r) var(--r) 0;padding:9px 13px;font-size:12px;line-height:1.6;margin-bottom:8px;border-left:3px solid}
+.cb:last-child{margin-bottom:0}
+.cb-info{background:#E6F1FB;border-color:#1565A8;color:#0C447C}
+.cb-warn{background:#FAEEDA;border-color:#BA7517;color:#633806}
+.cb-ok{background:#EAF3DE;border-color:#3B6D11;color:#27500A}
+.cb-err{background:#FAECE7;border-color:#993C1D;color:#712B13}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:12px;padding:9px 0;border-bottom:0.5px solid #eee}
+.step:last-child{border-bottom:none}
+.sn{width:26px;height:26px;border-radius:50%;background:#003B6F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+.st{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.sd{font-size:12px;color:#555;margin-top:2px;line-height:1.5}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#003B6F;color:#fff;font-weight:600;padding:8px 10px;text-align:left;font-size:11px}
+td{padding:6px 10px;border-bottom:0.5px solid #eee;color:var(--color-text-primary);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9f9f9}
+
+/* PROGRAMMES */
+.pfilters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.pf{font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid #ccc;background:#fff;color:#555;cursor:pointer;transition:all .15s}
+.pf:hover,.pf.on{background:#003B6F;color:#fff;border-color:#003B6F}
+.plist{max-height:400px;overflow-y:auto;border:0.5px solid #ddd;border-radius:var(--r)}
+.prow{display:flex;align-items:center;padding:7px 12px;border-bottom:0.5px solid #eee;gap:8px}
+.prow:last-child{border-bottom:none}
+.prow:hover{background:#f9f9f9}
+.pname{flex:1;font-size:12px;color:var(--color-text-primary);line-height:1.4}
+.pdur{font-size:10px;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.d12{background:#E6F1FB;color:#0C447C}
+.d24{background:#EEEDFE;color:#3C3489}
+.d36{background:#EAF3DE;color:#27500A}
+.d48{background:#FAEEDA;color:#633806}
+.plvl{font-size:10px;padding:2px 7px;border-radius:10px;flex-shrink:0}
+.lpg{background:#E6F1FB;color:#042C53}
+.lug{background:#EAF3DE;color:#27500A}
+.lfd{background:#FAEEDA;color:#633806}
+.may-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:#FAEEDA;color:#633806;flex-shrink:0;font-weight:600}
+.srch{width:100%;padding:8px 12px;font-size:12px;border:0.5px solid #ccc;border-radius:var(--r);margin-bottom:7px;background:#fff;color:var(--color-text-primary)}
+.srch:focus{outline:none;border-color:#1565A8}
+.pcount{font-size:11px;color:#666;margin-bottom:6px}
+
+/* SECTION LABEL */
+.slabel{font-size:11px;font-weight:600;color:#fff;background:#003B6F;padding:5px 10px;border-radius:6px 6px 0 0;margin-top:10px;margin-bottom:0}
+.sblock{border:0.5px solid #ddd;border-radius:0 6px 6px 6px;padding:10px;margin-bottom:10px}
+
+/* IELTS */
+.ielts-row{display:flex;align-items:center;padding:8px 10px;border-bottom:0.5px solid #eee;gap:10px}
+.ielts-row:last-child{border-bottom:none}
+.ielts-score{font-size:22px;font-weight:600;color:#003B6F;min-width:36px;text-align:center}
+.ielts-prog{font-size:12px;color:var(--color-text-primary);flex:1;line-height:1.5}
+
+@media(max-width:600px){
+  .statrow{grid-template-columns:repeat(2,1fr)}
+  .hero-meta{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-stripe"></div>
+  <div class="hero-body">
+    <div class="hero-badge">
+      <div class="hero-badge-main">CCCU</div>
+      <div class="hero-badge-sub">Est. 1962</div>
+    </div>
+    <div class="hero-text">
+      <div class="hero-title">Canterbury Christ Church University</div>
+      <div class="hero-sub">iNUNI Agent Reference Guide &nbsp;·&nbsp; Sep 2026 &amp; Jan / May Intakes</div>
+    </div>
+    <div class="hero-meta">
+      <span class="hero-pill hp-gold">UNESCO World Heritage campus</span>
+      <span class="hero-pill hp-green">Top 10 UK grad employment</span>
+      <span class="hero-pill hp-blue">6th student satisfaction</span>
+      <div class="hero-contact">
+        Submit via GUS Gateway &nbsp;·&nbsp; Enquiries: <a href="mailto:submitCCCU@inuniglobal.com">submitCCCU@inuniglobal.com</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="statrow">
+  <div class="sc sc-1"><div class="sc-n">30,000+</div><div class="sc-l">Students across both campuses</div></div>
+  <div class="sc sc-2"><div class="sc-n">163</div><div class="sc-l">Programmes available</div></div>
+  <div class="sc sc-3"><div class="sc-n">~65%</div><div class="sc-l">Grads in skilled roles — 15 months</div></div>
+  <div class="sc sc-4"><div class="sc-n">2</div><div class="sc-l">Campuses: Canterbury &amp; Medway</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabbar">
+  <button class="tab on" onclick="go('overview',this)">Overview</button>
+  <button class="tab" onclick="go('usps',this)">USPs &amp; facts</button>
+  <button class="tab" onclick="go('programmes',this)">Programmes</button>
+  <button class="tab" onclick="go('admissions',this)">Admissions</button>
+  <button class="tab" onclick="go('docs',this)">Documents</button>
+  <button class="tab" onclick="go('english',this)">English &amp; POE</button>
+  <button class="tab" onclick="go('campus',this)">Campus &amp; life</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="panel on">
+  <div class="g2">
+    <div class="card card-accent-blue">
+      <div class="ch">University at a glance</div>
+      <div class="row"><span class="rl">Full name</span><span class="rv">Canterbury Christ Church University</span></div>
+      <div class="row"><span class="rl">Location</span><span class="rv">Kent, South East England — ~1 hr from London by high-speed train</span></div>
+      <div class="row"><span class="rl">Campuses</span><span class="rv">Canterbury (UNESCO Heritage city) &amp; Medway (Chatham Maritime)</span></div>
+      <div class="row"><span class="rl">Founded</span><span class="rv">1962 — 60+ years of impact through education &amp; research</span></div>
+      <div class="row"><span class="rl">Intakes</span><span class="rv">September (main) · January · May (selective PG only)</span></div>
+      <div class="row"><span class="rl">Submit apps</span><span class="rv">Via GUS Gateway portal</span></div>
+      <div class="row"><span class="rl">Enquiries</span><span class="rv"><a href="mailto:submitCCCU@inuniglobal.com" style="color:#1565A8">submitCCCU@inuniglobal.com</a></span></div>
+      <div class="row"><span class="rl">Website</span><span class="rv"><a href="https://www.canterbury.ac.uk" style="color:#1565A8">canterbury.ac.uk</a></span></div>
+    </div>
+    <div class="card card-accent-teal">
+      <div class="ch">Schools &amp; faculties</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
+        <span class="b b-blue">Nursing &amp; Midwifery</span>
+        <span class="b b-blue">Allied &amp; Public Health</span>
+        <span class="b b-teal">Social Work</span>
+        <span class="b b-teal">Education &amp; Teacher Training</span>
+        <span class="b b-purple">Sciences &amp; Psychology</span>
+        <span class="b b-purple">Clinical Psychology</span>
+        <span class="b b-gold">Business &amp; Law</span>
+        <span class="b b-gold">Finance &amp; Economics</span>
+        <span class="b b-coral">Computing &amp; Engineering</span>
+        <span class="b b-coral">Medical School</span>
+        <span class="b b-navy">Arts, Humanities &amp; Media</span>
+        <span class="b b-navy">Sports Science</span>
+        <span class="b b-gray">Policing &amp; Criminology</span>
+      </div>
+      <div class="cb cb-info">Canterbury sits inside a <b>UNESCO World Heritage Site</b> — one of the most distinctive campus settings in the entire UK.</div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card card-accent-blue" style="text-align:center;padding:1rem 0.8rem">
+      <div style="font-size:26px;font-weight:600;color:#003B6F">Top 10</div>
+      <div style="font-size:11px;color:#1565A8;margin-top:4px;line-height:1.4">UK for graduate employment</div>
+      <div style="font-size:10px;color:#888;margin-top:3px">HESA Graduate Outcomes 2025</div>
+    </div>
+    <div class="card card-accent-gold" style="text-align:center;padding:1rem 0.8rem">
+      <div style="font-size:26px;font-weight:600;color:#633806">6th</div>
+      <div style="font-size:11px;color:#854F0B;margin-top:4px;line-height:1.4">Student satisfaction ranking</div>
+      <div style="font-size:10px;color:#888;margin-top:3px">The Sunday Times Good University Guide</div>
+    </div>
+    <div class="card card-accent-green" style="text-align:center;padding:1rem 0.8rem">
+      <div style="font-size:26px;font-weight:600;color:#27500A">+5pts</div>
+      <div style="font-size:11px;color:#3B6D11;margin-top:4px;line-height:1.4">Above national avg — skilled roles</div>
+      <div style="font-size:10px;color:#888;margin-top:3px">Within 15 months of graduating</div>
+    </div>
+  </div>
+</div>
+
+<!-- USPS -->
+<div id="usps" class="panel">
+  <div class="g2">
+    <div class="card card-accent-blue">
+      <div class="ch">Key selling points</div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>UNESCO World Heritage campus</b> — Canterbury city centre; one of the UK's most distinctive study environments.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>Top 10 UK for graduate employment</b> — nearly two-thirds in highly skilled roles within 15 months, 5 pts above the national average (HESA 2025).</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>6th for student satisfaction</b> — rose 10+ places; scored top 5 in the National Student Survey 2024–25.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>World-class health simulation</b> — Medway campus: operating theatres, scrub rooms, wards, physiotherapy settings.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>GradFORCE programme</b> — employability built into every year of study; Unitemps in-house recruitment service for paid work.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>Multi-million-pound investment</b> — new and renovated buildings across both campuses over the last decade.</div></div>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="ch">Interesting facts to share</div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Medway library is a <b>Grade II listed building</b> believed to be the <b>longest library in Europe</b> — 2.7 miles of shelving.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Canterbury is <b>less than 1 hour from London</b> by high-speed train — easy European connections too.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Kent is known as <b>"The Garden of England"</b> — stunning coastline, beautiful countryside and charming villages.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Canterbury city is home to <b>three universities</b> — safe, vibrant, culturally rich student environment.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>First-year accommodation guaranteed</b> — 24-hr security, all bills included, unlimited gym access, no summer rent.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">60+ clubs &amp; societies: football, boxing, cheerleading, lacrosse, rugby, snowsports, trampolining and more.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">Scholarships &amp; deposits</div>
+    <div class="g2" style="margin-bottom:0">
+      <div class="cb cb-ok"><b>PG scholarship:</b> Available each year of study. Confirm exact amounts with admissions — updated each intake cycle.</div>
+      <div class="cb cb-info"><b>Deposits:</b> Required for both UG &amp; PG upon Unconditional Firm (UF) offer. Accommodation eligibility opens as soon as UF is confirmed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRAMMES -->
+<div id="programmes" class="panel">
+  <div class="cb cb-warn" style="margin-bottom:8px"><b>May 2026 intake:</b> Available for selective master's programmes only. Confirm availability per programme with admissions. Main intakes: September &amp; January.</div>
+  <div class="pfilters">
+    <button class="pf on" onclick="fp('all',this)">All (163)</button>
+    <button class="pf" onclick="fp('pg',this)">Postgraduate</button>
+    <button class="pf" onclick="fp('ug',this)">Undergraduate</button>
+    <button class="pf" onclick="fp('foundation',this)">With Foundation Year</button>
+    <button class="pf" onclick="fp('may',this)">May intake</button>
+    <button class="pf" onclick="fp('health',this)">Health &amp; Nursing</button>
+    <button class="pf" onclick="fp('business',this)">Business &amp; Law</button>
+    <button class="pf" onclick="fp('tech',this)">Tech &amp; Engineering</button>
+    <button class="pf" onclick="fp('sport',this)">Sport</button>
+  </div>
+  <input class="srch" type="text" placeholder="Search programmes..." oninput="sp(this.value)">
+  <div class="pcount" id="pcount">Showing 163 programmes</div>
+  <div class="plist" id="plist"></div>
+</div>
+
+<!-- ADMISSIONS -->
+<div id="admissions" class="panel">
+  <div class="g2">
+    <div class="card card-accent-blue">
+      <div class="ch">Application flow — agent to enrolment</div>
+      <div class="steps">
+        <div class="step"><div class="sn">1</div><div><div class="st">Agent prepares &amp; submits via GUS Gateway</div><div class="sd">Complete document file submitted through the GUS Gateway portal. For enquiries: submitCCCU@inuniglobal.com</div></div></div>
+        <div class="step"><div class="sn">2</div><div><div class="st">iNUNI validates &amp; registers (24–48 hr)</div><div class="sd">Missing documents listed; Salesforce / Power BI updated. COA issued on registration.</div></div></div>
+        <div class="step"><div class="sn">3</div><div><div class="st">iNUNI AI suitability check (24/7, no booking)</div><div class="sd">Evaluates credibility, study intent, immigration history. Red flags: prior visa rejections, unexplained gaps, conflicting employment.</div></div></div>
+        <div class="step"><div class="sn">4</div><div><div class="st">Offer reviewed by university (3 business days)</div><div class="sd">Conditional or unconditional offer issued by CCCU admissions team.</div></div></div>
+        <div class="step"><div class="sn">5</div><div><div class="st">Deposit paid &amp; pre-CAS interview (~20 min)</div><div class="sd">Focus: genuine intent, academic progress, immigration history, career goals. Prep students carefully.</div></div></div>
+        <div class="step"><div class="sn">6</div><div><div class="st">CAS issued → visa application → enrolment</div><div class="sd">CAS letter issued for visa. Student enrols upon visa approval.</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card card-accent-gold" style="margin-bottom:10px">
+        <div class="ch">SLAs &amp; key timelines</div>
+        <div class="row"><span class="rl">File registration</span><span class="rv">24–48 hours after receipt</span></div>
+        <div class="row"><span class="rl">Offer turnaround</span><span class="rv">Within 3 business days</span></div>
+        <div class="row"><span class="rl">Suitability AI</span><span class="rv">24/7, no booking required</span></div>
+        <div class="row"><span class="rl">Pre-CAS interview</span><span class="rv">~20 minutes</span></div>
+        <div class="row"><span class="rl">Accommodation</span><span class="rv">Eligible from UF offer date</span></div>
+        <div class="row"><span class="rl">Intakes</span><span class="rv">September · January · May (selective PG)</span></div>
+      </div>
+      <div class="card card-accent-coral">
+        <div class="ch">SOP requirements — agent checklist</div>
+        <div class="row"><span class="rl">AI content</span><span class="rv">Max 30% — submitted in Word for AI detection</span></div>
+        <div class="row"><span class="rl">Must name</span><span class="rv">CCCU and Canterbury specifically</span></div>
+        <div class="row"><span class="rl">Must include</span><span class="rv">Programme rationale, career goals, gap explanation</span></div>
+        <div class="row"><span class="rl">English level</span><span class="rv">SOP must match language cert proficiency</span></div>
+        <div class="row"><span class="rl">Plagiarism</span><span class="rv">Zero tolerance — screened against all other SOPs</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="cb cb-warn"><b>Interview red flags — prep students proactively:</b> previous visa rejections, unexplained study gaps, employment that conflicts with study plans, inconsistencies across SOP / CV / transcripts / interview responses.</div>
+</div>
+
+<!-- DOCUMENTS -->
+<div id="docs" class="panel">
+  <div class="g2">
+    <div class="card card-accent-teal">
+      <div class="ch">Undergraduate document checklist</div>
+      <div class="tw"><table>
+        <thead><tr><th>Document</th><th>Key requirements</th></tr></thead>
+        <tbody>
+          <tr><td><b>Application form</b></td><td>Correct intake, full name, DOB, address, nationality, email, phone, course. Declaration signed &amp; dated.</td></tr>
+          <tr><td><b>Valid passport</b></td><td>Clear scanned copy of ID page only.</td></tr>
+          <tr><td><b>Academic transcripts</b></td><td>SSC &amp; HSC transcripts AND certificates. Must be in English, clear scanned copies.</td></tr>
+          <tr><td><b>Proof of English</b></td><td>Valid for 2 years. Exemptions may apply — see English &amp; POE tab.</td></tr>
+          <tr><td><b>LOR</b></td><td>Academic or work referee. On letterhead, signed, dated, non-editable. Max 5 years old.</td></tr>
+          <tr><td><b>Statement of Purpose</b></td><td>Word format. Personalised. Max 30% AI. Must name CCCU &amp; Canterbury.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card card-accent-purple">
+      <div class="ch">Postgraduate document checklist</div>
+      <div class="tw"><table>
+        <thead><tr><th>Document</th><th>Key requirements</th></tr></thead>
+        <tbody>
+          <tr><td><b>Application form</b></td><td>Same as UG — all personal details, correct course &amp; intake, declaration signed.</td></tr>
+          <tr><td><b>Valid passport</b></td><td>Clear scanned copy of ID page only.</td></tr>
+          <tr><td><b>Bachelor's transcripts &amp; cert</b></td><td>UK-equivalent degree. Final transcripts showing overall CGPA &amp; completion date. Provisional only accepted with finals (not Nigeria / Bangladesh).</td></tr>
+          <tr><td><b>Proof of English</b></td><td>Valid for 2 years. Exemptions may apply — see English &amp; POE tab.</td></tr>
+          <tr><td><b>LOR</b></td><td>Same as UG — letterhead, signed, dated, non-editable format.</td></tr>
+          <tr><td><b>Statement of Purpose</b></td><td>Word format. CCCU &amp; Canterbury named. Programme rationale &amp; career goals.</td></tr>
+          <tr><td><b>CV</b></td><td>No older than 6 months. Full academic &amp; professional history included.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="cb cb-err"><b>Not accepted at PG level:</b> course completion certificates and online result statements. Final transcripts with CGPA and completion date are mandatory.</div>
+</div>
+
+<!-- ENGLISH & POE -->
+<div id="english" class="panel">
+  <div class="g2">
+    <div class="card card-accent-blue">
+      <div class="ch">Standard IELTS requirements</div>
+      <div class="ielts-row"><div class="ielts-score">6.0</div><div class="ielts-prog"><b>UG (standard)</b> — overall, no individual band requirement specified</div></div>
+      <div class="ielts-row"><div class="ielts-score">6.0</div><div class="ielts-prog"><b>PG (standard)</b> — overall, for most taught master's programmes</div></div>
+      <div style="margin-top:10px" class="cb cb-info">All English tests are valid for <b>2 years</b> from the test date. IELTS and IELTS Indicator are both accepted.</div>
+    </div>
+    <div class="card card-accent-coral">
+      <div class="ch">Higher IELTS — specialist programmes</div>
+      <div class="ielts-row"><div class="ielts-score" style="font-size:17px;color:#993C1D">6.5</div><div class="ielts-prog">No element below 6.0 — MA Creative &amp; Critical Writing · MA Modern History · MA Medieval &amp; Early Modern Studies · MA TESOL · MA Social Work · MSc Nursing (Adult/Child/MH) · MSc Psychology · PGCE Primary &amp; Secondary · MPhil/PhD programmes · MA American Studies · MA English Literature (by Research) · MA Theology &amp; Religious Studies</div></div>
+      <div class="ielts-row"><div class="ielts-score" style="font-size:17px;color:#993C1D">7.0</div><div class="ielts-prog">Writing 7.0+, all other bands 6.5+ — MSc Forensic &amp; Investigative Psychology · MSc Foundation in Clinical Psychology</div></div>
+      <div class="ielts-row"><div class="ielts-score" style="font-size:17px;color:#993C1D">7.5</div><div class="ielts-prog">No element below 7.0 — MCh Surgery <span style="color:#888">(or OET medical, all grades B+)</span></div></div>
+      <div class="ielts-row"><div class="ielts-score" style="font-size:17px;color:#993C1D">7.5</div><div class="ielts-prog">No element below 7.5 — Doctorate in Clinical Psychology</div></div>
+      <div class="ielts-row" style="border-bottom:none"><div class="ielts-score" style="font-size:17px;color:#993C1D">8.0</div><div class="ielts-prog">No element below 7.5 — MSc Speech &amp; Language Therapy</div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="ch">POE exemptions — full conditions by market</div>
+    <div class="g2" style="margin-bottom:0">
+      <div>
+        <div class="slabel">India</div>
+        <div class="sblock">
+          <div class="tw"><table>
+            <thead><tr><th>Board</th><th>UG condition</th><th>PG condition</th></tr></thead>
+            <tbody>
+              <tr><td>CBSE &amp; ICSE</td><td>65% in Std XII English</td><td>Same as UG</td></tr>
+              <tr><td>Maharashtra, West Bengal, Tamil Nadu, Kerala, Karnataka</td><td>70% in Std XII English</td><td>Same as UG</td></tr>
+              <tr><td>Other state boards (Telangana, Haryana, Punjab, UP…)</td><td colspan="2" style="color:#A32D2D;font-weight:600">IELTS required — no exemption</td></tr>
+            </tbody>
+          </table></div>
+          <div class="cb cb-info" style="margin-top:8px;margin-bottom:0">Evidence required: mark sheet clearly showing English subject score. Exemption applies to both UG &amp; PG.</div>
+        </div>
+        <div class="slabel">Africa</div>
+        <div class="sblock">
+          <div style="font-size:11px;color:#666;margin-bottom:6px">Nigeria · Ghana · South Africa · Kenya · Uganda · Zimbabwe</div>
+          <div class="tw"><table>
+            <thead><tr><th>Level</th><th>Condition</th></tr></thead>
+            <tbody>
+              <tr><td>UG</td><td>Grades A1–C6 (1–6) in English — Senior School Certificate / WAEC</td></tr>
+              <tr><td>PG</td><td>MOI (Medium of Instruction) letter if bachelor's taught in English medium</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+      <div>
+        <div class="slabel">Universal exemptions (all markets)</div>
+        <div class="sblock">
+          <div class="cb cb-ok" style="margin-bottom:8px">Applicants who completed a bachelor's <b>or</b> master's degree in an <b>English-speaking country</b> are fully exempt from POE for PG applications.</div>
+          <div class="cb cb-ok" style="margin-bottom:8px">Applicants whose bachelor's degree was <b>taught entirely in English medium</b> may submit a Medium of Instruction (MOI) letter in lieu of IELTS (PG only).</div>
+          <div class="cb cb-ok" style="margin-bottom:0">Applicants who completed their degree in an English-speaking country are also exempt, regardless of where the institution is based.</div>
+        </div>
+        <div class="slabel">Agent reminders</div>
+        <div class="sblock" style="padding:0">
+          <div class="cb cb-warn" style="margin-bottom:0;border-radius:0 0 6px 6px">Always verify the exemption evidence is present in the file before submission — missing mark sheet percentage, unsigned MOI letter, or incorrect WAEC grade will delay the application. Do not assume; always check.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CAMPUS & LIFE -->
+<div id="campus" class="panel">
+  <div class="g2">
+    <div class="card card-accent-blue">
+      <div class="ch">Canterbury campus</div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Inside a <b>UNESCO World Heritage Site</b> — new buildings connect a historic city with a progressive vision.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Music venue, superb sports centre, well-stocked bookshop, coffee bars &amp; social spaces.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">~1 hour from London by train; three universities in the city — safe, lively, culturally diverse.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Kent — "The Garden of England" — beautiful coastline, countryside and charming villages on your doorstep.</div></div>
+    </div>
+    <div class="card card-accent-teal">
+      <div class="ch">Medway campus (Chatham Maritime)</div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Realistic hospital environment: <b>operating theatre, scrub room, wards, physio settings</b> — ideal for health students.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t"><b>Longest library in Europe</b> (Grade II listed) — 2.7 miles of shelving inside a stunning historic building.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">The Hub: live music, cinema, sports viewing, quiet study areas — social and academic in one space.</div></div>
+      <div class="usp"><div class="usp-dot"></div><div class="usp-t">Nearby multiplex, shopping centre, gym; close to Rochester Cathedral.</div></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card card-accent-green">
+      <div class="ch">Accommodation</div>
+      <div class="cb cb-ok"><b>Guaranteed first year</b> — allocated in date order once Unconditional Firm offer is confirmed.</div>
+      <div class="row"><span class="rl">Security</span><span class="rv">24-hour on-site security</span></div>
+      <div class="row"><span class="rl">Bills</span><span class="rv">All bills included — no hidden costs</span></div>
+      <div class="row"><span class="rl">Gym</span><span class="rv">Unlimited gym membership included</span></div>
+      <div class="row"><span class="rl">Summer rent</span><span class="rv">Not charged during vacation periods</span></div>
+      <div class="row"><span class="rl">How to apply</span><span class="rv">Online via accommodation portal — choose room type &amp; budget</span></div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">
+        <span class="b b-teal">Petros Court</span>
+        <span class="b b-teal">St George's Centre</span>
+        <span class="b b-teal">Pin Hill</span>
+        <span class="b b-teal">Lanfranc House</span>
+        <span class="b b-teal">University House</span>
+      </div>
+    </div>
+    <div class="card card-accent-gold">
+      <div class="ch">Employability &amp; student life</div>
+      <div class="row"><span class="rl">GradFORCE</span><span class="rv">Employability embedded from day 1 to graduation</span></div>
+      <div class="row"><span class="rl">Careers service</span><span class="rv">Dedicated Careers &amp; Enterprise support throughout</span></div>
+      <div class="row"><span class="rl">Unitemps</span><span class="rv">In-house recruitment for part-time student work</span></div>
+      <div class="row"><span class="rl">Ambassadors</span><span class="rv">Paid Student Ambassador roles on campus</span></div>
+      <div style="margin-top:10px"><div class="ch">Sports clubs &amp; societies</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+          <span class="b b-green">Football &amp; American Football</span>
+          <span class="b b-green">Basketball</span>
+          <span class="b b-green">Boxing</span>
+          <span class="b b-green">Cheerleading</span>
+          <span class="b b-green">Lacrosse</span>
+          <span class="b b-green">Rugby</span>
+          <span class="b b-green">Snowsports</span>
+          <span class="b b-green">Trampolining</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const P=[
+  {n:"International Foundation Programme",l:"foundation",d:12,m:false,c:[]},
+  {n:"MSc International Tourism & Hospitality Management",l:"pg",d:12,m:true,c:["business"]},
+  {n:"MSc International Business Management",l:"pg",d:12,m:true,c:["business"]},
+  {n:"MA Education",l:"pg",d:12,m:false,c:[]},
+  {n:"MBA International",l:"pg",d:12,m:true,c:["business"]},
+  {n:"MSc Speech and Language Therapy",l:"pg",d:24,m:false,c:["health"]},
+  {n:"MA Filmmaking",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Applied Clinical Psychology",l:"pg",d:12,m:false,c:["health"]},
+  {n:"MSc Nursing Adult",l:"pg",d:24,m:false,c:["health"]},
+  {n:"MSc Nursing Child",l:"pg",d:24,m:false,c:["health"]},
+  {n:"MA Heritage",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Mental Health Nursing",l:"pg",d:24,m:false,c:["health"]},
+  {n:"MSc Criminology and Criminal Psychology",l:"pg",d:12,m:false,c:[]},
+  {n:"PGCE Secondary Education (QTS)",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Data Intelligence",l:"pg",d:12,m:true,c:["tech"]},
+  {n:"MSc Psychology",l:"pg",d:12,m:false,c:["health"]},
+  {n:"MA Early Years Education",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Strength & Conditioning",l:"pg",d:12,m:false,c:["sport"]},
+  {n:"MA Applied Linguistics",l:"pg",d:12,m:false,c:[]},
+  {n:"MA Social Work",l:"pg",d:24,m:false,c:["health"]},
+  {n:"MA Media & Communications",l:"pg",d:12,m:false,c:[]},
+  {n:"MA Games Design",l:"pg",d:12,m:false,c:["tech"]},
+  {n:"MSc Applied Physical Activity & Health",l:"pg",d:12,m:false,c:["sport","health"]},
+  {n:"MA History",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Forensic and Investigative Psychology",l:"pg",d:12,m:false,c:["health"]},
+  {n:"LLM International Law",l:"pg",d:12,m:false,c:["business"]},
+  {n:"MSc International Events Management",l:"pg",d:12,m:false,c:["business"]},
+  {n:"MA Teaching English to Speakers of Other Languages (TESOL)",l:"pg",d:12,m:false,c:[]},
+  {n:"MMus Master of Music",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Cybersecurity",l:"pg",d:12,m:true,c:["tech"]},
+  {n:"MSc Policing & Security Transformation",l:"pg",d:24,m:false,c:[]},
+  {n:"MSc Advanced Manufacturing Systems and Technology",l:"pg",d:12,m:false,c:["tech"]},
+  {n:"MA Practical Theology",l:"pg",d:12,m:false,c:[]},
+  {n:"MSc Global Public Health",l:"pg",d:12,m:true,c:["health"]},
+  {n:"MSc Global Security",l:"pg",d:12,m:false,c:[]},
+  {n:"MA Graphic Design",l:"pg",d:12,m:false,c:[]},
+  {n:"MA Photography",l:"pg",d:12,m:false,c:[]},
+  {n:"PGCE Primary Education (QTS)",l:"pg",d:12,m:false,c:[]},
+  {n:"BSc (Hons) International Tourism & Hospitality Management",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Psychology (Sport & Exercise Studies)",l:"ug",d:36,m:false,c:["sport","health"]},
+  {n:"BA (Hons) Events Management",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BA (Hons) Early Childhood Studies",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) Media Production",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Sport & Exercise Science",l:"ug",d:36,m:false,c:["sport"]},
+  {n:"BSc (Hons) Sport Management",l:"ug",d:36,m:false,c:["sport","business"]},
+  {n:"BA (Hons) Theatre and Performance",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Nursing (Child)",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Nursing (Mental Health)",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BA (Hons) Music Production",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) Archaeology with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Archaeology",l:"ug",d:36,m:false,c:[]},
+  {n:"BEng Biomedical Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech","health"]},
+  {n:"BSc (Hons) Criminal Investigation",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Diagnostic Radiography",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Occupational Therapy",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BA (Hons) Marketing",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Physiotherapy",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Paramedic Science",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BA (Hons) Primary Education (QTS)",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Operating Department Practice",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Physical Education and Sport & Exercise Science with Foundation Year",l:"foundation",d:48,m:false,c:["sport"]},
+  {n:"BSc (Hons) Sports Therapy & Rehabilitation",l:"ug",d:36,m:false,c:["sport","health"]},
+  {n:"BSc (Hons) Nursing (Adult)",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Geography",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) Popular Music",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Biochemistry",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) History with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Forensic Investigation",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Forensic Investigation with Criminal Investigation",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Countering Terrorism and Extremism",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Applied Criminology with Criminal Investigation",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Finance & Investment",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Finance & Investment with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BEng Architectural Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Accounting and Finance with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BSc (Hons) Accounting and Finance",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Business Management",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BA (Hons) Graphic Design with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Graphic Design",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Human Resource Management",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Psychology with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) Psychology",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Applied Criminology with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"LL.B Law (Hons) with Criminology",l:"ug",d:36,m:false,c:["business"]},
+  {n:"LL.B. Law (Hons) with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"LL.B. Law (Hons)",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BEng Mechanical Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BEng Mechanical Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BA (Hons) Marketing with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BA (Hons) Creative Writing with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Creative Writing",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) History",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Human Resource Management with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BA (Hons) Photography with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Photography",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Computer Science",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Public Health",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BA (Hons) Film Production with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Film Production",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) Games Design",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Animal Science with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Animal Science",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Applied Criminology",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Applied Criminology with Forensic Investigation",l:"ug",d:36,m:false,c:[]},
+  {n:"BEng Biomedical Engineering",l:"ug",d:36,m:false,c:["tech","health"]},
+  {n:"BSc (Hons) Biomedical Science with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) Biomedical Science",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Business Information Technology with Foundation Year",l:"foundation",d:48,m:false,c:["business","tech"]},
+  {n:"BEng Chemical Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BEng Chemical Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) CyberSecurity & Computer Forensics with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) CyberSecurity & Computer Forensics",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Wildlife Ecology & Conservation Science",l:"ug",d:36,m:false,c:[]},
+  {n:"BA (Hons) Education Studies",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Human Biology with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) Human Biology",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Politics and International Relations",l:"ug",d:36,m:false,c:[]},
+  {n:"BEng (Hons) Software Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BEng (Hons) Software Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Physical Education and Sport and Exercise Science",l:"ug",d:36,m:false,c:["sport"]},
+  {n:"BEng Product Design Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BEng Product Design Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Professional Policing",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Sport Coaching and Development with Foundation Year",l:"foundation",d:48,m:false,c:["sport"]},
+  {n:"BSc (Hons) Sport Coaching and Development",l:"ug",d:36,m:false,c:["sport"]},
+  {n:"BA (Hons) Theology, Philosophy & Religion with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Psychology (Clinical & Forensic Studies)",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Sports Therapy and Rehabilitation with Foundation Year",l:"foundation",d:48,m:false,c:["sport","health"]},
+  {n:"BEng (Hons) General Engineering",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BSc (Hons) Applied Criminology and Forensic Investigation with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Public Health with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) International Tourism & Hospitality Management with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BSc (Hons) Business Economics",l:"ug",d:36,m:false,c:["business"]},
+  {n:"BSc (Hons) Business Management with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BEng General Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) Psychology (Clinical & Forensic Studies) with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) Applied Criminology with Criminal Investigation with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"LL.B Law (Hons) with Criminology with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BSc (Hons) Psychology (Sport & Exercise Studies) with Foundation Year",l:"foundation",d:48,m:false,c:["sport","health"]},
+  {n:"BSc (Hons) Forensic Investigation with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Computer Science with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) Sport Management with Foundation Year",l:"foundation",d:48,m:false,c:["sport","business"]},
+  {n:"BA (Hons) Events Management with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BSc (Hons) Criminal Investigation with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Wildlife Ecology and Conservation Science with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Professional Policing with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Sport & Exercise Science with Foundation Year",l:"foundation",d:48,m:false,c:["sport"]},
+  {n:"BSc (Hons) Geography with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BEng Building Services Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) Countering Terrorism and Extremism with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Forensic Investigation with Criminal Investigation with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BA (Hons) Social Work with Foundation Year",l:"foundation",d:48,m:false,c:["health"]},
+  {n:"BSc (Hons) Business Economics with Foundation Year",l:"foundation",d:48,m:false,c:["business"]},
+  {n:"BEng Architectural Engineering with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) Computer Science & Artificial Intelligence",l:"ug",d:36,m:false,c:["tech"]},
+  {n:"BA (Hons) Theology, Philosophy & Religion",l:"ug",d:36,m:false,c:[]},
+  {n:"BSc (Hons) Business Information Technology",l:"ug",d:36,m:false,c:["business","tech"]},
+  {n:"BSc (Hons) Biochemistry with Foundation Year",l:"foundation",d:48,m:false,c:[]},
+  {n:"BSc (Hons) Computer Science & Artificial Intelligence with Foundation Year",l:"foundation",d:48,m:false,c:["tech"]},
+  {n:"BSc (Hons) Criminology with Psychology",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Midwifery",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Psychology with Education Studies",l:"ug",d:36,m:false,c:["health"]},
+  {n:"BSc (Hons) Psychology with Education Studies with Foundation Year",l:"foundation",d:36,m:false,c:["health"]}
+];
+
+let af='all',st='';
+function dc(d){return d===12?'d12':d===24?'d24':d===36?'d36':'d48'}
+function ll(l){return l==='pg'?'<span class="plvl lpg">PG</span>':l==='foundation'?'<span class="plvl lfd">Foundation</span>':'<span class="plvl lug">UG</span>'}
+function render(){
+  const list=document.getElementById('plist');
+  const cnt=document.getElementById('pcount');
+  let f=P.filter(p=>{
+    const ms=!st||p.n.toLowerCase().includes(st.toLowerCase());
+    let mf=true;
+    if(af==='pg')mf=p.l==='pg';
+    else if(af==='ug')mf=p.l==='ug';
+    else if(af==='foundation')mf=p.l==='foundation';
+    else if(af==='may')mf=p.m;
+    else if(af==='health')mf=p.c.includes('health');
+    else if(af==='business')mf=p.c.includes('business');
+    else if(af==='tech')mf=p.c.includes('tech');
+    else if(af==='sport')mf=p.c.includes('sport');
+    return ms&&mf;
+  });
+  cnt.textContent=`Showing ${f.length} programme${f.length!==1?'s':''}`;
+  list.innerHTML=f.map(p=>`<div class="prow">${p.m?'<span class="may-tag">May</span>':''}${ll(p.l)}<div class="pname">${p.n}</div><span class="pdur ${dc(p.d)}">${p.d} mo</span></div>`).join('');
+}
+function fp(f,btn){af=f;document.querySelectorAll('.pf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');render()}
+function sp(v){st=v;render()}
+function go(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='programmes')render();
+}
+render();
+</script>
+</div>
+</body>
+</html>
