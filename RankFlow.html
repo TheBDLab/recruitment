@@ -324,9 +324,8 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
       </div>
       <div>
         <div class="sb-ttl">Scoring</div>
-        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--cyan)"></div>Shot on target</div><div class="sl-pts">+1 pt</div></div>
-        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--maple)"></div>Goal scored</div><div class="sl-pts">+2 pts</div></div>
-        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Min 2 shots</div><div class="sl-pts">Entry</div></div>
+        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Goal scored</div><div class="sl-pts">+1 pt</div></div>
+
       </div>
       <!-- CANADA SPOTLIGHT BIG SCREEN -->
       <div class="bigscreen" id="bigscreen">
@@ -392,8 +391,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
             <div class="hero-stats">
               <div class="hstat"><div class="hstat-n" id="h-players" style="color:var(--red2)">0</div><div class="hstat-l">Players</div></div>
               <div class="hstat"><div class="hstat-n" id="h-nations" style="color:var(--cyan)">0</div><div class="hstat-l">Nations</div></div>
-              <div class="hstat"><div class="hstat-n" id="h-shots" style="color:var(--cyan)">0</div><div class="hstat-l">Shots</div></div>
-              <div class="hstat"><div class="hstat-n" id="h-goals" style="color:var(--maple)">0</div><div class="hstat-l">Goals</div></div>
+              <div class="hstat"><div class="hstat-n" id="h-goals" style="color:var(--gold)">0</div><div class="hstat-l">Goals</div></div>
               <div class="hstat"><div class="hstat-n" id="h-pts" style="color:var(--gold)">0</div><div class="hstat-l">Total Pts</div></div>
             </div>
             <div class="hero-prize-badge">
@@ -421,7 +419,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
         <table class="tbl">
           <thead><tr>
             <th>#</th><th></th><th style="text-align:left">Player</th>
-            <th>Shots</th><th>Goals</th><th>Pts</th><th>Form</th>
+            <th>Goals</th><th>Pts</th><th>Form</th>
           </tr></thead>
           <tbody id="tbl-body"></tbody>
         </table>
@@ -486,230 +484,175 @@ var players=[];
 function loadPlayers(){try{var d=localStorage.getItem(SK);if(d)players=JSON.parse(d);}catch(e){players=[];}}
 function savePlayers(){try{localStorage.setItem(SK,JSON.stringify(players));}catch(e){}}
 
-// ── AUDIO: BRAZIL 2014 FIFA WORLD CUP ANTHEM STYLE ──
+// ── AUDIO: OLÉ OLÉ OLÉ — Football crowd anthem ──
 var audioCtx=null,musicPlaying=false,loopTimer=null;
 function createAnthem(ctx){
-  var sr=ctx.sampleRate,now=ctx.currentTime;
-  var totalDur=32.0;
+  var sr=ctx.sampleRate, now=ctx.currentTime;
+  var totalDur=28.0;
 
-  // ── Signal chain ──
   var master=ctx.createGain();
   master.gain.setValueAtTime(0,now);
-  master.gain.linearRampToValueAtTime(0.42,now+3.0);
-  master.gain.setValueAtTime(0.42,now+totalDur-2.5);
+  master.gain.linearRampToValueAtTime(0.44,now+2.0);
+  master.gain.setValueAtTime(0.44,now+totalDur-2.5);
   master.gain.linearRampToValueAtTime(0,now+totalDur);
   master.connect(ctx.destination);
 
   var comp=ctx.createDynamicsCompressor();
-  comp.threshold.value=-14;comp.knee.value=6;comp.ratio.value=3;comp.attack.value=0.003;comp.release.value=0.18;
+  comp.threshold.value=-12;comp.knee.value=8;comp.ratio.value=4;comp.attack.value=0.002;comp.release.value=0.15;
   comp.connect(master);
 
-  // Stadium reverb — long, warm
-  var revBuf=ctx.createBuffer(2,sr*4,sr);
-  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.4);}
-  var rev=ctx.createConvolver();rev.buffer=revBuf;
-  var revGain=ctx.createGain();revGain.gain.value=0.55;
-  rev.connect(revGain);revGain.connect(master);
+  // Stadium reverb
+  var revBuf=ctx.createBuffer(2,sr*3.5,sr);
+  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.6);}
+  var rev=ctx.createConvolver(); rev.buffer=revBuf;
+  var revG=ctx.createGain(); revG.gain.value=0.5; rev.connect(revG); revG.connect(master);
 
-  // Short room reverb for percussion
-  var roomBuf=ctx.createBuffer(2,sr*0.6,sr);
-  for(var ch=0;ch<2;ch++){var rd=roomBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,3);}
-  var room=ctx.createConvolver();room.buffer=roomBuf;
-  var roomGain=ctx.createGain();roomGain.gain.value=0.3;
-  room.connect(roomGain);roomGain.connect(master);
+  // Crowd roar — warm band-limited noise swell
+  function crowdSwell(t,dur,vol){
+    var buf=ctx.createBuffer(1,Math.floor(sr*dur),sr);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    var src=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+    f.type='bandpass';f.frequency.value=700;f.Q.value=0.4;
+    src.buffer=buf;src.connect(f);f.connect(g);g.connect(master);
+    g.gain.setValueAtTime(0,now+t);
+    g.gain.linearRampToValueAtTime(vol,now+t+0.6);
+    g.gain.setValueAtTime(vol,now+t+dur-0.8);
+    g.gain.linearRampToValueAtTime(0,now+t+dur);
+    src.start(now+t);
+  }
 
-  // ── Helpers ──
-  function brass(freq,st,dur,vol){
-    // Layered sawtooth + square for warm brass timbre
+  // Brass stab for accent
+  function brass(freq,t,dur,vol){
     [1,2,3].forEach(function(h){
       var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
       o.type='sawtooth';o.frequency.value=freq*h;
-      f.type='lowpass';f.frequency.value=freq*h<2000?3200:1800;f.Q.value=0.5;
-      var v=vol/(h*1.4);
-      g.gain.setValueAtTime(0,now+st);
-      g.gain.linearRampToValueAtTime(v,now+st+0.04);
-      g.gain.setValueAtTime(v*0.85,now+st+dur*0.6);
-      g.gain.linearRampToValueAtTime(0,now+st+dur);
+      f.type='lowpass';f.frequency.value=Math.min(freq*h*2.5,4000);
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime((vol/(h*1.5)),now+t+0.03);
+      g.gain.setValueAtTime(vol/(h*1.5)*0.8,now+t+dur-0.05);
+      g.gain.linearRampToValueAtTime(0,now+t+dur);
       o.connect(f);f.connect(g);g.connect(rev);g.connect(comp);
-      o.start(now+st);o.stop(now+st+dur+0.1);
+      o.start(now+t);o.stop(now+t+dur+0.06);
     });
   }
 
-  function strings(freq,st,dur,vol){
-    // Soft triangle + detuned pair for string-like pad
-    [-4,0,4].forEach(function(det){
-      var o=ctx.createOscillator(),g=ctx.createGain();
-      o.type='triangle';o.frequency.value=freq*(1+det*0.0005);
-      g.gain.setValueAtTime(0,now+st);
-      g.gain.linearRampToValueAtTime(vol,now+st+0.18);
-      g.gain.setValueAtTime(vol*0.9,now+st+dur-0.2);
-      g.gain.linearRampToValueAtTime(0,now+st+dur);
-      o.connect(g);g.connect(rev);
-      o.start(now+st);o.stop(now+st+dur+0.1);
-    });
-  }
-
-  function choir(freq,st,dur,vol){
-    // Sine cluster simulating vocal "aah" choir pad
-    [1,1.005,0.995,2,0.5].forEach(function(r,i){
+  // Choir "OLÉ" — sung note cluster
+  function ole(fund,t,dur,vol){
+    var ratios=[1,1.004,0.996,2,0.5];
+    ratios.forEach(function(r,i){
       var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-      o.type=i<3?'sine':'triangle';o.frequency.value=freq*r;
-      f.type='bandpass';f.frequency.value=freq*r*1.2;f.Q.value=1.8;
-      var v=i<3?vol*0.18:vol*0.06;
-      g.gain.setValueAtTime(0,now+st);
-      g.gain.linearRampToValueAtTime(v,now+st+0.35);
-      g.gain.setValueAtTime(v,now+st+dur-0.4);
-      g.gain.linearRampToValueAtTime(0,now+st+dur);
+      o.type=(i<3)?'sine':'triangle';
+      o.frequency.value=fund*r;
+      f.type='bandpass';f.frequency.value=fund*r*1.5;f.Q.value=2.5;
+      var v=(i<3)?(vol*0.22):(vol*0.08);
+      g.gain.setValueAtTime(0,now+t);
+      g.gain.linearRampToValueAtTime(v,now+t+0.08);
+      g.gain.setValueAtTime(v*0.9,now+t+dur-0.1);
+      g.gain.linearRampToValueAtTime(0,now+t+dur);
       o.connect(f);f.connect(g);g.connect(rev);
-      o.start(now+st);o.stop(now+st+dur+0.1);
+      o.start(now+t);o.stop(now+t+dur+0.08);
     });
   }
 
-  function bass(freq,st,dur,vol){
-    var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-    o.type='sawtooth';o.frequency.value=freq;
-    f.type='lowpass';f.frequency.value=280;f.Q.value=0.7;
-    g.gain.setValueAtTime(0,now+st);
-    g.gain.linearRampToValueAtTime(vol,now+st+0.03);
-    g.gain.setValueAtTime(vol*0.7,now+st+dur-0.05);
-    g.gain.linearRampToValueAtTime(0,now+st+dur);
-    o.connect(f);f.connect(g);g.connect(comp);
-    o.start(now+st);o.stop(now+st+dur+0.05);
-  }
-
-  function kick(t){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.frequency.setValueAtTime(180,now+t);
-    o.frequency.exponentialRampToValueAtTime(42,now+t+0.18);
-    g.gain.setValueAtTime(0.7,now+t);
-    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.22);
-    o.connect(g);g.connect(comp);g.connect(room);
-    o.start(now+t);o.stop(now+t+0.3);
-  }
-
-  function snare(t){
-    var buf=ctx.createBuffer(1,Math.floor(sr*0.15),sr);
-    var d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-    var src=ctx.createBufferSource(),g=ctx.createGain();
-    var bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2200;bp.Q.value=0.6;
-    src.buffer=buf;src.connect(bp);bp.connect(g);
-    g.gain.setValueAtTime(0.28,now+t);
-    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.15);
-    g.connect(comp);g.connect(room);src.start(now+t);
-  }
-
-  function timbal(t,v){
-    // Brazilian samba timbal drum hit
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.frequency.setValueAtTime(320,now+t);
-    o.frequency.exponentialRampToValueAtTime(180,now+t+0.06);
-    g.gain.setValueAtTime(v||0.35,now+t);
-    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.12);
-    o.connect(g);g.connect(comp);g.connect(room);
-    o.start(now+t);o.stop(now+t+0.18);
-  }
-
-  function clave(t){
-    // High woodblock click — iconic samba clave
-    var buf=ctx.createBuffer(1,Math.floor(sr*0.05),sr);
+  // Hand-clap
+  function clap(t){
+    var buf=ctx.createBuffer(1,Math.floor(sr*0.1),sr);
     var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,4);
+    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
     var src=ctx.createBufferSource(),g=ctx.createGain(),hp=ctx.createBiquadFilter();
-    hp.type='highpass';hp.frequency.value=4000;
-    src.buffer=buf;src.connect(hp);hp.connect(g);
-    g.gain.setValueAtTime(0.18,now+t);
-    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.05);
-    g.connect(comp);src.start(now+t);
+    hp.type='highpass';hp.frequency.value=1200;
+    src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(comp);g.connect(rev);
+    g.gain.setValueAtTime(0.35,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.1);
+    src.start(now+t);
   }
 
-  // ── SECTION A: Intro fanfare — iconic 5-note brass call (0–4s) ──
-  // The famous "dun-dun-dun-dun-DUUUN" opening
-  var T=0; // tempo: crotchet = 0.5s (120bpm)
-  brass(392,T+0.0,0.22,0.32);   // G
-  brass(392,T+0.25,0.22,0.32);  // G
-  brass(523.25,T+0.5,0.22,0.36);// C5
-  brass(392,T+0.75,0.22,0.32);  // G
-  brass(659.25,T+1.1,1.1,0.42); // E5 — the long note
-  brass(587.33,T+2.3,0.22,0.32);// D5
-  brass(523.25,T+2.6,0.22,0.32);// C5
-  brass(392,T+2.9,1.1,0.38);    // G — settle
-
-  // Choir swells under the fanfare
-  choir(261.63,T+0.0,4.0,0.5);  // C chord
-  choir(329.63,T+0.0,4.0,0.4);
-  choir(392,T+0.0,4.0,0.4);
-
-  // ── SECTION B: Main theme — soaring melody (4–12s) ──
-  T=4.0;
-  // Melody — the uplifting phrase
-  var mel2=[
-    [523.25,0,0.45],[659.25,0.5,0.45],[783.99,1.0,0.45],[880,1.5,0.9],
-    [783.99,2.5,0.45],[659.25,3.0,0.45],[783.99,3.5,0.9],
-    [659.25,4.5,0.45],[587.33,5.0,0.45],[523.25,5.5,0.45],[587.33,6.0,0.45],[659.25,6.5,0.9],
-    [523.25,7.5,0.45]
-  ];
-  mel2.forEach(function(n){brass(n[0],T+n[1],n[2],0.28);});
-  mel2.forEach(function(n){strings(n[0]*0.5,T+n[1],n[2]+0.1,0.14);});
-
-  // Choir pads — warm harmonic bed
-  choir(261.63,T+0,2.0,0.55);choir(329.63,T+0,2.0,0.45);choir(392,T+0,2.0,0.45);
-  choir(349.23,T+2,2.0,0.5);choir(440,T+2,2.0,0.42);choir(523.25,T+2,2.0,0.38);
-  choir(261.63,T+4,2.0,0.55);choir(329.63,T+4,2.0,0.45);choir(523.25,T+4,2.0,0.4);
-  choir(220,T+6,2.0,0.5);choir(277.18,T+6,2.0,0.42);choir(329.63,T+6,2.0,0.42);
-
-  // Bass line
-  bass(65.41,T+0,1.9,0.42);bass(87.31,T+2,1.9,0.42);bass(65.41,T+4,1.9,0.42);bass(55,T+6,1.9,0.42);
-
-  // ── SECTION C: Brazilian samba percussion kicks in (8s+) ──
-  T=8.0;
-  for(var b=0;b<24;b+=1){
-    kick(T+b*0.5);
-    if(b%2===1) snare(T+b*0.5+0.25);
-    timbal(T+b*0.5+0.12,0.22);
-    clave(T+b*0.5);
-    clave(T+b*0.5+0.32);
+  // Kick drum
+  function kick(t,vol){
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.setValueAtTime(200,now+t);o.frequency.exponentialRampToValueAtTime(45,now+t+0.15);
+    g.gain.setValueAtTime(vol||0.65,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.2);
+    o.connect(g);g.connect(comp);o.start(now+t);o.stop(now+t+0.28);
   }
 
-  // ── SECTION D: Climax — full ensemble (12–24s) ──
-  T=12.0;
-  var climax=[
-    [523.25,0,0.45],[659.25,0.5,0.45],[880,1.0,0.45],[1046.5,1.5,0.9],
-    [880,2.5,0.45],[783.99,3.0,0.45],[880,3.5,0.9],
-    [1046.5,4.5,0.45],[987.77,5.0,0.45],[880,5.5,0.45],[783.99,6.0,0.45],[659.25,6.5,0.9],
-    [783.99,7.5,0.45],[880,8.0,0.45],[1046.5,8.5,0.45],[1318.5,9.0,1.5]
-  ];
-  climax.forEach(function(n){brass(n[0],T+n[1],n[2],0.34);});
-  climax.forEach(function(n){strings(n[0]*0.5,T+n[1],n[2]+0.15,0.18);});
-  climax.forEach(function(n){choir(n[0]*0.25,T+n[1],n[2]+0.2,0.55);});
+  // ── OLÉ OLÉ OLÉ melody ──
+  // The famous chant: "Olé olé olé olé… Olé… Olé…"
+  // In E major — E=329.63, F#=369.99, G#=415.30, A=440, B=493.88
+  // Pattern: short-short-LONG, short-short-LONG, short-LONG
+  // Each "olé" = one rising figure
+  // Bar = 0.5s per beat, 4/4 at ~120bpm
 
-  // Big bass line in climax
-  bass(65.41,T+0,1.9,0.5);bass(87.31,T+2,1.9,0.5);bass(65.41,T+4,1.9,0.5);
-  bass(55,T+6,1.9,0.5);bass(65.41,T+8,1.9,0.5);bass(87.31,T+10,1.9,0.5);
+  var B=0.5; // beat duration
 
-  // Full samba percussion through climax
-  for(var b=0;b<24;b+=1){
-    kick(T+b*0.5);
-    if(b%2===1) snare(T+b*0.5+0.25);
-    timbal(T+b*0.5+0.12,0.28);
-    clave(T+b*0.5);
-    clave(T+b*0.5+0.32);
+  // ── INTRO: crowd builds (0–3s) ──
+  crowdSwell(0,6,0.12);
+  crowdSwell(6,8,0.18);
+  crowdSwell(14,14,0.22);
+  for(var i=0;i<6;i++) clap(i*0.5);
+
+  // ── VERSE 1: First OLÉ phrase (3–11s) ──
+  // "O - LÉ  O-LÉ  O-LÉ  O-LÉ"
+  var T=3.0;
+  // Phrase 1: Olé olé olé olé
+  ole(329.63,T+0*B,0.35,0.7);      // O
+  ole(415.30,T+0.4*B,0.55,0.8);    // LÉ (rise)
+  ole(329.63,T+1.0*B,0.35,0.65);   // O
+  ole(415.30,T+1.4*B,0.55,0.75);   // LÉ
+  ole(329.63,T+2.0*B,0.35,0.65);   // O
+  ole(415.30,T+2.4*B,0.55,0.75);   // LÉ
+  ole(329.63,T+3.0*B,0.35,0.65);   // O
+  ole(440,T+3.4*B,0.9,0.85);       // LÉ (higher)
+
+  // Phrase 2: Olé… Olé…
+  ole(329.63,T+4.5*B,0.35,0.7);
+  ole(493.88,T+5.0*B,1.2,0.9);     // OLÉ (top note, long hold)
+  ole(329.63,T+6.5*B,0.35,0.7);
+  ole(440,T+7.0*B,1.4,0.88);       // OLÉ
+
+  // Brass stabs under the melody
+  brass(164.81,T+0,0.3,0.32);brass(196,T+2*B,0.3,0.3);
+  brass(220,T+4*B,0.3,0.35);brass(246.94,T+6*B,0.3,0.32);
+
+  // Kick + clap rhythm through verse
+  for(var i=0;i<16;i++){
+    kick(T+i*B*0.5, 0.5);
+    if(i%4===2) clap(T+i*B*0.5+0.25*B);
+    if(i%2===1) clap(T+i*B*0.5);
   }
 
-  // ── SECTION E: Resolution — gentle fade (24–32s) ──
+  // ── BUILDUP: rising energy (11–16s) ──
+  T=11.0;
+  ole(329.63,T+0,0.3,0.75);ole(369.99,T+0.35,0.3,0.78);ole(415.30,T+0.7,0.3,0.82);ole(440,T+1.05,0.3,0.86);
+  ole(329.63,T+1.5,0.3,0.75);ole(369.99,T+1.85,0.3,0.78);ole(415.30,T+2.2,0.3,0.82);ole(493.88,T+2.55,1.0,0.92);
+  brass(261.63,T,0.4,0.4);brass(329.63,T+1.5,0.4,0.42);brass(392,T+2.5,0.6,0.45);
+  for(var i=0;i<10;i++){kick(T+i*0.4,0.6);clap(T+i*0.4+0.2);}
+
+  // ── CHORUS CLIMAX: full OLÉ (16–24s) ──
+  T=16.0;
+  // All together now — louder, higher
+  ole(392,T+0*B,0.35,0.9);ole(493.88,T+0.4*B,0.55,0.95);
+  ole(392,T+1.0*B,0.35,0.9);ole(493.88,T+1.4*B,0.55,0.95);
+  ole(392,T+2.0*B,0.35,0.9);ole(493.88,T+2.4*B,0.55,0.95);
+  ole(392,T+3.0*B,0.35,0.88);ole(523.25,T+3.4*B,1.0,1.0);   // peak C5
+
+  ole(392,T+4.5*B,0.35,0.88);ole(587.33,T+5.0*B,1.4,1.0);   // D5 long
+  ole(392,T+6.5*B,0.35,0.85);ole(523.25,T+7.0*B,1.6,0.95);  // C5 settle
+
+  brass(196,T,0.45,0.5);brass(246.94,T+2*B,0.45,0.5);brass(261.63,T+4*B,0.45,0.52);brass(329.63,T+6*B,0.45,0.5);
+
+  // Dense crowd clapping
+  for(var i=0;i<32;i++){
+    kick(T+i*B*0.5, 0.55);
+    clap(T+i*B*0.5);
+    if(i%4===2) clap(T+i*B*0.5+0.15);
+  }
+
+  // ── OUTRO: fade with final Olé (24–28s) ──
   T=24.0;
-  brass(523.25,T+0,1.8,0.24);brass(659.25,T+2,1.8,0.22);brass(783.99,T+4,2.4,0.2);
-  choir(261.63,T+0,4.0,0.4);choir(329.63,T+0,4.0,0.32);choir(392,T+0,4.0,0.3);
-  choir(261.63,T+4,3.5,0.35);choir(329.63,T+4,3.5,0.28);choir(523.25,T+4,3.5,0.25);
-  strings(261.63,T+0,8.0,0.12);strings(329.63,T+0,8.0,0.1);
-  bass(65.41,T+0,1.9,0.3);bass(65.41,T+4,3.5,0.2);
-
-  // Soft kick pattern fading out
-  for(var b=0;b<12;b+=1){
-    var fv=1-b/12;
-    kick(T+b*0.5);
-    if(b%2===1) snare(T+b*0.5+0.25);
-    clave(T+b*0.5);
-  }
+  ole(329.63,T+0,0.4,0.7);ole(415.30,T+0.5,0.4,0.72);ole(440,T+1.0,0.5,0.75);
+  ole(329.63,T+2.0,0.4,0.65);ole(493.88,T+2.5,1.8,0.78);
+  brass(164.81,T,0.5,0.3);brass(196,T+2,0.5,0.28);
+  for(var i=0;i<8;i++) clap(T+i*0.5);
 
   return totalDur;
 }
@@ -807,8 +750,8 @@ function startApp(){
 // ── DATA & RENDER ──
 var activeFilter='all';
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2600);}
-function pts(p){return p.shots+p.goals*2;}
-function qual(p){return(p.shots+p.goals)>=2;}
+function pts(p){return p.goals;}
+function qual(p){return true;}
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tnav,.fbtn').forEach(function(b){b.classList.remove('active','on');});btn.classList.contains('tnav')?btn.classList.add('active'):btn.classList.add('on');renderAll();}
 function applyFilter(p){if(activeFilter==='all')return true;if(activeFilter==='unf')return p.school==='UNF'||p.school==='Both';if(activeFilter==='ucw')return p.school==='UCW'||p.school==='Both';return true;}
 function barCol(pct){if(pct>70)return'linear-gradient(90deg,#E8293A,#F5C842)';if(pct>40)return'linear-gradient(90deg,#7C5CFC,#29B6F6)';return'linear-gradient(90deg,#29B6F6,#22C55E)';}
@@ -821,7 +764,7 @@ function renderPodium(){
   pw.innerHTML=sorted.slice(0,3).map(function(p,i){
     var flag=(p.country||'').replace(/[A-Za-z ]/g,'').trim()||'&#127758;';
     var score=pts(p);
-    return'<div class="pod-card '+cls[i]+'"><div class="pod-header"><div class="pod-medal">'+medals[i]+'</div><div class="pod-flag">'+flag+'</div><div class="pod-info"><div class="pod-name">'+p.name+'</div><div class="pod-sub">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></div><div class="pod-pts-big">'+score+'</div></div><div class="pod-footer"><div class="pod-stat shots-col"><div class="pod-stat-n">'+p.shots+'</div><div class="pod-stat-l">Shots</div></div><div class="pod-stat goals-col"><div class="pod-stat-n">'+p.goals+'</div><div class="pod-stat-l">Goals</div></div></div></div>';
+    return'<div class="pod-card '+cls[i]+'"><div class="pod-header"><div class="pod-medal">'+medals[i]+'</div><div class="pod-flag">'+flag+'</div><div class="pod-info"><div class="pod-name">'+p.name+'</div><div class="pod-sub">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></div><div class="pod-pts-big">'+score+'</div></div><div class="pod-footer"><div class="pod-stat goals-col" style="flex:1"><div class="pod-stat-n">'+p.goals+'</div><div class="pod-stat-l">Goals</div></div></div></div>';
   }).join('');
 }
 
@@ -836,22 +779,22 @@ function renderNations(){
 function renderTable(){
   var q=(document.getElementById('search-bar').value||'').toLowerCase();
   var allS=players.filter(qual).sort(function(a,b){return pts(b)-pts(a);});
-  var unq=players.filter(function(p){return!qual(p);});
+  var unq=[];
   var maxP=allS.length?pts(allS[0]):1;
   var medals=['&#127865;','&#127866;','&#127867;'],rowC=['gr','sr','br'];
   function mq(p){return!q||p.name.toLowerCase().includes(q)||(p.country||'').toLowerCase().includes(q)||(p.agency||'').toLowerCase().includes(q);}
   var qF=allS.filter(function(p){return applyFilter(p)&&mq(p);});
-  var uF=unq.filter(function(p){return applyFilter(p)&&mq(p);});
+  var uF=[];
   var tbody=document.getElementById('tbl-body');
-  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="7"><div style="text-align:center;padding:32px 20px;"><div style="font-size:28px;margin-bottom:10px;">&#9917;</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">LEADERBOARD GOES LIVE MAY 1ST</div><div style="font-size:11px;color:var(--muted);letter-spacing:1px;">The official player standings will be published here on 1st May 2026.<br>Stay tuned &mdash; the race to London is about to begin.</div></div></td></tr>';return;}
+  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="6"><div style="text-align:center;padding:32px 20px;"><div style="font-size:28px;margin-bottom:10px;">&#9917;</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">LEADERBOARD GOES LIVE MAY 1ST</div><div style="font-size:11px;color:var(--muted);letter-spacing:1px;">The official player standings will be published here on 1st May 2026.<br>Stay tuned &mdash; the race to London is about to begin.</div></div></td></tr>';return;}
   var html=qF.map(function(p){
     var score=pts(p),pct=Math.round((score/Math.max(maxP,1))*100);
     var ri=allS.indexOf(p),rc=ri<3?rowC[ri]:'',rkd=ri<3?medals[ri]:(ri+1);
     var flag=(p.country||'').replace(/[A-Za-z ]/g,'').trim()||'&#127758;';
     var londonBadge=ri<3?' <span style="font-size:9px;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.25);border-radius:3px;padding:1px 4px;color:var(--gold);letter-spacing:1px;font-family:Oswald,sans-serif;">LDN</span>':'';
-    return'<tr class="'+rc+'"><td class="rk">'+rkd+'</td><td class="fl-c">'+flag+'</td><td><div class="pn">'+p.name+londonBadge+'</div><div class="pa">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></td><td class="sv">'+p.shots+'</td><td class="gv">'+p.goals+'</td><td class="ptv">'+score+'</td><td class="bw"><div class="mb"><div class="mf" style="width:'+pct+'%;background:'+barCol(pct)+'"></div></div></td></tr>';
+    return'<tr class="'+rc+'"><td class="rk">'+rkd+'</td><td class="fl-c">'+flag+'</td><td><div class="pn">'+p.name+londonBadge+'</div><div class="pa">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></td><td class="gv">'+p.goals+'</td><td class="ptv">'+score+'</td><td class="bw"><div class="mb"><div class="mf" style="width:'+pct+'%;background:'+barCol(pct)+'"></div></div></td></tr>';
   }).join('');
-  if(uF.length){html+='<tr class="unq-sep"><td colspan="7">Not yet qualified &mdash; need 2 shots to enter</td></tr>';html+=uF.map(function(p){var flag=(p.country||'').replace(/[A-Za-z ]/g,'').trim()||'&#127758;';return'<tr class="unq-row"><td class="rk">&mdash;</td><td class="fl-c">'+flag+'</td><td><div class="pn">'+p.name+'</div><div class="pa">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></td><td class="sv">'+p.shots+'</td><td class="gv">'+p.goals+'</td><td class="ptv" style="color:var(--muted)">'+pts(p)+'</td><td class="bw"><div class="mb"></div></td></tr>';}).join('');}
+
   tbody.innerHTML=html;
 }
 
@@ -859,7 +802,6 @@ function updateStats(){
   var q=players.filter(qual);
   document.getElementById('h-players').textContent=q.length;
   document.getElementById('h-nations').textContent=new Set(players.map(function(p){return p.country;}).filter(Boolean)).size;
-  document.getElementById('h-shots').textContent=players.reduce(function(s,p){return s+p.shots;},0);
   document.getElementById('h-goals').textContent=players.reduce(function(s,p){return s+p.goals;},0);
   document.getElementById('h-pts').textContent=players.reduce(function(s,p){return s+pts(p);},0);
 }
