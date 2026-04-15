@@ -1,0 +1,2137 @@
+import { useState, useEffect, useCallback, useRef } from "react";
+
+// ─── PERSISTENT STORAGE HELPERS ──────────────────────────────────
+const store = {
+  async get(key) {
+    try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch { return null; }
+  },
+  async set(key, val) {
+    try { await window.storage.set(key, JSON.stringify(val)); } catch (e) { console.error("Storage error:", e); }
+  },
+  async list(prefix) {
+    try { const r = await window.storage.list(prefix); return r?.keys || []; } catch { return []; }
+  },
+  async delete(key) {
+    try { await window.storage.delete(key); } catch {}
+  }
+};
+
+// ─── DATA CONSTANTS ──────────────────────────────────────────────
+const UNIVERSITIES = ["INUNI","SDSU","CCCU","RPI","AKRON","LIM","HERZING","CUC","HARTPURY","AVILA"];
+const ACTIVITY_TYPES = [
+  "Met Agent","Called Agent","Counselled Student","Trained Agent","Identified Business Opportunity",
+  "Follow-up Meeting","Contract Discussion","Marketing Review","Onboarding Session","Performance Review"
+];
+const NATIONALITIES = ["Nigerian","Ghanaian","Kenyan","Indian","Pakistani","Bangladeshi","Sri Lankan","Egyptian","Moroccan","Saudi","Emirati","Chinese","Vietnamese","Other"];
+const INTAKES = ["Jan 2026","May 2026","Sep 2026","Jan 2027"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const PRIORITY_COLORS = { urgent: "#c0392b", high: "#b8860b", medium: "#1a2a3a", low: "#8c9aab" };
+const STATUS_COLORS = { pending: "#b8860b", "in-progress": "#1a2a3a", resolved: "#2d6a4f", rejected: "#c0392b" };
+
+const SAMPLE_AGENTS = [
+  "Apex Education","Global Study Hub","EduBridge Int.","Premier Pathways","Horizon Advisors",
+  "Merit Connect","Pacific Scholars","Nova Recruitment","Atlas Education","Pinnacle Group",
+  "Elite Scholars","Summit Education","Vanguard Int.","Prestige Edu","Crown Pathways",
+  "Sterling Advisors","Diamond Education","Aspire Global","Zenith Partners","Catalyst Recruitment"
+];
+
+// ─── ICON COMPONENTS ─────────────────────────────────────────────
+const Icon = ({ name, size = 18 }) => {
+  const icons = {
+    activity: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+    tasks: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>,
+    ticket: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5v2"/><path d="M15 11v2"/><path d="M15 17v2"/><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg>,
+    chart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+    megaphone: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg>,
+    agents: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
+    book: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>,
+    plus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    send: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+    target: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+    arrow: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+    star: <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    folder: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>,
+    trophy: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 1012 0V2z"/></svg>,
+    trash: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ─── REUSABLE COMPONENTS ─────────────────────────────────────────
+const Badge = ({ children, color = "#8c9aab", gold, style = {} }) => {
+  const bg = gold ? "linear-gradient(135deg, #b8860b, #d4a847)" : "none";
+  return (
+    <span style={{ display:"inline-flex",alignItems:"center",padding:"3px 11px",borderRadius:4,fontSize:10.5,fontWeight:600,letterSpacing:0.8,textTransform:"uppercase",background:gold ? bg : `${color}0f`,color:gold?"#fff":color,border:gold?"none":`1px solid ${color}20`,...style }}>{children}</span>
+  );
+};
+
+const Card = ({ children, style = {}, onClick, gold }) => (
+  <div onClick={onClick} style={{ background:gold?"linear-gradient(135deg,#faf6ed,#f7f0df)":"#ffffff",borderRadius:8,border:gold?"1px solid #d4a84730":"1px solid #e8e6e1",padding:22,transition:"all .2s",cursor:onClick?"pointer":"default",boxShadow:"0 1px 3px rgba(0,0,0,.03)",...style }}>
+    {children}
+  </div>
+);
+
+const Input = ({ label, ...props }) => (
+  <div style={{ display:"flex",flexDirection:"column",gap:5 }}>
+    {label && <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2,fontFamily:"var(--body)" }}>{label}</label>}
+    <input {...props} style={{ padding:"11px 0",borderRadius:0,border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,outline:"none",fontFamily:"var(--body)",transition:"border-color .2s",...(props.style||{}) }} onFocus={e => e.target.style.borderBottomColor = "#b8860b"} onBlur={e => e.target.style.borderBottomColor = "#d5d3ce"} />
+  </div>
+);
+
+const Select = ({ label, options, ...props }) => (
+  <div style={{ display:"flex",flexDirection:"column",gap:5 }}>
+    {label && <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2,fontFamily:"var(--body)" }}>{label}</label>}
+    <select {...props} style={{ padding:"11px 0",borderRadius:0,border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,outline:"none",fontFamily:"var(--body)",...(props.style||{}) }}>
+      <option value="">Select...</option>
+      {options.map(o => <option key={o} value={o}>{o}</option>)}
+    </select>
+  </div>
+);
+
+const TextArea = ({ label, ...props }) => (
+  <div style={{ display:"flex",flexDirection:"column",gap:5 }}>
+    {label && <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2,fontFamily:"var(--body)" }}>{label}</label>}
+    <textarea {...props} style={{ padding:"11px 0",borderRadius:0,border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,outline:"none",fontFamily:"var(--body)",resize:"vertical",minHeight:70,...(props.style||{}) }} />
+  </div>
+);
+
+const Btn = ({ children, variant = "primary", icon, gold, style = {}, ...props }) => {
+  const styles = {
+    primary: { background:"var(--navy)",color:"#ffffff",border:"none" },
+    gold: { background:"linear-gradient(135deg,#b8860b,#d4a847)",color:"#fff",border:"none" },
+    secondary: { background:"transparent",color:"var(--navy)",border:"1px solid #d5d3ce" },
+    danger: { background:"#c0392b0d",color:"#c0392b",border:"1px solid #c0392b25" },
+    ghost: { background:"transparent",color:"#8c9aab",border:"none" },
+  };
+  return (
+    <button {...props} style={{ display:"inline-flex",alignItems:"center",gap:7,padding:"11px 22px",borderRadius:4,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"var(--body)",transition:"all .2s",letterSpacing:0.8,textTransform:"uppercase",...styles[gold?"gold":variant],...style }}>
+      {icon && <Icon name={icon} size={14} />}{children}
+    </button>
+  );
+};
+
+const EmptyState = ({ icon, title, sub }) => (
+  <div style={{ textAlign:"center",padding:"60px 20px",color:"#8c9aab" }}>
+    <div style={{ opacity:0.2,marginBottom:14 }}><Icon name={icon} size={52} /></div>
+    <div style={{ fontSize:16,fontWeight:600,marginBottom:5,fontFamily:"var(--serif)",color:"var(--navy)" }}>{title}</div>
+    <div style={{ fontSize:13 }}>{sub}</div>
+  </div>
+);
+
+const ProgressBar = ({ value, max, color = "var(--gold)", height = 6 }) => {
+  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  return (
+    <div style={{ height,borderRadius:2,background:"#e8e6e1",overflow:"hidden" }}>
+      <div style={{ height:"100%",width:`${pct}%`,background:color,borderRadius:2,transition:"width .6s ease" }} />
+    </div>
+  );
+};
+
+const TabBar = ({ tabs, active, onChange }) => (
+  <div style={{ display:"flex",gap:0,borderBottom:"1px solid #e8e6e1" }}>
+    {tabs.map(t => (
+      <button key={t.id} onClick={() => onChange(t.id)} style={{ padding:"12px 20px",border:"none",borderBottom:active === t.id ? "2px solid var(--gold)" : "2px solid transparent",background:"transparent",color:active === t.id ? "var(--navy)" : "#8c9aab",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"var(--body)",transition:"all .2s",letterSpacing:0.6,textTransform:"uppercase",marginBottom:-1 }}>
+        {t.label}
+      </button>
+    ))}
+  </div>
+);
+
+const SectionHeader = ({ eyebrow, title, right }) => (
+  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:28,paddingBottom:16,borderBottom:"1px solid #e8e6e1" }}>
+    <div>
+      <div style={{ fontSize:11,fontWeight:600,color:"var(--gold)",textTransform:"uppercase",letterSpacing:2.5,marginBottom:6 }}>{eyebrow}</div>
+      <div style={{ fontSize:26,fontWeight:400,color:"var(--navy)",fontFamily:"var(--serif)",lineHeight:1.1 }}>{title}</div>
+    </div>
+    {right}
+  </div>
+);
+
+// ─── SECTION 1: ACTIVITY LOG ─────────────────────────────────────
+function ActivityLog() {
+  const [activities, setActivities] = useState([]);
+  const [form, setForm] = useState({ type:"", agent:"", notes:"", university:"" });
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => { store.get("activities").then(d => d && setActivities(d)); }, []);
+  const save = (a) => { setActivities(a); store.set("activities", a); };
+
+  const submit = () => {
+    if (!form.type || !form.agent) return;
+    save([{ ...form, id: Date.now(), timestamp: new Date().toISOString() }, ...activities]);
+    setForm({ type:"", agent:"", notes:"", university:"" });
+    setShowForm(false);
+  };
+
+  const del = (id) => save(activities.filter(a => a.id !== id));
+  const today = activities.filter(a => new Date(a.timestamp).toDateString() === new Date().toDateString());
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Daily Tracker" title="Activity Log" right={<Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "Log Activity"}</Btn>} />
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:28 }}>
+        <Card><div style={{ fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>Today</div><div style={{ fontSize:36,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)" }}>{today.length}</div></Card>
+        <Card><div style={{ fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>This Week</div><div style={{ fontSize:36,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)" }}>{activities.filter(a => { const d = new Date(a.timestamp); const now = new Date(); return d > new Date(now.setDate(now.getDate()-7)); }).length}</div></Card>
+        <Card><div style={{ fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>Total</div><div style={{ fontSize:36,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)" }}>{activities.length}</div></Card>
+      </div>
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+          <div style={{ fontSize:13,fontWeight:600,marginBottom:20,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase" }}>New Activity Entry</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}>
+            <Select label="Activity Type" options={ACTIVITY_TYPES} value={form.type} onChange={e => setForm({...form, type:e.target.value})} />
+            <Input label="Agent Name" placeholder="e.g. Apex Education" value={form.agent} onChange={e => setForm({...form, agent:e.target.value})} />
+            <Select label="University" options={UNIVERSITIES} value={form.university} onChange={e => setForm({...form, university:e.target.value})} />
+            <TextArea label="Discussion Summary" placeholder="Key discussion points..." value={form.notes} onChange={e => setForm({...form, notes:e.target.value})} />
+          </div>
+          <div style={{ marginTop:20,display:"flex",justifyContent:"flex-end" }}><Btn gold icon="send" onClick={submit}>Submit to Engine Room</Btn></div>
+        </Card>
+      )}
+      <div style={{ display:"flex",flexDirection:"column",gap:1 }}>
+        {activities.length === 0 && <EmptyState icon="activity" title="No Activities Logged" sub="Start logging your daily activities to keep Engine Room informed" />}
+        {activities.slice(0, 30).map(a => (
+          <div key={a.id} style={{ display:"flex",alignItems:"center",gap:18,padding:"16px 0",borderBottom:"1px solid #f0eeeb" }}>
+            <div style={{ width:44,height:44,borderRadius:4,background:"#f7f6f3",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"var(--navy)" }}><Icon name="activity" size={18} /></div>
+            <div style={{ flex:1,minWidth:0 }}>
+              <div style={{ display:"flex",alignItems:"center",gap:8,flexWrap:"wrap" }}>
+                <span style={{ fontWeight:600,fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>{a.type}</span>
+                <Badge color="var(--navy)">{a.agent}</Badge>
+                {a.university && <Badge gold>{a.university}</Badge>}
+              </div>
+              {a.notes && <div style={{ fontSize:13,color:"#8c9aab",marginTop:4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{a.notes}</div>}
+            </div>
+            <div style={{ textAlign:"right",flexShrink:0 }}>
+              <div style={{ fontSize:11,color:"#8c9aab" }}>{new Date(a.timestamp).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
+              <div style={{ fontSize:10,color:"#b8b5ae" }}>{new Date(a.timestamp).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</div>
+            </div>
+            <button onClick={() => del(a.id)} style={{ background:"none",border:"none",cursor:"pointer",color:"#c8c5be",padding:4 }}><Icon name="trash" size={14} /></button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION 2: TASKS ────────────────────────────────────────────
+function Tasks() {
+  const [tasks, setTasks] = useState([]);
+  const [form, setForm] = useState({ title:"", priority:"medium", dueDate:"", source:"self", notes:"" });
+  const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => { store.get("tasks").then(d => d && setTasks(d)); }, []);
+  const save = (t) => { setTasks(t); store.set("tasks", t); };
+
+  const submit = () => {
+    if (!form.title) return;
+    save([{ ...form, id: Date.now(), status:"pending", created: new Date().toISOString() }, ...tasks]);
+    setForm({ title:"", priority:"medium", dueDate:"", source:"self", notes:"" });
+    setShowForm(false);
+  };
+  const toggle = (id) => save(tasks.map(t => t.id === id ? { ...t, status: t.status === "done" ? "pending" : "done" } : t));
+  const del = (id) => save(tasks.filter(t => t.id !== id));
+  const filtered = filter === "all" ? tasks : filter === "active" ? tasks.filter(t => t.status !== "done") : tasks.filter(t => t.status === "done");
+  const pending = tasks.filter(t => t.status !== "done").length;
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Task Manager" title="Your Tasks" right={<Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "New Task"}</Btn>} />
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:24 }}>
+        {[{l:"Pending",v:pending,c:"var(--gold)"},{l:"Urgent",v:tasks.filter(t=>t.priority==="urgent"&&t.status!=="done").length,c:"#c0392b"},{l:"Engine Room",v:tasks.filter(t=>t.source==="Engine Room").length,c:"var(--navy)"},{l:"Completed",v:tasks.filter(t=>t.status==="done").length,c:"#2d6a4f"}].map(m => (
+          <Card key={m.l}><div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:6 }}>{m.l}</div><div style={{ fontSize:30,fontWeight:400,fontFamily:"var(--serif)",color:m.c }}>{m.v}</div></Card>
+        ))}
+      </div>
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}>
+            <div style={{ gridColumn:"1/3" }}><Input label="Task Title" placeholder="What needs to be done?" value={form.title} onChange={e => setForm({...form, title:e.target.value})} /></div>
+            <Select label="Priority" options={["urgent","high","medium","low"]} value={form.priority} onChange={e => setForm({...form, priority:e.target.value})} />
+            <Input label="Due Date" type="date" value={form.dueDate} onChange={e => setForm({...form, dueDate:e.target.value})} />
+            <Select label="Source" options={["self","Engine Room","Activity Follow-up"]} value={form.source} onChange={e => setForm({...form, source:e.target.value})} />
+            <TextArea label="Notes" value={form.notes} onChange={e => setForm({...form, notes:e.target.value})} />
+          </div>
+          <div style={{ marginTop:18,display:"flex",justifyContent:"flex-end" }}><Btn gold icon="plus" onClick={submit}>Add Task</Btn></div>
+        </Card>
+      )}
+      <div style={{ marginBottom:20 }}><TabBar tabs={[{id:"all",label:"All"},{id:"active",label:"Active"},{id:"done",label:"Completed"}]} active={filter} onChange={setFilter} /></div>
+      <div style={{ display:"flex",flexDirection:"column",gap:1 }}>
+        {filtered.length === 0 && <EmptyState icon="tasks" title="No Tasks" sub="Add tasks or they'll auto-generate from activities" />}
+        {filtered.map(t => (
+          <div key={t.id} style={{ display:"flex",alignItems:"center",gap:14,padding:"14px 0",borderBottom:"1px solid #f0eeeb",opacity:t.status==="done"?0.45:1 }}>
+            <button onClick={() => toggle(t.id)} style={{ width:22,height:22,borderRadius:3,border:`2px solid ${PRIORITY_COLORS[t.priority]}`,background:t.status==="done"?PRIORITY_COLORS[t.priority]:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"#fff" }}>
+              {t.status === "done" && <Icon name="check" size={11} />}
+            </button>
+            <div style={{ flex:1 }}>
+              <div style={{ fontWeight:500,fontSize:14,textDecoration:t.status==="done"?"line-through":"none",color:"var(--navy)",fontFamily:"var(--serif)" }}>{t.title}</div>
+              <div style={{ display:"flex",gap:6,marginTop:5,flexWrap:"wrap" }}>
+                <Badge color={PRIORITY_COLORS[t.priority]}>{t.priority}</Badge>
+                {t.source !== "self" && <Badge gold>{t.source}</Badge>}
+                {t.dueDate && <Badge color="#8c9aab">{t.dueDate}</Badge>}
+              </div>
+            </div>
+            <button onClick={() => del(t.id)} style={{ background:"none",border:"none",cursor:"pointer",color:"#c8c5be",padding:4 }}><Icon name="trash" size={14} /></button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION 3: ADMISSION TICKETS ────────────────────────────────
+function AdmissionTickets() {
+  const [tickets, setTickets] = useState([]);
+  const [form, setForm] = useState({ university:"", studentId:"", issue:"", priority:"medium" });
+  const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => { store.get("tickets").then(d => d && setTickets(d)); }, []);
+  const save = (t) => { setTickets(t); store.set("tickets", t); };
+
+  const submit = () => {
+    if (!form.university || !form.studentId || !form.issue) return;
+    save([{ ...form, id: Date.now(), status:"pending", created: new Date().toISOString(), feedback:null, feedbackDate:null }, ...tickets]);
+    setForm({ university:"", studentId:"", issue:"", priority:"medium" });
+    setShowForm(false);
+  };
+  const addFeedback = (id, fb) => { save(tickets.map(t => t.id === id ? { ...t, feedback:fb, feedbackDate:new Date().toISOString(), status:"resolved" } : t)); setSelected(null); };
+  const updateStatus = (id, status) => save(tickets.map(t => t.id === id ? { ...t, status } : t));
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Admission Team" title="Urgent Requests" right={<Btn variant="danger" icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "Raise Request"}</Btn>} />
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:24 }}>
+        {[{l:"Pending",v:tickets.filter(t=>t.status==="pending").length,c:"var(--gold)"},{l:"In Progress",v:tickets.filter(t=>t.status==="in-progress").length,c:"var(--navy)"},{l:"Resolved",v:tickets.filter(t=>t.status==="resolved").length,c:"#2d6a4f"},{l:"Total",v:tickets.length,c:"#8c9aab"}].map(m => (
+          <Card key={m.l}><div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:6 }}>{m.l}</div><div style={{ fontSize:30,fontWeight:400,fontFamily:"var(--serif)",color:m.c }}>{m.v}</div></Card>
+        ))}
+      </div>
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid #c0392b" }}>
+          <div style={{ fontSize:13,fontWeight:600,marginBottom:20,color:"#c0392b",letterSpacing:1.5,textTransform:"uppercase" }}>Urgent Admission Request</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}>
+            <Select label="University" options={UNIVERSITIES} value={form.university} onChange={e => setForm({...form, university:e.target.value})} />
+            <Input label="Student ID" placeholder="e.g. STU-2026-0001" value={form.studentId} onChange={e => setForm({...form, studentId:e.target.value})} />
+            <Select label="Priority" options={["urgent","high","medium"]} value={form.priority} onChange={e => setForm({...form, priority:e.target.value})} />
+            <div />
+            <div style={{ gridColumn:"1/3" }}><TextArea label="Issue Description" placeholder="Describe the issue in detail..." value={form.issue} onChange={e => setForm({...form, issue:e.target.value})} /></div>
+          </div>
+          <div style={{ marginTop:18,display:"flex",justifyContent:"flex-end" }}><Btn variant="danger" icon="send" onClick={submit}>Submit Request</Btn></div>
+        </Card>
+      )}
+      {selected && (() => {
+        const t = tickets.find(x => x.id === selected);
+        if (!t) return null;
+        return (
+          <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"start" }}>
+              <div>
+                <div style={{ fontSize:18,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)" }}>Ticket #{t.id.toString().slice(-4)}</div>
+                <div style={{ display:"flex",gap:6,marginTop:8 }}><Badge color={PRIORITY_COLORS[t.priority]}>{t.priority}</Badge><Badge color={STATUS_COLORS[t.status]}>{t.status}</Badge><Badge gold>{t.university}</Badge></div>
+              </div>
+              <Btn variant="ghost" onClick={() => setSelected(null)}>Close</Btn>
+            </div>
+            <div style={{ marginTop:18,padding:18,background:"#f7f6f3",borderRadius:4 }}>
+              <div style={{ fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,marginBottom:6 }}>STUDENT ID: {t.studentId}</div>
+              <div style={{ fontSize:14,color:"var(--navy)",lineHeight:1.7 }}>{t.issue}</div>
+            </div>
+            {t.feedback ? (
+              <div style={{ marginTop:14,padding:18,background:"#2d6a4f0a",borderRadius:4,border:"1px solid #2d6a4f20" }}>
+                <div style={{ fontSize:11,fontWeight:600,color:"#2d6a4f",letterSpacing:1.2,marginBottom:6 }}>ADMISSION TEAM FEEDBACK</div>
+                <div style={{ fontSize:14,color:"var(--navy)",lineHeight:1.7 }}>{t.feedback}</div>
+              </div>
+            ) : (
+              <div style={{ marginTop:14 }}>
+                <div style={{ fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,marginBottom:8 }}>PROVIDE FEEDBACK</div>
+                <div style={{ display:"flex",gap:10 }}>
+                  <textarea id={`fb-${t.id}`} placeholder="Type feedback..." style={{ flex:1,padding:12,borderRadius:4,border:"1px solid #d5d3ce",background:"#fff",color:"var(--navy)",fontSize:13,fontFamily:"var(--body)",resize:"none" }} />
+                  <Btn gold onClick={() => { const el = document.getElementById(`fb-${t.id}`); if(el.value) addFeedback(t.id, el.value); }}>Reply</Btn>
+                </div>
+                <div style={{ display:"flex",gap:8,marginTop:10 }}>
+                  <Btn variant="secondary" onClick={() => updateStatus(t.id, "in-progress")} style={{ fontSize:10,padding:"8px 14px" }}>In-Progress</Btn>
+                  <Btn variant="danger" onClick={() => updateStatus(t.id, "rejected")} style={{ fontSize:10,padding:"8px 14px" }}>Reject</Btn>
+                </div>
+              </div>
+            )}
+          </Card>
+        );
+      })()}
+      <div style={{ display:"flex",flexDirection:"column",gap:1 }}>
+        {tickets.length === 0 && <EmptyState icon="ticket" title="No Requests" sub="Raise an urgent request to the admission team" />}
+        {tickets.map(t => (
+          <div key={t.id} onClick={() => setSelected(t.id)} style={{ display:"flex",alignItems:"center",gap:16,padding:"14px 0",borderBottom:"1px solid #f0eeeb",cursor:"pointer" }}>
+            <div style={{ width:44,height:44,borderRadius:4,background:`${STATUS_COLORS[t.status]}0d`,display:"flex",alignItems:"center",justifyContent:"center",color:STATUS_COLORS[t.status],flexShrink:0 }}><Icon name="ticket" size={18} /></div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontWeight:500,fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>#{t.id.toString().slice(-4)} — {t.university}</div>
+              <div style={{ fontSize:12,color:"#8c9aab",marginTop:3 }}>{t.issue.slice(0,60)}...</div>
+            </div>
+            <div style={{ display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5 }}>
+              <Badge color={STATUS_COLORS[t.status]}>{t.status}</Badge>
+              {t.feedback && <Badge color="#2d6a4f">Feedback</Badge>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION 4: COMMAND CENTRE (Unified Dashboard + Reports) ─────
+function CommandCentre() {
+  const [data, setData] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [view, setView] = useState("vitals");
+  const [filterUni, setFilterUni] = useState("All");
+  const [filterNat, setFilterNat] = useState("All");
+  const [reportPeriod, setReportPeriod] = useState("weekly");
+
+  useEffect(() => {
+    store.get("salesData").then(d => {
+      if (d) { setData(d); return; }
+      const gen = {};
+      INTAKES.forEach(intake => { gen[intake] = {}; UNIVERSITIES.forEach(uni => { gen[intake][uni] = { applicationTarget:Math.floor(Math.random()*40+20), applicationActual:Math.floor(Math.random()*35+5), depositTarget:Math.floor(Math.random()*30+10), depositActual:Math.floor(Math.random()*25+3), enrolmentTarget:Math.floor(Math.random()*20+5), enrolmentActual:Math.floor(Math.random()*18+1) }; }); });
+      const monthly = {}; MONTHS.forEach(m => { monthly[m] = { appTarget:Math.floor(Math.random()*50+20), appActual:Math.floor(Math.random()*45+5), depTarget:Math.floor(Math.random()*30+10), depActual:Math.floor(Math.random()*25+2) }; });
+      const agentPerf = SAMPLE_AGENTS.map(name => ({ name, applications:Math.floor(Math.random()*30+5), deposits:Math.floor(Math.random()*20+2), enrolments:Math.floor(Math.random()*15+1), nationality:NATIONALITIES[Math.floor(Math.random()*NATIONALITIES.length)], university:UNIVERSITIES[Math.floor(Math.random()*UNIVERSITIES.length)] }));
+      const bonuses = [{ threshold:"10 deposits/month",bonus:"$500",status:"eligible" },{ threshold:"25 applications/intake",bonus:"$750",status:"in-progress" },{ threshold:"50 enrolments/year",bonus:"$2,000",status:"not-started" },{ threshold:"Top performer Q1",bonus:"$1,500",status:"eligible" }];
+      const sd = { intakes:gen, monthly, agentPerf, bonuses };
+      setData(sd); store.set("salesData", sd);
+    });
+    store.get("activities").then(d => d && setActivities(d));
+    store.get("tasks").then(d => d && setTasks(d));
+  }, []);
+
+  if (!data) return <div style={{ padding:60,textAlign:"center",color:"#8c9aab",fontFamily:"var(--serif)" }}>Loading command centre...</div>;
+
+  // ── Computed data ──
+  const totals = { appTarget:0,appActual:0,depTarget:0,depActual:0,enrTarget:0,enrActual:0 };
+  Object.values(data.intakes).forEach(intake => { Object.entries(intake).forEach(([uni, d]) => { if (filterUni!=="All"&&uni!==filterUni) return; totals.appTarget+=d.applicationTarget; totals.appActual+=d.applicationActual; totals.depTarget+=d.depositTarget; totals.depActual+=d.depositActual; totals.enrTarget+=d.enrolmentTarget; totals.enrActual+=d.enrolmentActual; }); });
+
+  const now = new Date();
+  const cutoff = reportPeriod === "weekly" ? new Date(now.getTime()-7*86400000) : new Date(now.getTime()-30*86400000);
+  const periodAct = activities.filter(a => new Date(a.timestamp) >= cutoff);
+  const completedTasks = tasks.filter(t => t.status === "done" && new Date(t.created) >= cutoff);
+  const pendingTasks = tasks.filter(t => t.status !== "done");
+  const prodScore = Math.min(100, Math.round((periodAct.length * 3 + completedTasks.length * 5) / (reportPeriod==="weekly"?1:4)));
+  const prodColor = prodScore >= 80 ? "#2d6a4f" : prodScore >= 60 ? "var(--gold)" : prodScore >= 40 ? "#b8860b" : "#c0392b";
+  const prodLabel = prodScore >= 80 ? "Excellent" : prodScore >= 60 ? "Good" : prodScore >= 40 ? "Moderate" : "Needs Attention";
+
+  const actByType = {}; periodAct.forEach(a => { actByType[a.type] = (actByType[a.type]||0)+1; });
+  const actByAgent = {}; periodAct.forEach(a => { if(a.agent) actByAgent[a.agent] = (actByAgent[a.agent]||0)+1; });
+
+  const uniPerf = UNIVERSITIES.map(uni => {
+    let at=0,aa=0,dt=0,da=0,et=0,ea=0;
+    Object.values(data.intakes).forEach(intake => { if(intake[uni]) { at+=intake[uni].applicationTarget; aa+=intake[uni].applicationActual; dt+=intake[uni].depositTarget; da+=intake[uni].depositActual; et+=intake[uni].enrolmentTarget; ea+=intake[uni].enrolmentActual; } });
+    return { uni, at, aa, dt, da, et, ea };
+  });
+
+  // ── Metric ring component ──
+  const Ring = ({ value, max, size=90, stroke=6, color, label, sublabel }) => {
+    const pct = max > 0 ? Math.min(value/max,1) : 0;
+    const r = (size-stroke)/2;
+    const circ = 2*Math.PI*r;
+    return (
+      <div style={{ textAlign:"center" }}>
+        <svg width={size} height={size} style={{ transform:"rotate(-90deg)" }}>
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e8e6e1" strokeWidth={stroke} />
+          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={circ*(1-pct)} strokeLinecap="round" style={{ transition:"stroke-dashoffset .8s ease" }} />
+        </svg>
+        <div style={{ marginTop:-size/2-8,position:"relative" }}>
+          <div style={{ fontSize:20,fontWeight:700,fontFamily:"var(--serif)",color:"var(--navy)" }}>{Math.round(pct*100)}%</div>
+        </div>
+        <div style={{ marginTop:size/2-14 }}>
+          <div style={{ fontSize:11,fontWeight:600,color:"var(--navy)",marginTop:4 }}>{label}</div>
+          <div style={{ fontSize:10,color:"#8c9aab" }}>{sublabel}</div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {/* ── HEADER ── */}
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:20 }}>
+        <div>
+          <div style={{ fontSize:11,fontWeight:600,color:"var(--gold)",textTransform:"uppercase",letterSpacing:2.5,marginBottom:6 }}>Command Centre</div>
+          <div style={{ fontSize:26,fontWeight:400,color:"var(--navy)",fontFamily:"var(--serif)",lineHeight:1.1 }}>Your Performance Hub</div>
+        </div>
+        <div style={{ display:"flex",gap:8,alignItems:"center" }}>
+          <select value={filterUni} onChange={e => setFilterUni(e.target.value)} style={{ padding:"9px 14px",borderRadius:4,border:"1px solid #d5d3ce",background:"#fff",color:"var(--navy)",fontSize:11,fontFamily:"var(--body)" }}>
+            <option value="All">All Universities</option>{UNIVERSITIES.map(u => <option key={u} value={u}>{u}</option>)}
+          </select>
+          <select value={reportPeriod} onChange={e => setReportPeriod(e.target.value)} style={{ padding:"9px 14px",borderRadius:4,border:"1px solid #d5d3ce",background:"#fff",color:"var(--navy)",fontSize:11,fontFamily:"var(--body)" }}>
+            <option value="weekly">This Week</option>
+            <option value="monthly">This Month</option>
+          </select>
+        </div>
+      </div>
+
+      {/* ══════════ VITALS STRIP ══════════ */}
+      <div style={{ display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr",gap:14,marginBottom:20 }}>
+        {/* Productivity card */}
+        <Card gold style={{ display:"flex",alignItems:"center",gap:20,padding:20 }}>
+          <div>
+            <svg width={80} height={80} style={{ transform:"rotate(-90deg)" }}>
+              <circle cx={40} cy={40} r={34} fill="none" stroke="#d4a84730" strokeWidth={6} />
+              <circle cx={40} cy={40} r={34} fill="none" stroke={prodColor} strokeWidth={6} strokeDasharray={213.6} strokeDashoffset={213.6*(1-prodScore/100)} strokeLinecap="round" style={{ transition:"stroke-dashoffset .8s ease" }} />
+            </svg>
+            <div style={{ marginTop:-54,textAlign:"center",position:"relative" }}>
+              <div style={{ fontSize:22,fontWeight:800,fontFamily:"var(--serif)",color:prodColor }}>{prodScore}</div>
+            </div>
+          </div>
+          <div style={{ marginTop:0 }}>
+            <div style={{ fontSize:10,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase" }}>Productivity</div>
+            <div style={{ fontSize:20,fontWeight:700,fontFamily:"var(--serif)",color:"var(--navy)",marginTop:2 }}>{prodLabel}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",marginTop:4 }}>{periodAct.length} activities · {completedTasks.length} tasks done</div>
+            <div style={{ fontSize:11,color:pendingTasks.length > 5 ? "#c0392b" : "#8c9aab",fontWeight:pendingTasks.length > 5 ? 600 : 400,marginTop:2 }}>{pendingTasks.length} pending follow-ups</div>
+          </div>
+        </Card>
+        {/* KPI rings */}
+        {[
+          { label:"Applications", sub:`${totals.appActual} of ${totals.appTarget}`, val:totals.appActual, max:totals.appTarget, color:"var(--navy)" },
+          { label:"Deposits", sub:`${totals.depActual} of ${totals.depTarget}`, val:totals.depActual, max:totals.depTarget, color:"var(--gold)" },
+          { label:"Enrolments", sub:`${totals.enrActual} of ${totals.enrTarget}`, val:totals.enrActual, max:totals.enrTarget, color:"#2d6a4f" },
+        ].map(k => (
+          <Card key={k.label} style={{ display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:16 }}>
+            <Ring value={k.val} max={k.max} color={k.color} size={78} stroke={5} label={k.label} sublabel={k.sub} />
+          </Card>
+        ))}
+      </div>
+
+      {/* ══════════ TABS ══════════ */}
+      <TabBar tabs={[
+        {id:"vitals",label:"Targets & Intakes"},
+        {id:"monthly",label:"Monthly Trends"},
+        {id:"activity",label:"Activity Report"},
+        {id:"agents",label:"Agent Performance"},
+        {id:"bonuses",label:"Bonuses"},
+      ]} active={view} onChange={setView} />
+
+      <div style={{ marginTop:20 }}>
+        {/* ── TARGETS & INTAKES ── */}
+        {view === "vitals" && (<>
+          {/* Institution performance table */}
+          <Card style={{ marginBottom:16 }}>
+            <div style={{ fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:16 }}>Performance by Institution</div>
+            <div style={{ overflowX:"auto" }}>
+              <table style={{ width:"100%",borderCollapse:"collapse",fontSize:12 }}>
+                <thead><tr style={{ borderBottom:"2px solid #e8e6e1" }}>
+                  {["Institution","Apps","","Deposits","","Enrolments","","Health"].map((h,i) => (
+                    <th key={i} style={{ textAlign:"left",padding:"10px 8px",fontSize:10,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:.8 }}>{h}</th>
+                  ))}
+                </tr></thead>
+                <tbody>{uniPerf.filter(u => filterUni==="All" || u.uni===filterUni).map(u => {
+                  const appP = u.at>0?Math.round(u.aa/u.at*100):0;
+                  const depP = u.dt>0?Math.round(u.da/u.dt*100):0;
+                  const enrP = u.et>0?Math.round(u.ea/u.et*100):0;
+                  const health = Math.round((appP+depP+enrP)/3);
+                  const hColor = health>=70?"#2d6a4f":health>=45?"var(--gold)":"#c0392b";
+                  return (
+                    <tr key={u.uni} style={{ borderBottom:"1px solid #f0eeeb" }}>
+                      <td style={{ padding:"12px 8px",fontWeight:600,fontFamily:"var(--serif)",fontSize:13 }}>{u.uni}</td>
+                      <td style={{ padding:"12px 8px" }}><span style={{ fontWeight:700,color:"var(--navy)" }}>{u.aa}</span><span style={{ color:"#b8b5ae" }}>/{u.at}</span></td>
+                      <td style={{ padding:"12px 8px",width:60 }}><ProgressBar value={u.aa} max={u.at} color="var(--navy)" height={4} /></td>
+                      <td style={{ padding:"12px 8px" }}><span style={{ fontWeight:700,color:"var(--gold)" }}>{u.da}</span><span style={{ color:"#b8b5ae" }}>/{u.dt}</span></td>
+                      <td style={{ padding:"12px 8px",width:60 }}><ProgressBar value={u.da} max={u.dt} color="var(--gold)" height={4} /></td>
+                      <td style={{ padding:"12px 8px" }}><span style={{ fontWeight:700,color:"#2d6a4f" }}>{u.ea}</span><span style={{ color:"#b8b5ae" }}>/{u.et}</span></td>
+                      <td style={{ padding:"12px 8px",width:60 }}><ProgressBar value={u.ea} max={u.et} color="#2d6a4f" height={4} /></td>
+                      <td style={{ padding:"12px 8px" }}><Badge color={hColor} style={{ fontSize:11,padding:"4px 10px" }}>{health}%</Badge></td>
+                    </tr>
+                  );
+                })}</tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Intake breakdown */}
+          <Card>
+            <div style={{ fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:16 }}>By Intake Period</div>
+            {INTAKES.map((intake,idx) => {
+              const iData = data.intakes[intake]; let apps=0,deps=0,enr=0,at=0,dt=0,et=0;
+              Object.entries(iData).forEach(([uni,d]) => { if(filterUni!=="All"&&uni!==filterUni) return; apps+=d.applicationActual;at+=d.applicationTarget;deps+=d.depositActual;dt+=d.depositTarget;enr+=d.enrolmentActual;et+=d.enrolmentTarget; });
+              return (
+                <div key={intake} style={{ padding:"16px 0",borderTop:idx>0?"1px solid #f0eeeb":"none" }}>
+                  <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12 }}>
+                    <span style={{ fontWeight:600,fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>{intake}</span>
+                    <Badge color={Math.round((apps/(at||1)+deps/(dt||1)+enr/(et||1))/3*100) >= 60 ? "#2d6a4f" : "var(--gold)"}>{Math.round((apps/(at||1)+deps/(dt||1)+enr/(et||1))/3*100)}% avg</Badge>
+                  </div>
+                  <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16 }}>
+                    {[{l:"Applications",a:apps,t:at,c:"var(--navy)"},{l:"Deposits",a:deps,t:dt,c:"var(--gold)"},{l:"Enrolments",a:enr,t:et,c:"#2d6a4f"}].map(m => (
+                      <div key={m.l}>
+                        <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
+                          <span style={{ fontSize:10,color:"#8c9aab",textTransform:"uppercase",letterSpacing:.8 }}>{m.l}</span>
+                          <span style={{ fontSize:11,fontWeight:600,color:m.c }}>{m.t>0?Math.round(m.a/m.t*100):0}%</span>
+                        </div>
+                        <ProgressBar value={m.a} max={m.t} color={m.c} height={5} />
+                        <div style={{ display:"flex",justifyContent:"space-between",marginTop:4 }}>
+                          <span style={{ fontSize:12,fontWeight:700,color:m.c }}>{m.a}</span>
+                          <span style={{ fontSize:11,color:"#b8b5ae" }}>of {m.t}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </Card>
+        </>)}
+
+        {/* ── MONTHLY TRENDS ── */}
+        {view === "monthly" && (
+          <Card>
+            <div style={{ fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:24 }}>Monthly Trends</div>
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:30 }}>
+              {[{label:"Applications",key:"appActual",tkey:"appTarget",color:"var(--navy)",max:55},{label:"Deposits",key:"depActual",tkey:"depTarget",color:"var(--gold)",max:35}].map(ch => (
+                <div key={ch.label}>
+                  <div style={{ fontSize:10,fontWeight:600,color:ch.color,letterSpacing:1.5,textTransform:"uppercase",marginBottom:14 }}>{ch.label}</div>
+                  <div style={{ display:"flex",alignItems:"flex-end",gap:3,height:150 }}>
+                    {MONTHS.map(m => {
+                      const val = data.monthly[m][ch.key];
+                      const tgt = data.monthly[m][ch.tkey];
+                      const pct = val/(ch.max)*100;
+                      const hit = tgt > 0 && val >= tgt;
+                      return (
+                        <div key={m} style={{ flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3 }}>
+                          <div style={{ fontSize:9,fontWeight:600,color: hit ? "#2d6a4f" : ch.color }}>{val}</div>
+                          <div style={{ width:"100%",borderRadius:"3px 3px 0 0",height:`${pct}%`,minHeight:3,background: hit ? "#2d6a4f" : ch.color,opacity: hit ? 1 : 0.7,transition:"height .5s" }} />
+                          <div style={{ fontSize:9,color:"#8c9aab",fontWeight:500 }}>{m}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize:10,color:"#8c9aab",marginTop:8,display:"flex",alignItems:"center",gap:8 }}>
+                    <span style={{ width:8,height:8,borderRadius:2,background:ch.color,opacity:.7,display:"inline-block" }} /> Actual
+                    <span style={{ width:8,height:8,borderRadius:2,background:"#2d6a4f",display:"inline-block",marginLeft:8 }} /> Target met
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* ── ACTIVITY REPORT ── */}
+        {view === "activity" && (<>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:20 }}>
+            {[
+              {l:"Activities",v:periodAct.length,c:"var(--navy)"},
+              {l:"Tasks Completed",v:completedTasks.length,c:"#2d6a4f"},
+              {l:"Pending Follow-ups",v:pendingTasks.length,c:pendingTasks.length>5?"#c0392b":"var(--gold)"},
+              {l:"Agents Contacted",v:Object.keys(actByAgent).length,c:"var(--navy)"},
+            ].map(m => (
+              <Card key={m.l} style={{ textAlign:"center" }}>
+                <div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{m.l}</div>
+                <div style={{ fontSize:28,fontWeight:400,fontFamily:"var(--serif)",color:m.c }}>{m.v}</div>
+              </Card>
+            ))}
+          </div>
+
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20 }}>
+            <Card>
+              <div style={{ fontSize:13,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:14 }}>Activity Breakdown</div>
+              {Object.keys(actByType).length === 0 ? <div style={{ color:"#8c9aab",fontSize:12,padding:16,textAlign:"center" }}>No activities logged yet — start logging to see your report!</div> :
+                Object.entries(actByType).sort((a,b)=>b[1]-a[1]).map(([type,count]) => (
+                  <div key={type} style={{ display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid #f0eeeb" }}>
+                    <div style={{ flex:1,fontSize:12,fontWeight:500 }}>{type}</div>
+                    <div style={{ width:70 }}><ProgressBar value={count} max={Math.max(...Object.values(actByType))} color="var(--gold)" height={4} /></div>
+                    <span style={{ fontSize:14,fontWeight:700,fontFamily:"var(--serif)",width:26,textAlign:"right" }}>{count}</span>
+                  </div>
+                ))
+              }
+            </Card>
+            <Card>
+              <div style={{ fontSize:13,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:14 }}>Top Agents Engaged</div>
+              {Object.keys(actByAgent).length === 0 ? <div style={{ color:"#8c9aab",fontSize:12,padding:16,textAlign:"center" }}>Agent interactions will appear here</div> :
+                Object.entries(actByAgent).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([agent,count],i) => (
+                  <div key={agent} style={{ display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid #f0eeeb" }}>
+                    <span style={{ width:20,fontSize:11,color:i<3?"var(--gold)":"#8c9aab",fontWeight:700 }}>{i+1}</span>
+                    <span style={{ flex:1,fontSize:12,fontWeight:500 }}>{agent}</span>
+                    <Badge color="var(--navy)">{count}</Badge>
+                  </div>
+                ))
+              }
+            </Card>
+          </div>
+
+          {/* Pending follow-ups */}
+          {pendingTasks.length > 0 && (
+            <Card style={{ borderLeft:"3px solid " + (pendingTasks.length > 5 ? "#c0392b" : "var(--gold)") }}>
+              <div style={{ fontSize:13,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:14 }}>
+                {pendingTasks.length > 5 ? "⚠ " : ""}Pending Follow-ups ({pendingTasks.length})
+              </div>
+              {pendingTasks.slice(0,8).map(t => (
+                <div key={t.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #f0eeeb" }}>
+                  <div>
+                    <div style={{ fontSize:12,fontWeight:500 }}>{t.title}</div>
+                    <div style={{ display:"flex",gap:4,marginTop:3 }}>
+                      <Badge color={PRIORITY_COLORS[t.priority]}>{t.priority}</Badge>
+                      {t.source !== "self" && <Badge gold>{t.source}</Badge>}
+                    </div>
+                  </div>
+                  {t.dueDate && <span style={{ fontSize:11,color:new Date(t.dueDate)<now?"#c0392b":"#8c9aab",fontWeight:new Date(t.dueDate)<now?600:400 }}>{t.dueDate}</span>}
+                </div>
+              ))}
+            </Card>
+          )}
+        </>)}
+
+        {/* ── AGENT PERFORMANCE ── */}
+        {view === "agents" && (
+          <Card>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+              <div style={{ fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>Agent Leaderboard</div>
+              <select value={filterNat} onChange={e => setFilterNat(e.target.value)} style={{ padding:"8px 12px",borderRadius:4,border:"1px solid #d5d3ce",background:"#fff",color:"var(--navy)",fontSize:11,fontFamily:"var(--body)" }}>
+                <option value="All">All Nationalities</option>{NATIONALITIES.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div style={{ overflowX:"auto" }}>
+              <table style={{ width:"100%",borderCollapse:"collapse",fontSize:12 }}>
+                <thead><tr style={{ borderBottom:"2px solid #e8e6e1" }}>
+                  {["#","Agent","University","Nationality","Apps","Deposits","Enrol","Total"].map(h => (
+                    <th key={h} style={{ textAlign:"left",padding:"10px 8px",fontSize:10,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:.8 }}>{h}</th>
+                  ))}
+                </tr></thead>
+                <tbody>{data.agentPerf
+                  .filter(a => filterNat==="All"||a.nationality===filterNat)
+                  .filter(a => filterUni==="All"||a.university===filterUni)
+                  .sort((a,b) => (b.applications+b.deposits+b.enrolments)-(a.applications+a.deposits+a.enrolments))
+                  .map((a,i) => {
+                    const total = a.applications+a.deposits+a.enrolments;
+                    return (
+                      <tr key={a.name} style={{ borderBottom:"1px solid #f0eeeb" }}>
+                        <td style={{ padding:"10px 8px" }}>{i<3?<span style={{ color:"var(--gold)" }}><Icon name="star" size={13} /></span>:<span style={{ color:"#8c9aab" }}>{i+1}</span>}</td>
+                        <td style={{ padding:"10px 8px",fontWeight:600,fontFamily:"var(--serif)" }}>{a.name}</td>
+                        <td style={{ padding:"10px 8px" }}><Badge gold>{a.university}</Badge></td>
+                        <td style={{ padding:"10px 8px",color:"#8c9aab",fontSize:11 }}>{a.nationality}</td>
+                        <td style={{ padding:"10px 8px",fontWeight:600,color:"var(--navy)" }}>{a.applications}</td>
+                        <td style={{ padding:"10px 8px",fontWeight:600,color:"var(--gold)" }}>{a.deposits}</td>
+                        <td style={{ padding:"10px 8px",fontWeight:600,color:"#2d6a4f" }}>{a.enrolments}</td>
+                        <td style={{ padding:"10px 8px" }}>
+                          <span style={{ fontWeight:800,fontSize:15,fontFamily:"var(--serif)" }}>{total}</span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                }</tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {/* ── BONUSES ── */}
+        {view === "bonuses" && (
+          <Card gold>
+            <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:24 }}>
+              <span style={{ color:"var(--gold)" }}><Icon name="trophy" size={22} /></span>
+              <span style={{ fontSize:18,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)" }}>Bonus Eligibility</span>
+            </div>
+            {data.bonuses.map((b,i) => (
+              <div key={i} style={{ padding:"20px 0",borderTop:i>0?"1px solid #d4a84720":"none",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                <div>
+                  <div style={{ fontWeight:500,fontSize:14,color:"var(--navy)" }}>{b.threshold}</div>
+                  <div style={{ fontSize:28,fontWeight:400,fontFamily:"var(--serif)",color:"var(--gold)",marginTop:4 }}>{b.bonus}</div>
+                </div>
+                <Badge color={b.status==="eligible"?"#2d6a4f":b.status==="in-progress"?"#b8860b":"#8c9aab"} style={{ fontSize:11,padding:"8px 16px" }}>
+                  {b.status==="eligible"?"✓ Eligible":b.status==="in-progress"?"In Progress":"Not Started"}
+                </Badge>
+              </div>
+            ))}
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION 5: ANNOUNCEMENTS ────────────────────────────────────
+function Announcements() {
+  const [items, setItems] = useState([]);
+  const [form, setForm] = useState({ title:"", body:"", priority:"medium" });
+  const [showForm, setShowForm] = useState(false);
+  useEffect(() => { store.get("announcements").then(d => d && setItems(d)); }, []);
+  const save = (a) => { setItems(a); store.set("announcements", a); };
+  const submit = () => { if (!form.title||!form.body) return; save([{ ...form,id:Date.now(),date:new Date().toISOString(),from:"Engine Room" },...items]); setForm({ title:"",body:"",priority:"medium" }); setShowForm(false); };
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Engine Room" title="Announcements" right={<Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm?"Cancel":"New"}</Btn>} />
+      {showForm && (<Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}><div style={{ display:"grid",gap:20 }}><Input label="Title" value={form.title} onChange={e => setForm({...form,title:e.target.value})} /><Select label="Priority" options={["urgent","high","medium","low"]} value={form.priority} onChange={e => setForm({...form,priority:e.target.value})} /><TextArea label="Message" value={form.body} onChange={e => setForm({...form,body:e.target.value})} /></div><div style={{ marginTop:18,display:"flex",justifyContent:"flex-end" }}><Btn gold icon="megaphone" onClick={submit}>Publish</Btn></div></Card>)}
+      <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
+        {items.length===0 && <EmptyState icon="megaphone" title="No Announcements" sub="Engine Room announcements will appear here" />}
+        {items.map(a => (<Card key={a.id} style={{ borderLeft:`3px solid ${PRIORITY_COLORS[a.priority]}` }}><div style={{ display:"flex",justifyContent:"space-between" }}><div><div style={{ fontWeight:500,fontSize:18,fontFamily:"var(--serif)",color:"var(--navy)" }}>{a.title}</div><div style={{ display:"flex",gap:6,marginTop:8 }}><Badge color={PRIORITY_COLORS[a.priority]}>{a.priority}</Badge><Badge color="#8c9aab">{a.from}</Badge></div></div><div style={{ fontSize:11,color:"#8c9aab" }}>{new Date(a.date).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</div></div><div style={{ marginTop:16,fontSize:14,lineHeight:1.8,color:"#4a4f5c",whiteSpace:"pre-wrap" }}>{a.body}</div></Card>))}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION 6: AGENT PORTFOLIO ──────────────────────────────────
+function AgentPortfolio() {
+  const [agents, setAgents] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name:"",university:"",nationality:"",status:"active" });
+  const [period, setPeriod] = useState("year");
+
+  useEffect(() => {
+    store.get("agentPortfolio").then(d => {
+      if (d) { setAgents(d); return; }
+      const gen = SAMPLE_AGENTS.map((name,i) => ({ id:Date.now()+i,name, university:UNIVERSITIES[i%UNIVERSITIES.length], nationality:NATIONALITIES[i%NATIONALITIES.length], status:Math.random()>0.15?"active":"inactive", apps:Math.floor(Math.random()*35+5), deps:Math.floor(Math.random()*20+2), enr:Math.floor(Math.random()*12+1), monthApps:Math.floor(Math.random()*8+1), monthDeps:Math.floor(Math.random()*5) }));
+      setAgents(gen); store.set("agentPortfolio", gen);
+    });
+  }, []);
+  const save = (a) => { setAgents(a); store.set("agentPortfolio", a); };
+  const addAgent = () => { if (!form.name) return; save([...agents,{ ...form,id:Date.now(),apps:0,deps:0,enr:0,monthApps:0,monthDeps:0 }]); setForm({ name:"",university:"",nationality:"",status:"active" }); setShowForm(false); };
+  const active = agents.filter(a => a.status==="active").length;
+  const totalScore = agents.reduce((s,a) => s+a.apps+a.deps+a.enr, 0);
+  const overallPct = agents.length > 0 ? Math.round(totalScore/(agents.length*68)*100) : 0;
+  const sorted = [...agents].sort((a,b) => period==="year" ? (b.apps+b.deps+b.enr)-(a.apps+a.deps+a.enr) : (b.monthApps+b.monthDeps)-(a.monthApps+a.monthDeps));
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Portfolio" title="Agent Management" right={<Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm?"Cancel":"Add Agent"}</Btn>} />
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:28 }}>
+        <Card><div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>Total</div><div style={{ fontSize:40,fontWeight:400,fontFamily:"var(--serif)" }}>{agents.length}</div><div style={{ fontSize:12,color:"#2d6a4f",marginTop:4 }}>{active} active</div></Card>
+        <Card gold><div style={{ fontSize:10,fontWeight:600,color:"var(--gold)",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>Performance</div><div style={{ fontSize:40,fontWeight:400,fontFamily:"var(--serif)" }}>{overallPct}%</div><ProgressBar value={overallPct} max={100} color="var(--gold)" height={4} /></Card>
+        <Card><div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8 }}>Inactive</div><div style={{ fontSize:40,fontWeight:400,fontFamily:"var(--serif)",color:"#c0392b" }}>{agents.length-active}</div></Card>
+      </div>
+      {showForm && (<Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}><div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}><Input label="Agent Name" value={form.name} onChange={e => setForm({...form,name:e.target.value})} /><Select label="University" options={UNIVERSITIES} value={form.university} onChange={e => setForm({...form,university:e.target.value})} /><Select label="Nationality" options={NATIONALITIES} value={form.nationality} onChange={e => setForm({...form,nationality:e.target.value})} /><Select label="Status" options={["active","inactive"]} value={form.status} onChange={e => setForm({...form,status:e.target.value})} /></div><div style={{ marginTop:18,display:"flex",justifyContent:"flex-end" }}><Btn gold onClick={addAgent}>Add</Btn></div></Card>)}
+      <Card>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20 }}>
+          <div style={{ fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>Top 20 Agents</div>
+          <TabBar tabs={[{id:"year",label:"Year"},{id:"month",label:"Month"}]} active={period} onChange={setPeriod} />
+        </div>
+        <table style={{ width:"100%",borderCollapse:"collapse",fontSize:12 }}>
+          <thead><tr style={{ borderBottom:"2px solid #e8e6e1" }}>{["#","Agent","Status","Uni","Apps","Deps","Enrol","Score"].map(h => (<th key={h} style={{ textAlign:"left",padding:"10px",fontSize:10,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1 }}>{h}</th>))}</tr></thead>
+          <tbody>{sorted.slice(0,20).map((a,i) => { const score = period==="year"?a.apps+a.deps+a.enr:a.monthApps+a.monthDeps; return (
+            <tr key={a.id} style={{ borderBottom:"1px solid #f0eeeb" }}>
+              <td style={{ padding:"10px" }}>{i<3?<span style={{ color:"var(--gold)" }}><Icon name="star" size={14} /></span>:<span style={{ color:"#8c9aab" }}>{i+1}</span>}</td>
+              <td style={{ padding:"10px",fontWeight:600,fontFamily:"var(--serif)" }}>{a.name}</td>
+              <td style={{ padding:"10px" }}><Badge color={a.status==="active"?"#2d6a4f":"#c0392b"}>{a.status}</Badge></td>
+              <td style={{ padding:"10px" }}><Badge gold>{a.university}</Badge></td>
+              <td style={{ padding:"10px",color:"var(--navy)",fontWeight:600 }}>{period==="year"?a.apps:a.monthApps}</td>
+              <td style={{ padding:"10px",color:"var(--gold)",fontWeight:600 }}>{period==="year"?a.deps:a.monthDeps}</td>
+              <td style={{ padding:"10px",color:"#2d6a4f",fontWeight:600 }}>{period==="year"?a.enr:"-"}</td>
+              <td style={{ padding:"10px",fontWeight:700,fontSize:16,fontFamily:"var(--serif)" }}>{score}</td>
+            </tr>); })}</tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
+
+// ─── SECTION 7: KNOWLEDGE ROOM ───────────────────────────────────
+function KnowledgeRoom() {
+  const [activeFolder, setActiveFolder] = useState(null);
+  const [docs, setDocs] = useState({});
+  const [showUpload, setShowUpload] = useState(false);
+  const [form, setForm] = useState({ folder:"",title:"",type:"Guide",description:"" });
+
+  useEffect(() => {
+    store.get("knowledgeDocs").then(d => {
+      if (d) { setDocs(d); return; }
+      const init = {}; UNIVERSITIES.forEach(u => { init[u] = [{ id:Date.now()+Math.random(),title:`${u} Agent Handbook`,type:"Guide",date:"2026-01-15",from:"Marketing" },{ id:Date.now()+Math.random(),title:`${u} Commission Structure`,type:"Policy",date:"2026-02-01",from:"Admissions" },{ id:Date.now()+Math.random(),title:`${u} Programme Overview`,type:"Brochure",date:"2025-11-20",from:"Marketing" }]; });
+      setDocs(init); store.set("knowledgeDocs", init);
+    });
+  }, []);
+  const save = (d) => { setDocs(d); store.set("knowledgeDocs", d); };
+  const addDoc = () => { if (!form.folder||!form.title) return; const u = { ...docs }; if (!u[form.folder]) u[form.folder]=[]; u[form.folder]=[{ id:Date.now(),title:form.title,type:form.type,date:new Date().toISOString().slice(0,10),from:"Uploaded",description:form.description },...u[form.folder]]; save(u); setForm({ folder:"",title:"",type:"Guide",description:"" }); setShowUpload(false); };
+  const typeColors = { Guide:"var(--navy)",Policy:"#c0392b",Brochure:"#2d6a4f",Template:"var(--gold)",Training:"#6b5b95",Other:"#8c9aab" };
+
+  return (
+    <div>
+      <SectionHeader eyebrow="Resources" title="Knowledge Room" right={<Btn gold icon="plus" onClick={() => setShowUpload(!showUpload)}>{showUpload?"Cancel":"Add Doc"}</Btn>} />
+      {showUpload && (<Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}><div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20 }}><Select label="University Folder" options={UNIVERSITIES} value={form.folder} onChange={e => setForm({...form,folder:e.target.value})} /><Select label="Type" options={Object.keys(typeColors)} value={form.type} onChange={e => setForm({...form,type:e.target.value})} /><Input label="Document Title" value={form.title} onChange={e => setForm({...form,title:e.target.value})} /><TextArea label="Description" value={form.description} onChange={e => setForm({...form,description:e.target.value})} /></div><div style={{ marginTop:18,display:"flex",justifyContent:"flex-end" }}><Btn gold onClick={addDoc}>Add</Btn></div></Card>)}
+      {!activeFolder ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:16 }}>
+          {UNIVERSITIES.map(u => (
+            <Card key={u} onClick={() => setActiveFolder(u)} style={{ cursor:"pointer",textAlign:"center",padding:28 }}>
+              <div style={{ width:56,height:56,borderRadius:4,background:"linear-gradient(135deg,#f7f6f3,#ede9e0)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",color:"var(--gold)" }}><Icon name="folder" size={26} /></div>
+              <div style={{ fontWeight:500,fontSize:16,fontFamily:"var(--serif)",color:"var(--navy)" }}>{u}</div>
+              <div style={{ fontSize:12,color:"#8c9aab",marginTop:6 }}>{(docs[u]||[]).length} documents</div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div>
+          <div style={{ display:"flex",alignItems:"center",gap:12,marginBottom:20 }}>
+            <Btn variant="ghost" onClick={() => setActiveFolder(null)} style={{ padding:"8px 12px" }}>← Back</Btn>
+            <div style={{ fontSize:18,fontFamily:"var(--serif)",color:"var(--navy)" }}>{activeFolder}</div>
+            <Badge gold>{(docs[activeFolder]||[]).length} docs</Badge>
+          </div>
+          {(docs[activeFolder]||[]).map(d => (
+            <div key={d.id} style={{ display:"flex",alignItems:"center",gap:16,padding:"16px 0",borderBottom:"1px solid #f0eeeb" }}>
+              <div style={{ width:42,height:42,borderRadius:4,background:`${typeColors[d.type]||"#8c9aab"}0d`,display:"flex",alignItems:"center",justifyContent:"center",color:typeColors[d.type],flexShrink:0 }}><Icon name="book" size={18} /></div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontWeight:500,fontSize:14,fontFamily:"var(--serif)",color:"var(--navy)" }}>{d.title}</div>
+                <div style={{ display:"flex",gap:6,marginTop:5 }}><Badge color={typeColors[d.type]}>{d.type}</Badge><Badge color="#8c9aab">{d.from}</Badge><span style={{ fontSize:11,color:"#b8b5ae" }}>{d.date}</span></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+// ─── SECTION 9: TRAVEL, EXPENSES & PO REQUESTS ──────────────────
+function Operations({ user }) {
+  const [tab, setTab] = useState("travel");
+  return (
+    <div>
+      <SectionHeader eyebrow="Operations" title="Travel, Expenses & PO" right={null} />
+      <TabBar tabs={[{id:"travel",label:"Travel Requests"},{id:"expenses",label:"Expenses"},{id:"po",label:"PO Requests"},{id:"opsDash",label:"Dashboard"}]} active={tab} onChange={setTab} />
+      <div style={{ marginTop:20 }}>
+        {tab === "travel" && <TravelRequests user={user} />}
+        {tab === "expenses" && <ExpensesSection user={user} />}
+        {tab === "po" && <PORequests user={user} />}
+        {tab === "opsDash" && <OpsDashboard />}
+      </div>
+    </div>
+  );
+}
+
+// ─── TRAVEL REQUESTS ─────────────────────────────────────────────
+function TravelRequests({ user }) {
+  const [trips, setTrips] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [form, setForm] = useState({
+    tripName:"", startDate:"", endDate:"", fullName: user?.name || "", lineManager:"",
+    costCentres:[""], journeys:[{from:"",to:""}], hotels:[{name:"",checkIn:"",checkOut:""}]
+  });
+
+  useEffect(() => { store.get("travelRequests").then(d => d && setTrips(d)); }, []);
+  const save = (t) => { setTrips(t); store.set("travelRequests", t); };
+
+  const addJourney = () => { if(form.journeys.length < 10) setForm({...form, journeys:[...form.journeys, {from:"",to:""}]}); };
+  const addHotel = () => { if(form.hotels.length < 10) setForm({...form, hotels:[...form.hotels, {name:"",checkIn:"",checkOut:""}]}); };
+  const addCostCentre = () => { if(form.costCentres.length < 3) setForm({...form, costCentres:[...form.costCentres, ""]}); };
+
+  const updateJourney = (i,field,val) => { const j=[...form.journeys]; j[i]={...j[i],[field]:val}; setForm({...form,journeys:j}); };
+  const updateHotel = (i,field,val) => { const h=[...form.hotels]; h[i]={...h[i],[field]:val}; setForm({...form,hotels:h}); };
+  const updateCostCentre = (i,val) => { const c=[...form.costCentres]; c[i]=val; setForm({...form,costCentres:c}); };
+
+  const submit = () => {
+    if(!form.tripName || !form.startDate || !form.fullName || !form.lineManager) return;
+    const ref = "TRV-" + Date.now().toString().slice(-6);
+    const trip = { ...form, id:Date.now(), ref, status:"pending_approval", created:new Date().toISOString(), approvedBy:null, approvalDate:null, costCentres:form.costCentres.filter(c=>c) };
+    save([trip, ...trips]);
+    setForm({ tripName:"", startDate:"", endDate:"", fullName:user?.name||"", lineManager:"", costCentres:[""], journeys:[{from:"",to:""}], hotels:[{name:"",checkIn:"",checkOut:""}] });
+    setShowForm(false);
+  };
+
+  const approveTrip = (id) => {
+    save(trips.map(t => t.id===id ? {...t, status:"approved", approvedBy:"Marina Sunehag", approvalDate:new Date().toISOString()} : t));
+    setSelected(null);
+  };
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20 }}>
+        <div style={{ fontSize:12,color:"#8c9aab" }}>{trips.length} travel request{trips.length!==1?"s":""}</div>
+        <Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "New Travel Request"}</Btn>
+      </div>
+
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+          <div style={{ fontSize:13,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:20 }}>New Travel Request</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+            <Input label="Full Name" value={form.fullName} onChange={e => setForm({...form,fullName:e.target.value})} />
+            <Input label="Line Manager" value={form.lineManager} onChange={e => setForm({...form,lineManager:e.target.value})} />
+            <Input label="Trip Name" value={form.tripName} onChange={e => setForm({...form,tripName:e.target.value})} />
+            <div />
+            <Input label="Start Date" type="date" value={form.startDate} onChange={e => setForm({...form,startDate:e.target.value})} />
+            <Input label="End Date" type="date" value={form.endDate} onChange={e => setForm({...form,endDate:e.target.value})} />
+          </div>
+
+          {/* Cost Centres */}
+          <div style={{ marginTop:20 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>University Cost Centre{form.costCentres.length>1?"s":""}</label>
+              {form.costCentres.length < 3 && <button onClick={addCostCentre} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:11,cursor:"pointer",fontWeight:600 }}>+ Add</button>}
+            </div>
+            {form.costCentres.map((c,i) => (
+              <div key={i} style={{ marginBottom:6 }}>
+                <select value={c} onChange={e => updateCostCentre(i,e.target.value)} style={{ width:"100%",padding:"10px 0",border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,fontFamily:"var(--body)",outline:"none" }}>
+                  <option value="">Select university...</option>
+                  {UNIVERSITIES.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          {/* Journeys */}
+          <div style={{ marginTop:20 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Journey Legs ({form.journeys.length}/10)</label>
+              {form.journeys.length < 10 && <button onClick={addJourney} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:11,cursor:"pointer",fontWeight:600 }}>+ Add Leg</button>}
+            </div>
+            {form.journeys.map((j,i) => (
+              <div key={i} style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:8,padding:10,background:"#f7f6f3",borderRadius:6 }}>
+                <Input label={`Leg ${i+1} From`} value={j.from} onChange={e => updateJourney(i,"from",e.target.value)} />
+                <Input label={`Leg ${i+1} To`} value={j.to} onChange={e => updateJourney(i,"to",e.target.value)} />
+              </div>
+            ))}
+          </div>
+
+          {/* Hotels */}
+          <div style={{ marginTop:20 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Hotels ({form.hotels.length}/10)</label>
+              {form.hotels.length < 10 && <button onClick={addHotel} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:11,cursor:"pointer",fontWeight:600 }}>+ Add Hotel</button>}
+            </div>
+            {form.hotels.map((h,i) => (
+              <div key={i} style={{ display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:10,marginBottom:8,padding:10,background:"#f7f6f3",borderRadius:6 }}>
+                <Input label="Hotel Name" value={h.name} onChange={e => updateHotel(i,"name",e.target.value)} />
+                <Input label="Check-in" type="date" value={h.checkIn} onChange={e => updateHotel(i,"checkIn",e.target.value)} />
+                <Input label="Check-out" type="date" value={h.checkOut} onChange={e => updateHotel(i,"checkOut",e.target.value)} />
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop:20,display:"flex",justifyContent:"flex-end",gap:8 }}>
+            <Btn variant="secondary" onClick={() => setShowForm(false)}>Cancel</Btn>
+            <Btn gold icon="send" onClick={submit}>Submit for Approval</Btn>
+          </div>
+          <div style={{ marginTop:10,fontSize:11,color:"#8c9aab",textAlign:"right" }}>Requires Team Leader approval before extraction. Final form approved by Marina Sunehag.</div>
+        </Card>
+      )}
+
+      {/* Selected trip detail */}
+      {selected && (() => {
+        const t = trips.find(x => x.id === selected);
+        if(!t) return null;
+        return (
+          <Card style={{ marginBottom:20,borderLeft:"3px solid var(--gold)" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"start" }}>
+              <div>
+                <div style={{ fontSize:18,fontFamily:"var(--serif)",color:"var(--navy)" }}>{t.tripName}</div>
+                <div style={{ display:"flex",gap:6,marginTop:6 }}>
+                  <Badge gold>{t.ref}</Badge>
+                  <Badge color={t.status==="approved"?"#2d6a4f":t.status==="pending_approval"?"var(--gold)":"#c0392b"}>{t.status.replace("_"," ")}</Badge>
+                </div>
+              </div>
+              <Btn variant="ghost" onClick={() => setSelected(null)}>Close</Btn>
+            </div>
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:16 }}>
+              <div style={{ fontSize:12 }}><span style={{ color:"#8c9aab" }}>Full Name:</span> <strong>{t.fullName}</strong></div>
+              <div style={{ fontSize:12 }}><span style={{ color:"#8c9aab" }}>Line Manager:</span> <strong>{t.lineManager}</strong></div>
+              <div style={{ fontSize:12 }}><span style={{ color:"#8c9aab" }}>Dates:</span> <strong>{t.startDate} — {t.endDate}</strong></div>
+              <div style={{ fontSize:12 }}><span style={{ color:"#8c9aab" }}>Cost Centres:</span> <strong>{t.costCentres.join(", ")}</strong></div>
+            </div>
+            <div style={{ marginTop:14,fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1 }}>JOURNEYS</div>
+            {t.journeys.filter(j=>j.from||j.to).map((j,i) => <div key={i} style={{ fontSize:12,padding:"4px 0" }}>{i+1}. {j.from} → {j.to}</div>)}
+            <div style={{ marginTop:10,fontSize:11,fontWeight:600,color:"#8c9aab",letterSpacing:1 }}>HOTELS</div>
+            {t.hotels.filter(h=>h.name).map((h,i) => <div key={i} style={{ fontSize:12,padding:"4px 0" }}>{h.name} ({h.checkIn} — {h.checkOut})</div>)}
+            {t.approvedBy && (
+              <div style={{ marginTop:14,padding:12,background:"#2d6a4f0a",borderRadius:6,border:"1px solid #2d6a4f20" }}>
+                <div style={{ fontSize:11,fontWeight:600,color:"#2d6a4f",letterSpacing:1 }}>APPROVED</div>
+                <div style={{ fontSize:12,marginTop:4 }}>By: <strong>{t.approvedBy}</strong> on {new Date(t.approvalDate).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</div>
+              </div>
+            )}
+            <div style={{ display:"flex",gap:8,marginTop:14 }}>
+              {t.status === "pending_approval" && <Btn gold onClick={() => approveTrip(t.id)}>Approve (Team Leader)</Btn>}
+              {t.status === "approved" && <Btn variant="secondary">Extract to Excel</Btn>}
+            </div>
+          </Card>
+        );
+      })()}
+
+      {/* Trip list */}
+      {trips.length === 0 && <EmptyState icon="send" title="No Travel Requests" sub="Submit your first travel request" />}
+      {trips.map(t => (
+        <div key={t.id} onClick={() => setSelected(t.id)} style={{ display:"flex",alignItems:"center",gap:14,padding:"14px 0",borderBottom:"1px solid #f0eeeb",cursor:"pointer" }}>
+          <div style={{ width:42,height:42,borderRadius:4,background:"#f7f6f3",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--gold)" }}><Icon name="send" size={18} /></div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontWeight:600,fontSize:14,fontFamily:"var(--serif)" }}>{t.tripName}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",marginTop:2 }}>{t.ref} · {t.startDate} — {t.endDate} · {t.costCentres.join(", ")}</div>
+          </div>
+          <Badge color={t.status==="approved"?"#2d6a4f":"var(--gold)"}>{t.status.replace("_"," ")}</Badge>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── EXPENSES ────────────────────────────────────────────────────
+function ExpensesSection({ user }) {
+  const [claims, setClaims] = useState([]);
+  const [trips, setTrips] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name:"", linkedTrip:"", startDate:"", endDate:"", institutions:[""], receipts:[] });
+  const [scanResult, setScanResult] = useState(null);
+  const [scanError, setScanError] = useState("");
+
+  useEffect(() => {
+    store.get("expenseClaims").then(d => d && setClaims(d));
+    store.get("travelRequests").then(d => d && setTrips(d));
+  }, []);
+  const save = (c) => { setClaims(c); store.set("expenseClaims", c); };
+
+  const addInstitution = () => { if(form.institutions.length < 3) setForm({...form, institutions:[...form.institutions, ""]}); };
+  const updateInstitution = (i,val) => { const inst=[...form.institutions]; inst[i]=val; setForm({...form,institutions:inst}); };
+
+  // Validate institutions against targets
+  const salesData = useRef(null);
+  useEffect(() => { store.get("salesData").then(d => { salesData.current = d; }); }, []);
+
+  const hasTarget = (uni) => {
+    if(!salesData.current) return true;
+    let total = 0;
+    Object.values(salesData.current.intakes).forEach(intake => {
+      if(intake[uni]) total += intake[uni].applicationTarget + intake[uni].depositTarget;
+    });
+    return total > 0;
+  };
+
+  // GBP conversion rates (simplified)
+  const toGBP = (amount, currency) => {
+    const rates = { GBP:1, USD:0.79, EUR:0.86, AED:0.22, NGN:0.00051, INR:0.0095, PKR:0.0028, EGP:0.016, SAR:0.21, CNY:0.11 };
+    return Math.round((amount * (rates[currency] || 0.79)) * 100) / 100;
+  };
+
+  // AI Receipt Scanner (simulated)
+  const scanReceipt = () => {
+    setScanError("");
+    // Simulate AI reading a receipt
+    const currencies = ["GBP","USD","EUR","AED","NGN","INR"];
+    const descriptions = ["Business lunch with agent","Taxi to university campus","Conference room booking","Printed marketing materials","Coffee meeting with partner","Airport transfer","Hotel restaurant dinner","Uber to client meeting"];
+    const amount = Math.round((Math.random()*150+10)*100)/100;
+    const currency = currencies[Math.floor(Math.random()*currencies.length)];
+    const dayOffset = Math.floor(Math.random()*7);
+    const receiptDate = new Date(Date.now() - dayOffset*86400000).toISOString().slice(0,10);
+    const desc = descriptions[Math.floor(Math.random()*descriptions.length)];
+
+    setScanResult({
+      date: receiptDate,
+      description: desc,
+      amount,
+      currency,
+      amountGBP: toGBP(amount, currency),
+      spentOn: "self"
+    });
+  };
+
+  const addReceipt = () => {
+    if(!scanResult) return;
+    // Validate: check date is within claim period
+    if(form.startDate && form.endDate) {
+      const rd = new Date(scanResult.date);
+      if(rd < new Date(form.startDate) || rd > new Date(form.endDate)) {
+        setScanError("Receipt date is outside the claim period. Cannot log.");
+        return;
+      }
+    }
+    // Validate: no duplicate meals on same date
+    const sameDateMeals = form.receipts.filter(r => r.date === scanResult.date && (r.description.toLowerCase().includes("lunch") || r.description.toLowerCase().includes("dinner") || r.description.toLowerCase().includes("breakfast")));
+    if((scanResult.description.toLowerCase().includes("lunch") || scanResult.description.toLowerCase().includes("dinner") || scanResult.description.toLowerCase().includes("breakfast")) && sameDateMeals.length > 0) {
+      setScanError("A meal receipt already exists for this date. Cannot log duplicate meals.");
+      return;
+    }
+
+    setForm({...form, receipts:[...form.receipts, {...scanResult, id:Date.now()}]});
+    setScanResult(null);
+    setScanError("");
+  };
+
+  const submitClaim = () => {
+    if(!form.name || form.receipts.length === 0) return;
+    const validInst = form.institutions.filter(i => i);
+    // Check all institutions have targets
+    const invalidInst = validInst.filter(i => !hasTarget(i));
+    if(invalidInst.length > 0) { setScanError(`No targets for: ${invalidInst.join(", ")}. Cannot claim expenses.`); return; }
+
+    const claim = { ...form, id:Date.now(), ref:"EXP-"+Date.now().toString().slice(-6), status:"submitted", created:new Date().toISOString(), institutions:validInst, totalGBP: form.receipts.reduce((s,r) => s+r.amountGBP, 0) };
+    save([claim, ...claims]);
+    setForm({ name:"", linkedTrip:"", startDate:"", endDate:"", institutions:[""], receipts:[] });
+    setShowForm(false);
+    setScanResult(null);
+  };
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20 }}>
+        <div style={{ fontSize:12,color:"#8c9aab" }}>{claims.length} expense claim{claims.length!==1?"s":""}</div>
+        <Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "New Expense Claim"}</Btn>
+      </div>
+
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+          <div style={{ fontSize:13,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:20 }}>New Expense Claim</div>
+
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+            <Input label="Claim Name" placeholder="e.g. Lagos Agent Visit Q1" value={form.name} onChange={e => setForm({...form,name:e.target.value})} />
+            <Select label="Link to Travel Request (optional)" options={trips.map(t => t.tripName+" ("+t.ref+")")} value={form.linkedTrip} onChange={e => setForm({...form,linkedTrip:e.target.value})} />
+            <Input label="Period From" type="date" value={form.startDate} onChange={e => setForm({...form,startDate:e.target.value})} />
+            <Input label="Period To" type="date" value={form.endDate} onChange={e => setForm({...form,endDate:e.target.value})} />
+          </div>
+
+          {/* Institutions */}
+          <div style={{ marginTop:16 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Institutions (must have targets)</label>
+              {form.institutions.length < 3 && <button onClick={addInstitution} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:11,cursor:"pointer",fontWeight:600 }}>+ Add</button>}
+            </div>
+            {form.institutions.map((inst,i) => (
+              <select key={i} value={inst} onChange={e => updateInstitution(i,e.target.value)} style={{ width:"100%",padding:"10px 0",border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,fontFamily:"var(--body)",outline:"none",marginBottom:6 }}>
+                <option value="">Select university...</option>
+                {UNIVERSITIES.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+            ))}
+          </div>
+
+          {/* Receipts */}
+          <div style={{ marginTop:20,padding:16,background:"#f7f6f3",borderRadius:8 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12 }}>
+              <div style={{ fontSize:11,fontWeight:600,color:"var(--navy)",letterSpacing:1,textTransform:"uppercase" }}>Receipts ({form.receipts.length})</div>
+              <Btn variant="secondary" onClick={scanReceipt} style={{ fontSize:10,padding:"8px 14px" }} icon="activity">Scan Receipt (AI)</Btn>
+            </div>
+
+            {scanResult && (
+              <div style={{ padding:14,background:"#fff",borderRadius:6,border:"1px solid var(--gold)",marginBottom:12 }}>
+                <div style={{ fontSize:11,fontWeight:600,color:"var(--gold)",marginBottom:8 }}>AI Scanned Receipt</div>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:12 }}>
+                  <div><span style={{ color:"#8c9aab" }}>Date:</span> <strong>{scanResult.date}</strong></div>
+                  <div><span style={{ color:"#8c9aab" }}>Amount:</span> <strong>{scanResult.amount} {scanResult.currency}</strong></div>
+                  <div style={{ gridColumn:"1/3" }}><span style={{ color:"#8c9aab" }}>Description:</span> <strong>{scanResult.description}</strong></div>
+                  <div><span style={{ color:"#8c9aab" }}>GBP:</span> <strong>£{scanResult.amountGBP}</strong></div>
+                  <div>
+                    <label style={{ fontSize:10,color:"#8c9aab" }}>Spent on:</label>
+                    <select value={scanResult.spentOn} onChange={e => setScanResult({...scanResult,spentOn:e.target.value})} style={{ marginLeft:6,padding:"4px 8px",border:"1px solid #d5d3ce",borderRadius:4,fontSize:12,fontFamily:"var(--body)" }}>
+                      <option value="self">Myself</option>
+                      <option value="agent">Agent</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ display:"flex",gap:8,marginTop:10 }}>
+                  <Btn gold onClick={addReceipt} style={{ fontSize:10,padding:"8px 14px" }}>Accept & Add</Btn>
+                  <Btn variant="ghost" onClick={() => { setScanResult(null); setScanError(""); }} style={{ fontSize:10,padding:"8px 14px" }}>Discard</Btn>
+                </div>
+              </div>
+            )}
+
+            {scanError && <div style={{ color:"#c0392b",fontSize:12,padding:"8px 0",fontWeight:500 }}>{scanError}</div>}
+
+            {form.receipts.length === 0 ? <div style={{ color:"#8c9aab",fontSize:12,textAlign:"center",padding:16 }}>No receipts scanned yet. Click "Scan Receipt" to start.</div> :
+              <div>
+                {form.receipts.map((r,i) => (
+                  <div key={r.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #e8e6e1",fontSize:12 }}>
+                    <div>
+                      <div style={{ fontWeight:500 }}>{r.description}</div>
+                      <div style={{ color:"#8c9aab",fontSize:11 }}>{r.date} · {r.spentOn === "agent" ? "Agent" : "Self"}</div>
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontWeight:600 }}>{r.amount} {r.currency}</div>
+                      <div style={{ color:"var(--gold)",fontSize:11,fontWeight:600 }}>£{r.amountGBP}</div>
+                    </div>
+                  </div>
+                ))}
+                <div style={{ display:"flex",justifyContent:"flex-end",marginTop:10,fontSize:14,fontWeight:700,fontFamily:"var(--serif)" }}>
+                  Total: £{form.receipts.reduce((s,r) => s+r.amountGBP, 0).toFixed(2)}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div style={{ marginTop:16,display:"flex",justifyContent:"flex-end" }}>
+            <Btn gold icon="send" onClick={submitClaim}>Submit Expense Claim</Btn>
+          </div>
+        </Card>
+      )}
+
+      {/* Claims list */}
+      {claims.length === 0 && !showForm && <EmptyState icon="chart" title="No Expense Claims" sub="Start by creating a new expense claim" />}
+      {claims.map(c => (
+        <div key={c.id} style={{ display:"flex",alignItems:"center",gap:14,padding:"14px 0",borderBottom:"1px solid #f0eeeb" }}>
+          <div style={{ width:42,height:42,borderRadius:4,background:"#f7f6f3",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--gold)" }}><Icon name="chart" size={18} /></div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontWeight:600,fontSize:14,fontFamily:"var(--serif)" }}>{c.name}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",marginTop:2 }}>{c.ref} · {c.receipts.length} receipts · {c.institutions.join(", ")}</div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontWeight:700,fontSize:15,fontFamily:"var(--serif)",color:"var(--gold)" }}>£{c.totalGBP.toFixed(2)}</div>
+            <Badge color={c.status==="submitted"?"var(--gold)":"#2d6a4f"}>{c.status}</Badge>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── PO REQUESTS ─────────────────────────────────────────────────
+function PORequests({ user }) {
+  const [pos, setPos] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    supplierName:"", serviceLocation:"", institutions:[""], description:"",
+    amount:"", currency:"GBP", justification:"", contactName:"", contactEmail:"", contactPhone:""
+  });
+
+  useEffect(() => { store.get("poRequests").then(d => d && setPos(d)); }, []);
+  const save = (p) => { setPos(p); store.set("poRequests", p); };
+
+  const addInst = () => { if(form.institutions.length < 5) setForm({...form,institutions:[...form.institutions,""]}); };
+  const updateInst = (i,v) => { const inst=[...form.institutions]; inst[i]=v; setForm({...form,institutions:inst}); };
+
+  const submit = () => {
+    if(!form.supplierName || !form.description || !form.amount) return;
+    const amountNum = parseFloat(form.amount);
+    if(amountNum > 700 && !form.justification) { return; } // justification required above 700
+    const po = { ...form, id:Date.now(), ref:"PO-"+Date.now().toString().slice(-6), amount:amountNum, status:"submitted", created:new Date().toISOString(), institutions:form.institutions.filter(i=>i), submittedBy:user?.name||"" };
+    save([po, ...pos]);
+    setForm({ supplierName:"",serviceLocation:"",institutions:[""],description:"",amount:"",currency:"GBP",justification:"",contactName:"",contactEmail:"",contactPhone:"" });
+    setShowForm(false);
+  };
+
+  const needsJustification = parseFloat(form.amount) > 700;
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20 }}>
+        <div style={{ fontSize:12,color:"#8c9aab" }}>{pos.length} PO request{pos.length!==1?"s":""}</div>
+        <Btn gold icon="plus" onClick={() => setShowForm(!showForm)}>{showForm ? "Cancel" : "New PO Request"}</Btn>
+      </div>
+
+      {showForm && (
+        <Card style={{ marginBottom:24,borderLeft:"3px solid var(--gold)" }}>
+          <div style={{ fontSize:13,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:20 }}>Purchase Order Request</div>
+
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+            <Input label="Supplier Name" value={form.supplierName} onChange={e => setForm({...form,supplierName:e.target.value})} />
+            <Input label="Service Location" value={form.serviceLocation} onChange={e => setForm({...form,serviceLocation:e.target.value})} />
+          </div>
+
+          <div style={{ marginTop:16 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Institutions (up to 5)</label>
+              {form.institutions.length < 5 && <button onClick={addInst} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:11,cursor:"pointer",fontWeight:600 }}>+ Add</button>}
+            </div>
+            {form.institutions.map((inst,i) => (
+              <select key={i} value={inst} onChange={e => updateInst(i,e.target.value)} style={{ width:"100%",padding:"10px 0",border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",color:"var(--navy)",fontSize:14,fontFamily:"var(--body)",outline:"none",marginBottom:6 }}>
+                <option value="">Select university...</option>
+                {UNIVERSITIES.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+            ))}
+          </div>
+
+          <div style={{ marginTop:16 }}><TextArea label="Description of Service (detailed)" value={form.description} onChange={e => setForm({...form,description:e.target.value})} /></div>
+
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:16 }}>
+            <Input label="Amount" type="number" value={form.amount} onChange={e => setForm({...form,amount:e.target.value})} />
+            <Select label="Currency" options={["GBP","USD","EUR","AED","NGN","INR","PKR","EGP","SAR","CNY"]} value={form.currency} onChange={e => setForm({...form,currency:e.target.value})} />
+          </div>
+
+          {needsJustification && (
+            <div style={{ marginTop:16,padding:12,background:"#c0392b08",borderRadius:6,border:"1px solid #c0392b20" }}>
+              <div style={{ fontSize:11,color:"#c0392b",fontWeight:600,marginBottom:6 }}>Business justification required (amount exceeds £700)</div>
+              <TextArea label="Business Justification" value={form.justification} onChange={e => setForm({...form,justification:e.target.value})} />
+            </div>
+          )}
+
+          <div style={{ fontSize:13,fontWeight:600,color:"var(--navy)",marginTop:20,marginBottom:12 }}>Supplier Contact</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16 }}>
+            <Input label="Contact Name" value={form.contactName} onChange={e => setForm({...form,contactName:e.target.value})} />
+            <Input label="Email" type="email" value={form.contactEmail} onChange={e => setForm({...form,contactEmail:e.target.value})} />
+            <Input label="Phone" value={form.contactPhone} onChange={e => setForm({...form,contactPhone:e.target.value})} />
+          </div>
+
+          <div style={{ marginTop:20,display:"flex",justifyContent:"flex-end" }}>
+            <Btn gold icon="send" onClick={submit}>Submit PO Request</Btn>
+          </div>
+        </Card>
+      )}
+
+      {pos.length === 0 && !showForm && <EmptyState icon="tasks" title="No PO Requests" sub="Submit a purchase order request" />}
+      {pos.map(p => (
+        <div key={p.id} style={{ display:"flex",alignItems:"center",gap:14,padding:"14px 0",borderBottom:"1px solid #f0eeeb" }}>
+          <div style={{ width:42,height:42,borderRadius:4,background:"#f7f6f3",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--navy)" }}><Icon name="tasks" size={18} /></div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontWeight:600,fontSize:14,fontFamily:"var(--serif)" }}>{p.supplierName}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",marginTop:2 }}>{p.ref} · {p.institutions.join(", ")} · {p.serviceLocation}</div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontWeight:700,fontSize:15,fontFamily:"var(--serif)",color:"var(--navy)" }}>{p.amount} {p.currency}</div>
+            <Badge color="var(--gold)">{p.status}</Badge>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── OPS DASHBOARD ───────────────────────────────────────────────
+function OpsDashboard() {
+  const [trips, setTrips] = useState([]);
+  const [claims, setClaims] = useState([]);
+  const [pos, setPos] = useState([]);
+
+  useEffect(() => {
+    store.get("travelRequests").then(d => d && setTrips(d));
+    store.get("expenseClaims").then(d => d && setClaims(d));
+    store.get("poRequests").then(d => d && setPos(d));
+  }, []);
+
+  const totalExpenses = claims.reduce((s,c) => s + (c.totalGBP||0), 0);
+  const totalPO = pos.reduce((s,p) => s + (p.amount||0), 0);
+  const pendingTrips = trips.filter(t => t.status === "pending_approval").length;
+  const approvedTrips = trips.filter(t => t.status === "approved").length;
+
+  // Expenses by institution
+  const expByInst = {};
+  claims.forEach(c => { (c.institutions||[]).forEach(inst => { expByInst[inst] = (expByInst[inst]||0) + (c.totalGBP||0)/c.institutions.length; }); });
+
+  return (
+    <div>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:24 }}>
+        {[
+          {l:"Travel Requests",v:trips.length,sub:`${pendingTrips} pending · ${approvedTrips} approved`,c:"var(--navy)"},
+          {l:"Expense Claims",v:claims.length,sub:`£${totalExpenses.toFixed(0)} total`,c:"var(--gold)"},
+          {l:"PO Requests",v:pos.length,sub:`£${totalPO.toFixed(0)} total value`,c:"var(--navy)"},
+          {l:"Total Receipts",v:claims.reduce((s,c)=>s+c.receipts.length,0),sub:"across all claims",c:"#2d6a4f"},
+        ].map(m => (
+          <Card key={m.l}>
+            <div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",letterSpacing:1,textTransform:"uppercase",marginBottom:6 }}>{m.l}</div>
+            <div style={{ fontSize:30,fontWeight:400,fontFamily:"var(--serif)",color:m.c }}>{m.v}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",marginTop:4 }}>{m.sub}</div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Expenses by institution */}
+      <Card style={{ marginBottom:16 }}>
+        <div style={{ fontSize:13,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:16 }}>Expenses by Institution</div>
+        {Object.keys(expByInst).length === 0 ? <div style={{ color:"#8c9aab",fontSize:12 }}>No expenses logged yet</div> :
+          Object.entries(expByInst).sort((a,b)=>b[1]-a[1]).map(([inst,amt]) => (
+            <div key={inst} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #f0eeeb" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                <Badge gold>{inst}</Badge>
+              </div>
+              <span style={{ fontWeight:700,fontFamily:"var(--serif)" }}>£{amt.toFixed(2)}</span>
+            </div>
+          ))
+        }
+      </Card>
+
+      {/* Recent POs */}
+      <Card>
+        <div style={{ fontSize:13,fontFamily:"var(--serif)",color:"var(--navy)",marginBottom:16 }}>Recent PO Requests</div>
+        {pos.length === 0 ? <div style={{ color:"#8c9aab",fontSize:12 }}>No PO requests</div> :
+          pos.slice(0,5).map(p => (
+            <div key={p.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid #f0eeeb",fontSize:12 }}>
+              <div>
+                <div style={{ fontWeight:600 }}>{p.supplierName}</div>
+                <div style={{ color:"#8c9aab",fontSize:11 }}>{p.ref} · {p.institutions.join(", ")}</div>
+              </div>
+              <div style={{ fontWeight:700,fontFamily:"var(--serif)" }}>{p.amount} {p.currency}</div>
+            </div>
+          ))
+        }
+      </Card>
+    </div>
+  );
+}
+
+
+// ─── PENGUIN MASCOT SVG ──────────────────────────────────────────
+const PenguinMascot = ({ size = 80 }) => (
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Graduation cap */}
+    <rect x="60" y="18" width="80" height="8" rx="2" fill="#1a2a3a"/>
+    <polygon points="100,2 140,20 100,28 60,20" fill="#1a2a3a"/>
+    <line x1="135" y1="18" x2="145" y2="35" stroke="#1a2a3a" strokeWidth="2"/>
+    <circle cx="145" cy="37" r="4" fill="#3ba4d9"/>
+    <rect x="142" y="37" width="6" height="10" rx="1" fill="#3ba4d9"/>
+    {/* Body - dark wings/back */}
+    <ellipse cx="100" cy="130" rx="58" ry="72" fill="#1a2a3a"/>
+    {/* White belly */}
+    <ellipse cx="100" cy="135" rx="38" ry="58" fill="#ffffff"/>
+    {/* Head */}
+    <circle cx="100" cy="62" r="35" fill="#1a2a3a"/>
+    {/* Face white patch */}
+    <ellipse cx="100" cy="68" rx="24" ry="22" fill="#ffffff"/>
+    {/* Eyes */}
+    <circle cx="88" cy="60" r="8" fill="#ffffff"/>
+    <circle cx="112" cy="60" r="8" fill="#ffffff"/>
+    <circle cx="89" cy="59" r="5" fill="#1a2a3a"/>
+    <circle cx="113" cy="59" r="5" fill="#1a2a3a"/>
+    <circle cx="90.5" cy="57.5" r="2" fill="#ffffff"/>
+    <circle cx="114.5" cy="57.5" r="2" fill="#ffffff"/>
+    {/* Beak */}
+    <ellipse cx="100" cy="73" rx="6" ry="4" fill="#e8a025"/>
+    {/* Blue sash/scarf */}
+    <path d="M72 90 Q100 100 128 90 Q126 105 100 110 Q74 105 72 90Z" fill="#3ba4d9" opacity="0.9"/>
+    <path d="M85 100 L80 130 L88 128 L90 105Z" fill="#3ba4d9" opacity="0.8"/>
+    {/* Wings */}
+    <ellipse cx="48" cy="125" rx="16" ry="40" fill="#1a2a3a" transform="rotate(10 48 125)"/>
+    <ellipse cx="152" cy="125" rx="16" ry="40" fill="#1a2a3a" transform="rotate(-10 152 125)"/>
+    {/* Feet */}
+    <ellipse cx="80" cy="200" rx="16" ry="8" fill="#e8a025"/>
+    <ellipse cx="120" cy="200" rx="16" ry="8" fill="#e8a025"/>
+    {/* Cheek blush */}
+    <circle cx="78" cy="72" r="5" fill="#f0a0a0" opacity="0.3"/>
+    <circle cx="122" cy="72" r="5" fill="#f0a0a0" opacity="0.3"/>
+  </svg>
+);
+
+// ─── ECO - FLOATING PENGUIN ASSISTANT ────────────────────────────
+function PenguinAssistant({ onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
+  const [query, setQuery] = useState("");
+  const [typedText, setTypedText] = useState("");
+  const [mode, setMode] = useState("home");
+  const [step, setStep] = useState(0);
+  const [draft, setDraft] = useState({});
+  const [ecoMsg, setEcoMsg] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [customInput, setCustomInput] = useState("");
+
+  const introMsg = "Hello superstar! Eco is here, how do we make this day count?";
+
+  useEffect(() => {
+    if (open && !hasOpened) {
+      setHasOpened(true);
+      setTypedText("");
+      let i = 0;
+      const interval = setInterval(() => {
+        i++;
+        setTypedText(introMsg.slice(0, i));
+        if (i >= introMsg.length) clearInterval(interval);
+      }, 28);
+      return () => clearInterval(interval);
+    }
+  }, [open, hasOpened]);
+
+  const resetFlow = () => { setMode("home"); setStep(0); setDraft({}); setEcoMsg(""); setSaved(false); setCustomInput(""); };
+
+  const activitySteps = [
+    { key:"type", eco:"What did you do, superstar?", options: ACTIVITY_TYPES },
+    { key:"agent", eco:"Which agent was this with?", options: SAMPLE_AGENTS.slice(0,12), allowCustom: true },
+    { key:"university", eco:"Which university does this relate to?", options: UNIVERSITIES, allowSkip: true },
+    { key:"notes", eco:"Quick summary — just tap one or skip!", options: [
+      "Positive discussion, follow-up needed",
+      "Needs more info, will reconnect",
+      "Strong pipeline, ready to convert",
+      "Training completed successfully",
+      "New opportunity identified",
+      "Issue raised, escalation needed",
+      "Routine check-in, all on track",
+    ], allowSkip: true, allowCustom: true },
+  ];
+
+  const taskSteps = [
+    { key:"title", eco:"What kind of task do you need?", options: [
+      "Follow up with agent",
+      "Send commission structure",
+      "Prepare training materials",
+      "Submit application review",
+      "Chase deposit payment",
+      "Schedule onboarding call",
+      "Update agent portfolio",
+      "Review enrolment status",
+      "Prepare intake report",
+      "Respond to admission query",
+    ], allowCustom: true },
+    { key:"priority", eco:"How urgent is this?", options: [
+      { label: "\u{1F534} Urgent — needs attention now", value: "urgent" },
+      { label: "\u{1F7E1} High — today if possible", value: "high" },
+      { label: "\u{1F535} Medium — this week", value: "medium" },
+      { label: "\u26AA Low — when you get a chance", value: "low" },
+    ]},
+    { key:"source", eco:"Where did this come from?", options: [
+      { label: "My own initiative", value: "self" },
+      { label: "Engine Room assigned it", value: "Engine Room" },
+      { label: "Follow-up from an activity", value: "Activity Follow-up" },
+    ]},
+    { key:"dueDate", eco:"When does this need to be done?", options: [
+      { label: "Today", value: new Date().toISOString().slice(0,10) },
+      { label: "Tomorrow", value: new Date(Date.now()+86400000).toISOString().slice(0,10) },
+      { label: "This week", value: new Date(Date.now()+5*86400000).toISOString().slice(0,10) },
+      { label: "Next week", value: new Date(Date.now()+7*86400000).toISOString().slice(0,10) },
+      { label: "No deadline", value: "" },
+    ]},
+  ];
+
+  const currentSteps = mode === "logActivity" ? activitySteps : mode === "logTask" ? taskSteps : [];
+  const currentStep = currentSteps[step];
+
+  const handleSelect = async (value) => {
+    const newDraft = { ...draft, [currentStep.key]: value };
+    setDraft(newDraft);
+
+    if (step < currentSteps.length - 1) {
+      setStep(step + 1);
+      setCustomInput("");
+    } else {
+      setMode("confirm");
+      setCustomInput("");
+      if (mode === "logActivity") {
+        const activities = (await store.get("activities")) || [];
+        const entry = { id: Date.now(), type: newDraft.type || "", agent: newDraft.agent || "", university: newDraft.university || "", notes: newDraft.notes || "", timestamp: new Date().toISOString() };
+        await store.set("activities", [entry, ...activities]);
+        setEcoMsg("Boom! I\u2019ve logged your \u201C" + (newDraft.type||"activity") + "\u201D with " + (newDraft.agent||"the agent") + ". Keep crushing it, superstar!");
+      } else {
+        const tasks = (await store.get("tasks")) || [];
+        const entry = { id: Date.now(), title: newDraft.title || "", priority: newDraft.priority || "medium", source: newDraft.source || "self", dueDate: newDraft.dueDate || "", notes: "", status: "pending", created: new Date().toISOString() };
+        await store.set("tasks", [entry, ...tasks]);
+        setEcoMsg("Task locked in! \u201C" + (newDraft.title||"task") + "\u201D is on your list. You\u2019ve got this!");
+      }
+      setSaved(true);
+    }
+  };
+
+  const handleSkip = () => {
+    const newDraft = { ...draft, [currentStep.key]: "" };
+    setDraft(newDraft);
+    if (step < currentSteps.length - 1) { setStep(step + 1); setCustomInput(""); }
+    else handleSelect("");
+  };
+
+  const quickActions = [
+    { label: "Quick Log Activity", desc: "Tap through \u2014 no typing needed", action: "logActivity", icon: "activity", highlight: true },
+    { label: "Quick Add Task", desc: "Eco builds it, you just tap", action: "logTask", icon: "tasks", highlight: true },
+    { label: "View sales dashboard", desc: "Targets, actuals & bonuses", section: "dashboard", icon: "chart" },
+    { label: "Raise admission request", desc: "Urgent issue? Flag it now", section: "tickets", icon: "ticket" },
+    { label: "See announcements", desc: "Latest from Engine Room", section: "announcements", icon: "megaphone" },
+    { label: "Agent performance", desc: "Top agents & portfolio", section: "agents", icon: "agents" },
+    { label: "Knowledge room", desc: "University docs & resources", section: "knowledge", icon: "book" },
+  ];
+
+  const filtered = query
+    ? quickActions.filter(a => a.label.toLowerCase().includes(query.toLowerCase()) || a.desc.toLowerCase().includes(query.toLowerCase()))
+    : quickActions;
+
+  const EcoBubble = ({ msg }) => (
+    <div style={{ display:"flex",gap:10,alignItems:"flex-start",marginBottom:10 }}>
+      <div style={{ flexShrink:0,width:26,height:26,borderRadius:"50%",background:"rgba(255,255,255,.12)",border:"1.5px solid rgba(212,168,71,.3)",display:"flex",alignItems:"center",justifyContent:"center" }}>
+        <PenguinMascot size={18} />
+      </div>
+      <div style={{ background:"rgba(255,255,255,.08)",borderRadius:"2px 10px 10px 10px",padding:"10px 14px",flex:1,borderLeft:"2px solid var(--gold)" }}>
+        <div style={{ color:"#ffffff",fontSize:13,lineHeight:1.6,fontWeight:500 }}>{msg}</div>
+      </div>
+    </div>
+  );
+
+  const ProgressDots = () => (
+    <div style={{ display:"flex",gap:5,marginBottom:12 }}>
+      {currentSteps.map((_, i) => (
+        <div key={i} style={{ width: i === step ? 20 : 8, height: 6, borderRadius: 3, background: i < step ? "var(--gold)" : i === step ? "#ffffff" : "rgba(255,255,255,.2)", transition: "all .3s" }} />
+      ))}
+    </div>
+  );
+
+  return (
+    <>
+      {/* Floating Eco button */}
+      <div style={{ position:"fixed",bottom:24,right:24,zIndex:1000,display:"flex",flexDirection:"column",alignItems:"center",gap:4 }}>
+        {!open && (
+          <div style={{ background:"var(--navy)",color:"#fff",padding:"5px 12px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",boxShadow:"0 2px 8px rgba(0,0,0,.15)",animation:"ecoPulse 2s ease-in-out infinite" }}>
+            Ask Eco
+          </div>
+        )}
+        <button onClick={() => { if(open) { setOpen(false); resetFlow(); } else setOpen(true); }} style={{
+          width:68,height:68,borderRadius:"50%",border:"3px solid var(--gold)",
+          background:"linear-gradient(135deg,#ffffff,#faf6ed)",cursor:"pointer",
+          boxShadow: open ? "0 4px 20px rgba(0,0,0,.15)" : "0 4px 24px rgba(184,134,11,.25), 0 0 0 6px rgba(184,134,11,.08)",
+          display:"flex",alignItems:"center",justifyContent:"center",transition:"all .3s",
+          transform: open ? "scale(0.92)" : "scale(1)"
+        }}>
+          {open
+            ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a2a3a" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            : <PenguinMascot size={48} />
+          }
+        </button>
+      </div>
+
+      {/* Eco panel */}
+      {open && (
+        <div style={{
+          position:"fixed",bottom:108,right:24,width:380,borderRadius:16,background:"#ffffff",
+          border:"1px solid #e8e6e1",boxShadow:"0 16px 48px rgba(0,0,0,.14)",zIndex:1000,
+          overflow:"hidden",display:"flex",flexDirection:"column",maxHeight:"80vh",
+          animation:"ecoSlideUp .3s ease"
+        }}>
+          <style>{`
+            @keyframes ecoSlideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+            @keyframes ecoPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
+            @keyframes ecoBlink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+            @keyframes ecoFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+          `}</style>
+
+          {/* ═══ HOME ═══ */}
+          {mode === "home" && (<>
+            <div style={{ padding:"22px 22px 18px",background:"linear-gradient(135deg,#1a2a3a 0%,#2a3f54 100%)",position:"relative",overflow:"hidden",flexShrink:0 }}>
+              <div style={{ position:"absolute",top:-20,right:-20,width:80,height:80,borderRadius:"50%",border:"1px solid rgba(212,168,71,.15)" }} />
+              <div style={{ display:"flex",alignItems:"center",gap:16,position:"relative" }}>
+                <div style={{ flexShrink:0,background:"rgba(255,255,255,.12)",borderRadius:"50%",padding:6,border:"2px solid rgba(212,168,71,.3)" }}>
+                  <PenguinMascot size={48} />
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                    <span style={{ color:"#ffffff",fontWeight:800,fontSize:18,fontFamily:"var(--serif)" }}>Eco</span>
+                    <span style={{ background:"var(--gold)",color:"#fff",fontSize:8,fontWeight:700,padding:"2px 8px",borderRadius:10,letterSpacing:1,textTransform:"uppercase" }}>Online</span>
+                  </div>
+                  <div style={{ color:"rgba(255,255,255,.5)",fontSize:11,fontWeight:500,marginTop:3 }}>Your INUNI assistant</div>
+                </div>
+              </div>
+              <div style={{ marginTop:16,background:"rgba(255,255,255,.08)",borderRadius:10,padding:"12px 14px",borderLeft:"3px solid var(--gold)" }}>
+                <div style={{ color:"#ffffff",fontSize:13,lineHeight:1.6,fontWeight:500,minHeight:20 }}>
+                  {hasOpened ? typedText : introMsg}
+                  {hasOpened && typedText.length < introMsg.length && <span style={{ display:"inline-block",width:2,height:14,background:"var(--gold)",marginLeft:2,animation:"ecoBlink 0.8s infinite" }} />}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding:"14px 18px 8px",flexShrink:0 }}>
+              <div style={{ display:"flex",alignItems:"center",gap:10,padding:"11px 14px",background:"#f7f6f3",borderRadius:8,border:"1px solid #e8e6e1" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c9aab" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input value={query} onChange={e => setQuery(e.target.value)} placeholder="What are you looking for?" style={{ flex:1,border:"none",background:"transparent",outline:"none",fontSize:13,color:"var(--navy)",fontFamily:"var(--body)" }} />
+              </div>
+            </div>
+
+            <div style={{ padding:"6px 18px 18px",overflowY:"auto",flex:1 }}>
+              <div style={{ fontSize:10,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:10 }}>Quick Actions</div>
+              {filtered.map((a, i) => (
+                <button key={i} onClick={() => {
+                  if (a.action === "logActivity") { setMode("logActivity"); setStep(0); setDraft({}); }
+                  else if (a.action === "logTask") { setMode("logTask"); setStep(0); setDraft({}); }
+                  else if (a.section) { onNavigate(a.section); setOpen(false); setQuery(""); resetFlow(); }
+                }} style={{
+                  display:"flex",alignItems:"center",gap:12,width:"100%",padding:"10px 12px",borderRadius:8,
+                  border: a.highlight ? "1px solid #d4a84730" : "none",
+                  background: a.highlight ? "linear-gradient(135deg,#faf6ed,#f7f0df)" : "transparent",
+                  cursor:"pointer",fontFamily:"var(--body)",fontSize:13,color:"var(--navy)",textAlign:"left",
+                  transition:"all .15s",marginBottom: a.highlight ? 6 : 2
+                }} onMouseEnter={e => { if(!a.highlight) e.currentTarget.style.background="#f7f6f3"; }} onMouseLeave={e => { if(!a.highlight) e.currentTarget.style.background = a.highlight ? "linear-gradient(135deg,#faf6ed,#f7f0df)" : "transparent"; }}>
+                  <div style={{ width:34,height:34,borderRadius:8,background: a.highlight ? "linear-gradient(135deg,var(--gold),#d4a847)" : "linear-gradient(135deg,#faf6ed,#f7f0df)",display:"flex",alignItems:"center",justifyContent:"center",color: a.highlight ? "#fff" : "var(--gold)",flexShrink:0,border: a.highlight ? "none" : "1px solid #d4a84720" }}>
+                    <Icon name={a.icon} size={15} />
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontWeight: a.highlight ? 700 : 600,fontSize:13 }}>{a.label}</div>
+                    <div style={{ fontSize:11,color: a.highlight ? "var(--gold)" : "#8c9aab",marginTop:1 }}>{a.desc}</div>
+                  </div>
+                  {a.highlight && <div style={{ color:"var(--gold)" }}><Icon name="arrow" size={14} /></div>}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ padding:"10px 18px",borderTop:"1px solid #e8e6e1",background:"#faf9f7",display:"flex",justifyContent:"center",alignItems:"center",gap:6,flexShrink:0 }}>
+              <PenguinMascot size={14} />
+              <span style={{ fontSize:10,color:"#b8b5ae",letterSpacing:0.5,fontWeight:500 }}>Eco · INUNI THE DECK</span>
+            </div>
+          </>)}
+
+          {/* ═══ GUIDED FLOW ═══ */}
+          {(mode === "logActivity" || mode === "logTask") && currentStep && (<>
+            <div style={{ padding:"20px 22px 16px",background:"linear-gradient(135deg,#1a2a3a 0%,#2a3f54 100%)",flexShrink:0 }}>
+              <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14 }}>
+                <button onClick={() => { if(step > 0) { setStep(step-1); const d = {...draft}; delete d[currentStep.key]; setDraft(d); setCustomInput(""); } else resetFlow(); }} style={{ background:"rgba(255,255,255,.08)",border:"none",color:"#fff",padding:"5px 10px",borderRadius:6,cursor:"pointer",fontSize:11,fontWeight:600,fontFamily:"var(--body)",display:"flex",alignItems:"center",gap:4 }}>
+                  \u2190 {step > 0 ? "Back" : "Home"}
+                </button>
+                <span style={{ color:"var(--gold)",fontSize:10,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase" }}>
+                  {mode === "logActivity" ? "Quick Log" : "Quick Task"} \u00B7 {step+1}/{currentSteps.length}
+                </span>
+              </div>
+
+              <ProgressDots />
+
+              {Object.keys(draft).length > 0 && (
+                <div style={{ display:"flex",flexWrap:"wrap",gap:5,marginBottom:10 }}>
+                  {Object.entries(draft).filter(([k,v]) => v).map(([k,v]) => (
+                    <span key={k} style={{ background:"rgba(212,168,71,.2)",color:"#d4a847",padding:"3px 10px",borderRadius:12,fontSize:10,fontWeight:600 }}>
+                      {typeof v === "string" && v.length > 28 ? v.slice(0,28)+"\u2026" : v}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <EcoBubble msg={currentStep.eco} />
+            </div>
+
+            <div style={{ padding:"16px 18px",overflowY:"auto",flex:1,maxHeight:300,animation:"ecoFadeIn .25s ease" }}>
+              <div style={{ display:"flex",flexWrap:"wrap",gap:8 }}>
+                {currentStep.options.map((opt, i) => {
+                  const label = typeof opt === "object" ? opt.label : opt;
+                  const value = typeof opt === "object" ? opt.value : opt;
+                  return (
+                    <button key={i} onClick={() => handleSelect(value)} style={{
+                      padding:"10px 16px",borderRadius:24,border:"1px solid #e8e6e1",background:"#ffffff",
+                      color:"var(--navy)",fontSize:12,fontWeight:500,cursor:"pointer",fontFamily:"var(--body)",
+                      transition:"all .15s",textAlign:"left",lineHeight:1.4
+                    }} onMouseEnter={e => { e.currentTarget.style.background="linear-gradient(135deg,#faf6ed,#f7f0df)"; e.currentTarget.style.borderColor="#d4a847"; e.currentTarget.style.color="#b8860b"; }}
+                       onMouseLeave={e => { e.currentTarget.style.background="#ffffff"; e.currentTarget.style.borderColor="#e8e6e1"; e.currentTarget.style.color="var(--navy)"; }}>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {currentStep.allowCustom && (
+                <div style={{ marginTop:14,display:"flex",gap:8 }}>
+                  <input value={customInput} onChange={e => setCustomInput(e.target.value)} placeholder="Or type your own\u2026" style={{ flex:1,padding:"10px 14px",borderRadius:24,border:"1px solid #e8e6e1",background:"#f7f6f3",fontSize:12,color:"var(--navy)",fontFamily:"var(--body)",outline:"none" }} onKeyDown={e => { if(e.key==="Enter" && customInput.trim()) { handleSelect(customInput.trim()); setCustomInput(""); }}} />
+                  <button onClick={() => { if(customInput.trim()) { handleSelect(customInput.trim()); setCustomInput(""); }}} style={{ padding:"10px 16px",borderRadius:24,border:"none",background:"var(--navy)",color:"#fff",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"var(--body)",letterSpacing:0.5 }}>Add</button>
+                </div>
+              )}
+
+              {currentStep.allowSkip && (
+                <button onClick={handleSkip} style={{ marginTop:12,background:"none",border:"none",color:"#8c9aab",fontSize:12,cursor:"pointer",fontFamily:"var(--body)",fontWeight:500,padding:"6px 0" }}>
+                  Skip this step \u2192
+                </button>
+              )}
+            </div>
+          </>)}
+
+          {/* ═══ CONFIRMATION ═══ */}
+          {mode === "confirm" && (<>
+            <div style={{ padding:"28px 22px",background:"linear-gradient(135deg,#1a2a3a 0%,#2a3f54 100%)",textAlign:"center" }}>
+              <div style={{ width:64,height:64,margin:"0 auto 16px",borderRadius:"50%",background:"rgba(212,168,71,.15)",border:"2px solid rgba(212,168,71,.4)",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                {saved
+                  ? <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d4a847" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <PenguinMascot size={42} />
+                }
+              </div>
+              <div style={{ color:"#d4a847",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:10 }}>
+                {saved ? "All Done!" : "Saving\u2026"}
+              </div>
+              <div style={{ color:"#ffffff",fontSize:14,lineHeight:1.7,fontWeight:500,maxWidth:300,margin:"0 auto" }}>
+                {ecoMsg}
+              </div>
+            </div>
+
+            <div style={{ padding:"16px 18px" }}>
+              <div style={{ fontSize:10,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:10 }}>Eco recorded this for you</div>
+              {Object.entries(draft).filter(([k,v]) => v).map(([k,v]) => (
+                <div key={k} style={{ display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #f0eeeb",fontSize:12 }}>
+                  <span style={{ color:"#8c9aab",textTransform:"capitalize",fontWeight:500 }}>{k.replace(/([A-Z])/g," $1")}</span>
+                  <span style={{ color:"var(--navy)",fontWeight:600,maxWidth:200,textAlign:"right" }}>{typeof v === "string" && v.length > 35 ? v.slice(0,35)+"\u2026" : v}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding:"10px 18px 18px",display:"flex",gap:8 }}>
+              <button onClick={resetFlow} style={{ flex:1,padding:"12px",borderRadius:8,border:"1px solid #e8e6e1",background:"#fff",color:"var(--navy)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"var(--body)" }}>
+                Back to Eco
+              </button>
+              <button onClick={() => { const wasActivity = !!draft.type; resetFlow(); if(wasActivity) { setMode("logActivity"); } else { setMode("logTask"); } }} style={{ flex:1,padding:"12px",borderRadius:8,border:"none",background:"linear-gradient(135deg,var(--gold),#d4a847)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"var(--body)" }}>
+                Log Another
+              </button>
+            </div>
+          </>)}
+        </div>
+      )}
+    </>
+  );
+}
+
+
+// ─── MAIN APP ────────────────────────────────────────────────────
+const NAV = [
+  {id:"activity",label:"Activity Log",icon:"activity"},
+  {id:"tasks",label:"Tasks",icon:"tasks"},
+  {id:"tickets",label:"Admissions",icon:"ticket"},
+  {id:"dashboard",label:"Command Centre",icon:"target"},
+  {id:"operations",label:"Operations",icon:"send"},
+  {id:"announcements",label:"Announcements",icon:"megaphone"},
+  {id:"agents",label:"Agents",icon:"agents"},
+  {id:"knowledge",label:"Knowledge",icon:"book"},
+];
+const STEPS = [
+  {num:1,id:"activity",label:"LOG"},
+  {num:2,id:"tasks",label:"TASKS"},
+  {num:3,id:"dashboard",label:"COMMAND"},
+  {num:4,id:"operations",label:"OPS"},
+  {num:5,id:"agents",label:"AGENTS"},
+  {num:6,id:"announcements",label:"NEWS"},
+  {num:7,id:"knowledge",label:"KNOWLEDGE"},
+];
+
+// ─── GOLDEN COIN CELEBRATION ─────────────────────────────────────
+function CoinCelebration({ count, onDone }) {
+  const [coins, setCoins] = useState([]);
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    const generated = [];
+    for (let i = 0; i < 40; i++) {
+      generated.push({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 1.2,
+        duration: 1.8 + Math.random() * 1.5,
+        size: 18 + Math.random() * 22,
+        rotation: Math.random() * 720 - 360,
+        xDrift: (Math.random() - 0.5) * 120,
+      });
+    }
+    setCoins(generated);
+    const timer = setTimeout(() => { setShow(false); if(onDone) onDone(); }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <div style={{ position:"fixed",inset:0,zIndex:9999,pointerEvents:"auto",display:"flex",alignItems:"center",justifyContent:"center" }} onClick={() => { setShow(false); if(onDone) onDone(); }}>
+      <div style={{ position:"absolute",inset:0,background:"rgba(26,42,58,.7)",backdropFilter:"blur(4px)" }} />
+      <style>{`
+        @keyframes coinFall {
+          0% { transform: translateY(-120vh) translateX(0px) rotate(0deg); opacity:0; }
+          10% { opacity:1; }
+          100% { transform: translateY(110vh) translateX(var(--xd)) rotate(var(--rot)); opacity:0; }
+        }
+        @keyframes coinPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.08); } }
+        @keyframes celebFade { 0% { opacity:0; transform:scale(0.8) translateY(20px); } 100% { opacity:1; transform:scale(1) translateY(0); } }
+      `}</style>
+
+      {/* Falling coins */}
+      {coins.map(c => (
+        <div key={c.id} style={{
+          position:"fixed", left:`${c.left}%`, top:0, zIndex:10000,
+          animation:`coinFall ${c.duration}s ${c.delay}s ease-in forwards`,
+          "--xd":`${c.xDrift}px`, "--rot":`${c.rotation}deg`
+        }}>
+          <svg width={c.size} height={c.size} viewBox="0 0 40 40">
+            <defs>
+              <radialGradient id={`cg${c.id}`} cx="40%" cy="35%">
+                <stop offset="0%" stopColor="#f5d670"/>
+                <stop offset="50%" stopColor="#d4a847"/>
+                <stop offset="100%" stopColor="#96710a"/>
+              </radialGradient>
+            </defs>
+            <circle cx="20" cy="20" r="18" fill={`url(#cg${c.id})`} stroke="#96710a" strokeWidth="1.5"/>
+            <circle cx="20" cy="20" r="13" fill="none" stroke="#f5d670" strokeWidth="0.8" opacity="0.5"/>
+            <text x="20" y="24" textAnchor="middle" fontSize="14" fontWeight="800" fill="#96710a" fontFamily="serif">$</text>
+          </svg>
+        </div>
+      ))}
+
+      {/* Center message */}
+      <div style={{ position:"relative",zIndex:10001,textAlign:"center",animation:"celebFade .6s .3s ease both" }}>
+        <div style={{ width:100,height:100,borderRadius:"50%",background:"linear-gradient(135deg,#d4a847,#f5d670)",margin:"0 auto 24px",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 0 60px rgba(212,168,71,.5), 0 0 120px rgba(212,168,71,.2)",animation:"coinPulse 1.5s ease infinite" }}>
+          <svg width="48" height="48" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="18" fill="none" stroke="#96710a" strokeWidth="1.5"/>
+            <text x="20" y="25" textAnchor="middle" fontSize="18" fontWeight="800" fill="#96710a" fontFamily="serif">$</text>
+          </svg>
+        </div>
+        <div style={{ color:"#f5d670",fontSize:14,fontWeight:700,letterSpacing:3,textTransform:"uppercase",marginBottom:10 }}>New Deposit{count > 1 ? "s" : ""} Received!</div>
+        <div style={{ color:"#ffffff",fontSize:48,fontWeight:800,fontFamily:"var(--serif)",lineHeight:1,marginBottom:8 }}>+{count}</div>
+        <div style={{ color:"#ffffff",fontSize:16,fontWeight:500,opacity:.8,marginBottom:24 }}>
+          {count === 1 ? "A new deposit just landed!" : `${count} new deposits just landed!`}
+        </div>
+        <div style={{ color:"#ffffff",fontSize:20,fontWeight:700,fontFamily:"var(--serif)" }}>Keep going, superstar!</div>
+        <div style={{ color:"rgba(255,255,255,.4)",fontSize:12,marginTop:20 }}>Tap anywhere to continue</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── LOGIN SCREEN ────────────────────────────────────────────────
+function LoginScreen({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = () => {
+    if (!email || !password) { setError("Please enter your credentials"); return; }
+    setLoading(true);
+    setError("");
+    setTimeout(() => {
+      const displayName = email.split("@")[0].replace(/[._]/g," ").replace(/\b\w/g, c => c.toUpperCase());
+      onLogin({ email, name: displayName });
+    }, 1200);
+  };
+
+  return (
+    <div style={{ "--navy":"#1a2a3a","--gold":"#b8860b","--gold-light":"#d4a847","--serif":"'Playfair Display',Georgia,serif","--body":"'Source Sans 3','Segoe UI',sans-serif", fontFamily:"var(--body)",minHeight:"100vh",display:"flex",background:"#f7f6f3" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes loginFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+        @keyframes loginFadeIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes loginGlow { 0%,100% { box-shadow:0 0 40px rgba(184,134,11,.15); } 50% { box-shadow:0 0 60px rgba(184,134,11,.25); } }
+      `}</style>
+
+      {/* Left panel — branding */}
+      <div style={{ flex:1,background:"linear-gradient(135deg,#1a2a3a 0%,#0f1a26 100%)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden",padding:40 }}>
+        {/* Decorative elements */}
+        <div style={{ position:"absolute",top:"10%",left:"10%",width:200,height:200,borderRadius:"50%",border:"1px solid rgba(212,168,71,.08)" }} />
+        <div style={{ position:"absolute",bottom:"15%",right:"5%",width:300,height:300,borderRadius:"50%",border:"1px solid rgba(212,168,71,.05)" }} />
+        <div style={{ position:"absolute",top:"40%",right:"20%",width:100,height:100,borderRadius:"50%",border:"1px solid rgba(212,168,71,.1)" }} />
+
+        <div style={{ position:"relative",textAlign:"center",animation:"loginFadeIn .8s ease" }}>
+          <div style={{ animation:"loginFloat 4s ease-in-out infinite",marginBottom:40 }}>
+            <PenguinMascot size={140} />
+          </div>
+          <div style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:0,marginBottom:16 }}>
+            <span style={{ fontWeight:800,fontSize:36,letterSpacing:2,color:"#ffffff",fontFamily:"var(--serif)" }}>INUNI</span>
+            <span style={{ width:2,height:30,background:"var(--gold)",margin:"0 18px" }} />
+            <span style={{ fontWeight:600,fontSize:20,letterSpacing:6,color:"var(--gold)" }}>THE DECK</span>
+          </div>
+          <div style={{ color:"rgba(255,255,255,.4)",fontSize:13,letterSpacing:3,textTransform:"uppercase",fontWeight:500 }}>
+            Your Command Centre
+          </div>
+
+          <div style={{ marginTop:60,display:"flex",gap:28,justifyContent:"center" }}>
+            {[{n:"7",l:"Modules"},{n:"10",l:"Universities"},{n:"24/7",l:"Eco Assistant"}].map(s => (
+              <div key={s.l} style={{ textAlign:"center" }}>
+                <div style={{ color:"var(--gold)",fontSize:24,fontWeight:700,fontFamily:"var(--serif)" }}>{s.n}</div>
+                <div style={{ color:"rgba(255,255,255,.35)",fontSize:10,letterSpacing:1.5,textTransform:"uppercase",marginTop:4 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel — login form */}
+      <div style={{ width:480,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 60px",background:"#ffffff" }}>
+        <div style={{ width:"100%",maxWidth:340,animation:"loginFadeIn .8s .2s ease both" }}>
+          <div style={{ marginBottom:40 }}>
+            <div style={{ fontSize:11,fontWeight:600,color:"var(--gold)",letterSpacing:2.5,textTransform:"uppercase",marginBottom:10 }}>Welcome Back</div>
+            <div style={{ fontSize:30,fontWeight:400,fontFamily:"var(--serif)",color:"var(--navy)",lineHeight:1.2 }}>Sign in to<br/>The Deck</div>
+          </div>
+
+          <div style={{ display:"flex",flexDirection:"column",gap:24 }}>
+            <div style={{ display:"flex",flexDirection:"column",gap:5 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Email Address</label>
+              <input value={email} onChange={e => { setEmail(e.target.value); setError(""); }} placeholder="name@inuni.com" type="email" style={{ padding:"14px 0",border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",fontSize:15,color:"var(--navy)",outline:"none",fontFamily:"var(--body)",transition:"border-color .2s" }} onFocus={e => e.target.style.borderBottomColor = "#b8860b"} onBlur={e => e.target.style.borderBottomColor = "#d5d3ce"} onKeyDown={e => e.key === "Enter" && handleLogin()} />
+            </div>
+
+            <div style={{ display:"flex",flexDirection:"column",gap:5 }}>
+              <label style={{ fontSize:11,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:1.2 }}>Password</label>
+              <input value={password} onChange={e => { setPassword(e.target.value); setError(""); }} placeholder="Enter your password" type="password" style={{ padding:"14px 0",border:"none",borderBottom:"1px solid #d5d3ce",background:"transparent",fontSize:15,color:"var(--navy)",outline:"none",fontFamily:"var(--body)",transition:"border-color .2s" }} onFocus={e => e.target.style.borderBottomColor = "#b8860b"} onBlur={e => e.target.style.borderBottomColor = "#d5d3ce"} onKeyDown={e => e.key === "Enter" && handleLogin()} />
+            </div>
+
+            {error && <div style={{ color:"#c0392b",fontSize:12,fontWeight:500 }}>{error}</div>}
+
+            <button onClick={handleLogin} disabled={loading} style={{
+              padding:"16px",borderRadius:4,border:"none",
+              background: loading ? "#d5d3ce" : "linear-gradient(135deg,var(--navy),#2a3f54)",
+              color:"#ffffff",fontSize:13,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",
+              cursor: loading ? "default" : "pointer",fontFamily:"var(--body)",transition:"all .3s",
+              animation: !loading ? "loginGlow 3s ease infinite" : "none"
+            }}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+
+            <div style={{ textAlign:"center" }}>
+              <button style={{ background:"none",border:"none",color:"var(--gold)",fontSize:12,cursor:"pointer",fontFamily:"var(--body)",fontWeight:500 }}>Forgot password?</button>
+            </div>
+          </div>
+
+          <div style={{ marginTop:48,paddingTop:24,borderTop:"1px solid #e8e6e1",textAlign:"center" }}>
+            <div style={{ fontSize:10,color:"#b8b5ae",letterSpacing:1.5,textTransform:"uppercase" }}>Powered by INUNI Academic Intelligence</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [section, setSection] = useState("activity");
+  const [now, setNow] = useState(new Date());
+  const [showCoins, setShowCoins] = useState(false);
+  const [newDeposits, setNewDeposits] = useState(0);
+
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
+  const currentIdx = STEPS.findIndex(s => s.id === section);
+
+  const handleLogin = async (userData) => {
+    setUser(userData);
+    const lastDeposits = await store.get("lastDepositCount");
+    const salesData = await store.get("salesData");
+    if (salesData) {
+      let currentTotal = 0;
+      Object.values(salesData.intakes).forEach(intake => {
+        Object.values(intake).forEach(d => { currentTotal += d.depositActual; });
+      });
+      const lastCount = lastDeposits || 0;
+      if (currentTotal > lastCount && lastCount > 0) {
+        setNewDeposits(currentTotal - lastCount);
+        setShowCoins(true);
+      }
+      await store.set("lastDepositCount", currentTotal);
+    } else {
+      setTimeout(async () => {
+        const sd = await store.get("salesData");
+        if (sd) {
+          let total = 0;
+          Object.values(sd.intakes).forEach(intake => { Object.values(intake).forEach(d => { total += d.depositActual; }); });
+          await store.set("lastDepositCount", total);
+        }
+      }, 2000);
+    }
+  };
+
+  const handleLogout = () => { setUser(null); setSection("activity"); };
+
+  const renderSection = () => {
+    switch(section) {
+      case "activity": return <ActivityLog />;
+      case "tasks": return <Tasks />;
+      case "tickets": return <AdmissionTickets />;
+      case "dashboard": return <CommandCentre />;
+      case "operations": return <Operations user={user} />;
+      case "announcements": return <Announcements />;
+      case "agents": return <AgentPortfolio />;
+      case "knowledge": return <KnowledgeRoom />;
+      default: return null;
+    }
+  };
+
+  if (!user) return <LoginScreen onLogin={handleLogin} />;
+
+  return (
+    <div style={{ "--navy":"#1a2a3a","--gold":"#b8860b","--gold-light":"#d4a847","--serif":"'Playfair Display',Georgia,serif","--body":"'Source Sans 3','Segoe UI',sans-serif", fontFamily:"var(--body)",background:"#f7f6f3",color:"var(--navy)",minHeight:"100vh",fontSize:14,lineHeight:1.6 }}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      {showCoins && <CoinCelebration count={newDeposits} onDone={() => setShowCoins(false)} />}
+
+      <div style={{ background:"#ffffff",borderBottom:"1px solid #e8e6e1",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:72 }}>
+        <div style={{ display:"flex",alignItems:"center",gap:0 }}>
+          <span style={{ fontWeight:800,fontSize:22,letterSpacing:1,color:"var(--navy)",fontFamily:"var(--serif)" }}>INUNI</span>
+          <span style={{ width:1,height:22,background:"var(--gold)",margin:"0 14px" }} />
+          <span style={{ fontWeight:600,fontSize:14,letterSpacing:4,color:"var(--gold)" }}>THE DECK</span>
+        </div>
+        <div style={{ display:"flex",alignItems:"center",gap:0 }}>
+          {STEPS.map((s,i) => (
+            <div key={s.id} style={{ display:"flex",alignItems:"center" }}>
+              <button onClick={() => setSection(s.id)} style={{ display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",padding:"8px 8px",fontFamily:"var(--body)" }}>
+                <div style={{ width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:600, background:section===s.id?"var(--navy)":i<currentIdx?"var(--gold)":"#e8e6e1", color:section===s.id||i<currentIdx?"#fff":"#8c9aab", transition:"all .2s" }}>{s.num}</div>
+                <span style={{ fontSize:9,fontWeight:600,letterSpacing:0.8,color:section===s.id?"var(--navy)":"#8c9aab" }}>{s.label}</span>
+              </button>
+              {i<STEPS.length-1 && <div style={{ width:14,height:1,background:i<currentIdx?"var(--gold)":"#e8e6e1" }} />}
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"flex",alignItems:"center",gap:16 }}>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontSize:12,fontWeight:600,color:"var(--navy)" }}>{user.name}</div>
+            <div style={{ fontSize:10,color:"#8c9aab" }}>{now.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})} · {now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>
+          </div>
+          <button onClick={handleLogout} style={{ width:34,height:34,borderRadius:"50%",border:"1px solid #e8e6e1",background:"#f7f6f3",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#8c9aab" }} title="Sign out">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style={{ height:2,background:"linear-gradient(to right, var(--gold), var(--gold-light), var(--gold))" }} />
+
+      <div style={{ display:"flex",minHeight:"calc(100vh - 74px)" }}>
+        <div style={{ width:240,borderRight:"1px solid #e8e6e1",padding:"24px 12px",background:"#ffffff",flexShrink:0,overflowY:"auto" }}>
+          <div style={{ padding:"0 14px",marginBottom:16 }}><div style={{ fontSize:10,fontWeight:600,color:"#8c9aab",textTransform:"uppercase",letterSpacing:2 }}>Navigation</div></div>
+          {NAV.map(n => (
+            <button key={n.id} onClick={() => setSection(n.id)} style={{ display:"flex",alignItems:"center",gap:12,width:"100%",padding:"10px 16px",borderRadius:4,border:"none", background:section===n.id?"#f7f6f3":"transparent", color:section===n.id?"var(--navy)":"#8c9aab", cursor:"pointer",fontFamily:"var(--body)",fontSize:13,fontWeight:section===n.id?600:400, transition:"all .15s",marginBottom:1,textAlign:"left", borderLeft:section===n.id?"2px solid var(--gold)":"2px solid transparent" }}>
+              <Icon name={n.icon} size={16} />{n.label}
+            </button>
+          ))}
+          <div style={{ marginTop:24,padding:"16px 14px",borderRadius:6,background:"linear-gradient(135deg,#faf6ed,#f7f0df)",border:"1px solid #d4a84720" }}>
+            <div style={{ fontSize:10,fontWeight:600,color:"var(--gold)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6 }}>Logged in as</div>
+            <div style={{ fontSize:13,color:"var(--navy)",fontWeight:600,fontFamily:"var(--serif)" }}>{user.name}</div>
+            <div style={{ fontSize:11,color:"#8c9aab",lineHeight:2,marginTop:4 }}>Engine Room: <span style={{ color:"#2d6a4f",fontWeight:600 }}>Active</span></div>
+          </div>
+        </div>
+        <div style={{ flex:1,padding:"28px 36px",overflowY:"auto",maxHeight:"calc(100vh - 74px)" }}>{renderSection()}</div>
+      </div>
+      <PenguinAssistant onNavigate={setSection} />
+    </div>
+  );
+}
