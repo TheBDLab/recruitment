@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:#F2EDE4;font-family:'EB Garamond',Georgia,serif;color:#1A1410;line-height:1.7}
+  .page{background:#FDFAF5;max-width:780px;margin:0 auto 3px;position:relative;overflow:hidden}
+  .cover{min-height:1020px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 70px;text-align:center;background:#0A1628}
+  .cb{position:absolute;inset:18px;border:0.5px solid rgba(200,165,74,.4);pointer-events:none}
+  .cbi{position:absolute;inset:24px;border:0.5px solid rgba(200,165,74,.18);pointer-events:none}
+  .orn{color:#C8A54A;font-size:17px;letter-spacing:12px;margin-bottom:38px;opacity:.8}
+  .wordmark{font-family:'Cormorant Garamond',Georgia,serif;font-size:68px;font-weight:300;color:#FFFFFF;letter-spacing:22px;line-height:1;white-space:nowrap;margin-bottom:10px;text-indent:22px}
+  .logo-sub{font-size:11px;letter-spacing:5px;color:rgba(200,165,74,.7);text-transform:uppercase;margin-bottom:46px}
+  .cr1{width:160px;height:0.5px;background:#C8A54A;opacity:.5;margin:0 auto 46px}
+  .inv{font-size:14px;color:rgba(255,255,255,.5);font-style:italic;margin-bottom:18px;letter-spacing:.3px}
+  .ctitle{font-family:'Cormorant Garamond',Georgia,serif;font-size:44px;font-weight:400;color:#FFFFFF;line-height:1.2;margin-bottom:46px;max-width:580px}
+  .cr2{width:280px;height:0.5px;background:#C8A54A;opacity:.45;margin:0 auto 34px}
+  .ctag{font-size:14px;color:rgba(255,255,255,.55);font-style:italic;line-height:1.9;max-width:480px;margin-bottom:42px}
+  .datebox{background:rgba(200,165,74,.1);border:0.5px solid rgba(200,165,74,.3);padding:20px 52px;margin-bottom:30px}
+  .datelabel{font-size:12px;letter-spacing:4px;color:#C8A54A;text-transform:uppercase;margin-bottom:5px}
+  .dateloc{font-size:16px;color:rgba(255,255,255,.7);font-style:italic}
+  .byinv{font-size:11px;letter-spacing:2px;color:rgba(200,165,74,.55);text-transform:uppercase;margin-bottom:42px}
+  .cbody{font-size:15px;color:rgba(255,255,255,.62);line-height:1.9;max-width:520px;text-align:justify;margin-bottom:18px}
+  .cbodyi{font-size:15px;color:rgba(255,255,255,.45);font-style:italic;line-height:1.9;max-width:520px;text-align:center;margin-bottom:38px}
+  .cdress{font-size:12px;color:rgba(255,255,255,.38);font-style:italic;margin-bottom:7px}
+  .ccontact{font-size:13px;color:rgba(200,165,74,.72);letter-spacing:.8px;line-height:2}
+  .ip{padding:68px 80px}
+  .slabel{font-size:10px;letter-spacing:4px;color:#C8A54A;text-transform:uppercase;text-align:center;margin-bottom:10px}
+  .stitle{font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;font-weight:400;color:#0A1628;text-align:center;margin-bottom:26px;line-height:1.2}
+  .grule{width:100%;height:0.5px;background:#C8A54A;opacity:.55;margin-bottom:30px}
+  .trule{width:100%;height:0.5px;background:rgba(200,165,74,.28);margin:22px 0}
+  .bt{font-size:15px;color:#2A2218;line-height:1.9;text-align:justify;margin-bottom:16px}
+  .dh{text-align:center;margin:38px 0 22px}
+  .dl{font-size:10px;letter-spacing:5px;color:#C8A54A;text-transform:uppercase;margin-bottom:5px}
+  .dd{font-family:'Cormorant Garamond',Georgia,serif;font-size:27px;color:#0A1628;margin-bottom:3px}
+  .dt{font-size:13px;color:#8A7A6A;font-style:italic;letter-spacing:.8px}
+  .st{width:100%;border-collapse:collapse;margin-bottom:6px}
+  .st tr{border-bottom:0.5px solid rgba(200,165,74,.18)}
+  .st tr:last-child{border-bottom:none}
+  .stt{font-size:13px;font-weight:500;color:#C8A54A;padding:10px 14px 10px 0;width:66px;vertical-align:top;white-space:nowrap;border-right:0.5px solid rgba(200,165,74,.3)}
+  .stc{padding:10px 0 10px 16px;vertical-align:top}
+  .stn{font-size:15px;font-weight:500;color:#0A1628;line-height:1.4}
+  .std{font-size:13px;color:#7A6A58;font-style:italic;line-height:1.5;margin-top:2px}
+  .sdiv td{padding:5px 0;text-align:center;color:rgba(200,165,74,.45);font-size:13px;letter-spacing:4px;border-bottom:none!important}
+  .gp{background:#0A1628;padding:68px 80px;position:relative;overflow:hidden}
+  .gorn{text-align:center;color:#C8A54A;font-size:15px;letter-spacing:10px;margin-bottom:26px;opacity:.75}
+  .geb{text-align:center;font-size:13px;color:rgba(255,255,255,.42);font-style:italic;margin-bottom:9px}
+  .gtitle{font-family:'Cormorant Garamond',Georgia,serif;font-size:52px;font-weight:400;color:#FFFFFF;text-align:center;line-height:1.1;margin-bottom:4px}
+  .gsub{font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;color:#C8A54A;text-align:center;margin-bottom:18px}
+  .gassl{text-align:center;font-size:12px;color:rgba(255,255,255,.32);font-style:italic;margin-bottom:5px}
+  .gassn{text-align:center;font-size:18px;font-weight:500;color:rgba(255,255,255,.78);letter-spacing:2px;margin-bottom:5px}
+  .gasss{text-align:center;font-size:13px;color:rgba(255,255,255,.32);font-style:italic;margin-bottom:30px}
+  .grule2{width:100%;height:0.5px;background:rgba(200,165,74,.35);margin:20px 0 26px}
+  .gb{font-size:15px;color:rgba(255,255,255,.62);line-height:1.9;text-align:justify;margin-bottom:16px}
+  .gbi{font-size:15px;color:rgba(255,255,255,.42);font-style:italic;line-height:1.9;text-align:center;margin-bottom:26px}
+  .gpillars{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin:24px 0}
+  .gpillars h4{font-size:14px;font-weight:500;color:rgba(255,255,255,.88);margin-bottom:5px;line-height:1.4}
+  .gpillars p{font-size:13px;color:rgba(255,255,255,.48);line-height:1.7;text-align:justify;margin-bottom:18px}
+  .gol{text-align:center;font-size:10px;letter-spacing:5px;color:rgba(200,165,74,.68);text-transform:uppercase;margin-bottom:18px}
+  .gstt{color:rgba(200,165,74,.88)!important;border-right-color:rgba(200,165,74,.22)!important}
+  .gstn{color:rgba(255,255,255,.88)!important}
+  .gstd{color:rgba(255,255,255,.38)!important}
+  .gst tr{border-bottom-color:rgba(200,165,74,.1)!important}
+  .dresbox{background:rgba(200,165,74,.07);border:0.5px solid rgba(200,165,74,.22);padding:16px 28px;text-align:center;margin-top:22px}
+  .dresl{font-size:11px;letter-spacing:4px;color:#C8A54A;text-transform:uppercase;margin-bottom:5px}
+  .dresd{font-size:13px;color:rgba(255,255,255,.42);font-style:italic}
+  .igrid{display:grid;grid-template-columns:1fr 1fr;gap:0 48px;margin-bottom:32px}
+  .ii{margin-bottom:20px}
+  .il{font-size:11px;letter-spacing:2px;color:#C8A54A;text-transform:uppercase;margin-bottom:4px}
+  .iv{font-size:14px;color:#2A2218;line-height:1.6}
+  .iv a{color:#B8860B;text-decoration:none}
+  .covbox{background:#F5F0E8;border:0.5px solid rgba(200,165,74,.38);padding:26px 30px;margin-bottom:28px}
+  .covey{font-size:10px;letter-spacing:4px;color:#C8A54A;text-transform:uppercase;text-align:center;margin-bottom:5px}
+  .covh{font-size:11px;letter-spacing:1.5px;color:#5A4A38;text-transform:uppercase;text-align:center;margin-bottom:18px}
+  .covgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px 28px;margin-bottom:16px}
+  .ci{font-size:13.5px;color:#2A2218;line-height:1.5;padding-left:15px;position:relative}
+  .ci::before{content:'✦';position:absolute;left:0;color:#C8A54A;font-size:9px;top:4px}
+  .ci.hl{font-weight:500;color:#0A1628}
+  .covfn{font-size:12px;color:#8A7A6A;font-style:italic;text-align:center;padding-top:12px;border-top:0.5px solid rgba(200,165,74,.22)}
+  .closing{text-align:center;padding:46px 80px 60px;background:#FDFAF5}
+  .clrule{width:180px;height:0.5px;background:#C8A54A;opacity:.5;margin:0 auto 26px}
+  .clorn{color:#C8A54A;font-size:13px;letter-spacing:8px;margin-bottom:18px;opacity:.65}
+  .clline{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-style:italic;color:#0A1628;margin-bottom:10px}
+  .clfoot{font-size:11px;letter-spacing:3px;color:#B0A090;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="page cover">
+  <div class="cb"></div><div class="cbi"></div>
+  <div class="orn">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <div class="wordmark">I N U N I</div>
+  <div class="logo-sub">Global University Systems</div>
+  <div class="cr1"></div>
+  <div class="inv">requests the honour of your presence at</div>
+  <div class="ctitle">The INUNI Grand Convocation<br>on Global Higher Education</div>
+  <div class="cr2"></div>
+  <div class="ctag">An Exclusive Convening of the World's Foremost Higher Education Leaders,<br>Distinguished Scholars, and Architects of Transnational Academic Partnership</div>
+  <div class="datebox">
+    <div class="datelabel">3 r d &nbsp;–&nbsp; 4 t h &nbsp; S e p t e m b e r &nbsp; 2 0 2 6</div>
+    <div class="dateloc">London, United Kingdom</div>
+  </div>
+  <div class="byinv">GUS Group Institutions &nbsp;·&nbsp; By Personal Invitation Only</div>
+  <div class="cbody">You have been personally selected to join a distinguished assembly of Vice-Chancellors, Presidents, Rectors, and senior policy leaders from universities and higher education institutions across the globe. This convening represents a singular opportunity to shape the future of international academic collaboration at the highest level.</div>
+  <div class="cbodyi">Your distinction in the field, your institution's contribution to global scholarship, and your commitment to the advancement of international higher education have been the criteria by which this invitation has been extended. We are honoured to welcome you.</div>
+  <div class="cdress">Convocation: Smart Formal &nbsp;·&nbsp; Gala Night: Black Tie &nbsp;·&nbsp; RSVP by 22nd May 2026</div>
+  <div class="ccontact">partnerships@inuniglobal.com &nbsp;·&nbsp; www.globaluniversitysystems.com</div>
+</div>
+
+<div class="page ip">
+  <div class="slabel">Convocation Overview</div>
+  <div class="stitle">About This Convening</div>
+  <div class="grule"></div>
+  <p class="bt">The INUNI Grand Convocation on Global Higher Education brings together the most distinguished minds in international higher education for two days of rigorous intellectual exchange, strategic dialogue, and relationship formation. Hosted by INUNI at GUS Group institutions in London, the Convocation is modelled on the great academic gatherings of the world's leading research universities — intimate in scale, exceptional in calibre, consequential in outcome.</p>
+  <p class="bt">The programme encompasses in-depth case studies of exemplary TNE partnerships, thought leadership panels with global scholars, peer roundtable discussions, institutional showcases, and focused academic workshops — culminating in an invitation to join INUNI and its partners at the prestigious <strong>PIE (Professionals in International Education) Awards Gala</strong> on 4th September, where the sector's most celebrated achievements are honoured in the tradition of the great academic prize-giving ceremonies.</p>
+
+  <div class="dh"><div class="dl">Day One</div><div class="dd">Thursday, 3rd September 2026</div><div class="dt">Knowledge &nbsp;·&nbsp; Evidence &nbsp;·&nbsp; Partnership</div></div>
+  <div class="trule"></div>
+  <table class="st">
+    <tr><td class="stt">08:30</td><td class="stc"><div class="stn">Registration &amp; Welcome Coffee</div><div class="std">Grand Hall, GUS London — delegates arrive</div></td></tr>
+    <tr><td class="stt">09:15</td><td class="stc"><div class="stn">Formal Opening Ceremony</div><div class="std">Chancellor's Address — Setting the agenda for global TNE</div></td></tr>
+    <tr><td class="stt">10:15</td><td class="stc"><div class="stn">In-Depth Case Studies I</div><div class="std">Institutional reputation, student outcomes &amp; global reach — data-driven presentations</div></td></tr>
+    <tr><td class="stt">12:00</td><td class="stc"><div class="stn">President's Roundtable Luncheon</div><div class="std">Invitation-only — Vice-Chancellors, Presidents &amp; Rectors</div></td></tr>
+    <tr><td class="stt">13:45</td><td class="stc"><div class="stn">Thought Leadership Panel I</div><div class="std">The Future of International Academic Collaboration</div></td></tr>
+    <tr><td class="stt">14:45</td><td class="stc"><div class="stn">Thought Leadership Panel II</div><div class="std">Digital Transformation &amp; AI in Transnational Education</div></td></tr>
+    <tr><td class="stt">15:45</td><td class="stc"><div class="stn">Afternoon Break</div></td></tr>
+    <tr><td class="stt">16:00</td><td class="stc"><div class="stn">Roundtable Discussions A &amp; B</div><div class="std">Dual-degree programmes &nbsp;·&nbsp; Faculty exchange initiatives</div></td></tr>
+    <tr><td class="stt">17:30</td><td class="stc"><div class="stn">Evening Reception &amp; Pre-Dinner Drinks</div><div class="std">Informal networking at GUS London</div></td></tr>
+    <tr><td class="stt">19:30</td><td class="stc"><div class="stn">Welcome Dinner &amp; Opening Keynote</div><div class="std">Formal dinner with keynote address by a renowned figure in global higher education</div></td></tr>
+  </table>
+
+  <div class="dh" style="margin-top:44px"><div class="dl">Day Two</div><div class="dd">Friday, 4th September 2026</div><div class="dt">Innovation &nbsp;·&nbsp; Discovery &nbsp;·&nbsp; Celebration</div></div>
+  <div class="trule"></div>
+  <table class="st">
+    <tr><td class="stt">08:30</td><td class="stc"><div class="stn">Academic Workshops I–III</div><div class="std">Digital platforms &nbsp;·&nbsp; Cross-border accreditation &nbsp;·&nbsp; AI in education</div></td></tr>
+    <tr><td class="stt">09:45</td><td class="stc"><div class="stn">Thought Leadership Panels III &amp; IV</div><div class="std">Policy implications &nbsp;·&nbsp; Sustainable &amp; ethical partnership models</div></td></tr>
+    <tr><td class="stt">11:00</td><td class="stc"><div class="stn">Academic Workshops IV–VI</div><div class="std">Resilient partnerships &nbsp;·&nbsp; Impact measurement &nbsp;·&nbsp; Student welfare</div></td></tr>
+    <tr><td class="stt">12:15</td><td class="stc"><div class="stn">Roundtable Discussions C &amp; D</div><div class="std">Joint research ventures &nbsp;·&nbsp; Student mobility &amp; cross-border experience</div></td></tr>
+    <tr><td class="stt">13:15</td><td class="stc"><div class="stn">Summit Declaration &amp; Communiqué</div><div class="std">Adoption of shared commitments to global TNE excellence</div></td></tr>
+    <tr><td class="stt">13:45</td><td class="stc"><div class="stn">Closing Remarks &amp; Luncheon</div><div class="std">INUNI Leadership address — followed by a celebratory farewell luncheon</div></td></tr>
+    <tr><td class="stt">15:00</td><td class="stc"><div class="stn">GUS Group Universities Showcase Tour</div><div class="std">An exclusive guided tour of GUS Group's portfolio of universities across the United Kingdom — visiting campuses, meeting faculty, and witnessing world-class TNE delivery in action</div></td></tr>
+    <tr><td class="stt">17:30</td><td class="stc"><div class="stn">Afternoon at Leisure</div><div class="std">Delegates retire to refresh and prepare for the Grand Gala Evening</div></td></tr>
+    <tr class="sdiv"><td colspan="2">— &nbsp; — &nbsp; — &nbsp; — &nbsp; — &nbsp; — &nbsp; — &nbsp; —</td></tr>
+    <tr><td class="stt">18:30</td><td class="stc"><div class="stn">Guests Depart for the Gala Venue</div><div class="std">Onward to the Grand Gala Dinner &amp; PIE Awards Night</div></td></tr>
+  </table>
+</div>
+
+<div class="page gp">
+  <div class="cb"></div><div class="cbi"></div>
+  <div class="gorn">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</div>
+  <div class="geb">Friday, 4th September 2026 &nbsp;·&nbsp; London</div>
+  <div class="gtitle">The Grand Gala</div>
+  <div class="gsub">Dinner &amp; Awards Night</div>
+  <div class="grule2"></div>
+  <div class="gassl">In Proud Association with</div>
+  <div class="gassn">The PIE Awards 2026</div>
+  <div class="gasss">Professionals in International Education</div>
+  <div class="grule2"></div>
+  <p class="gb">As the curtain falls on two days of extraordinary intellectual discourse, INUNI invites every Convocation delegate to be present for the crowning ceremony of the international education calendar: a formal Gala Dinner and Awards Night of the highest distinction, hosted in one of London's most magnificent venues.</p>
+  <p class="gb">The evening opens with a champagne reception in gilded surroundings, where the world's leading education figures assemble in the spirit of shared endeavour. A seated five-course dinner of the finest culinary craft follows — before the grand hall is hushed for the presentation of the <strong style="color:rgba(255,255,255,.9)">PIE Awards</strong>, the most coveted honours in international and transnational education.</p>
+  <p class="gbi">To be present in that room is to stand among the architects of the future of higher education — laureates, leaders, and luminaries from every continent — united in the conviction that education, pursued across borders and across cultures, remains among the noblest of human endeavours.</p>
+  <div class="grule2"></div>
+  <div class="gol">The Honours of the Evening</div>
+  <div class="gpillars">
+    <div>
+      <h4>The Highest Honour in the Sector</h4>
+      <p>The PIE Awards are to international education what the Nobel Prize is to science — the singular, peer-validated affirmation that one has not merely participated in the advancement of global learning, but has irrevocably shaped it.</p>
+      <h4>A Night of Historic Distinction</h4>
+      <p>Established in the tradition of the great academic prize-giving ceremonies, the Gala Dinner is an occasion that laureates recall throughout their careers — a moment of formal recognition before the peers whose respect they have earned.</p>
+    </div>
+    <div>
+      <h4>Judged by the World's Foremost Authorities</h4>
+      <p>Every nomination is assessed by an independent panel of internationally recognised leaders in higher education, ensuring that each award carries the full weight of sector-wide credibility, scholarly rigour, and unimpeachable integrity.</p>
+      <h4>An Unforgettable Evening</h4>
+      <p>From the first clink of champagne to the final ovation, the Gala is an evening of theatre, beauty, and genuine emotion — where the achievements of a lifetime are honoured before the audience that matters most.</p>
+    </div>
+  </div>
+  <div class="grule2"></div>
+  <div class="gol">Order of the Evening</div>
+  <table class="st gst">
+    <tr><td class="stt gstt">19:00</td><td class="stc"><div class="stn gstn">Champagne &amp; Canapé Reception</div><div class="std gstd">Guests assemble in the Grand Foyer — champagne, canapés, and the company of the world's finest education minds</div></td></tr>
+    <tr><td class="stt gstt">20:00</td><td class="stc"><div class="stn gstn">Procession &amp; Formal Dinner</div><div class="std gstd">Guests are invited to be seated — a five-course gala dinner served with the ceremony the occasion commands</div></td></tr>
+    <tr><td class="stt gstt">21:45</td><td class="stc"><div class="stn gstn">The PIE Awards Ceremony</div><div class="std gstd">The hall falls silent — presentation of the most coveted honours in international education, with keynote addresses and laureate tributes</div></td></tr>
+    <tr><td class="stt gstt">23:00</td><td class="stc"><div class="stn gstn">Celebration, Dancing &amp; Late Supper</div><div class="std gstd">The evening continues in the finest tradition — music, dancing, and the warmth of a company united by excellence</div></td></tr>
+  </table>
+  <div class="dresbox">
+    <div class="dresl">Dress Code &nbsp;·&nbsp; Black Tie</div>
+    <div class="dresd">Gentlemen: Black dinner jacket or national formal dress &nbsp;·&nbsp; Ladies: Evening gown or equivalent formal attire</div>
+  </div>
+</div>
+
+<div class="page ip">
+  <div class="slabel">Practical Information</div>
+  <div class="stitle">Logistics &amp; Arrangements</div>
+  <div class="grule"></div>
+  <div class="igrid">
+    <div>
+      <div class="ii"><div class="il">Venue</div><div class="iv">GUS Group Institutions, London. Full venue details provided upon confirmation of attendance.</div></div>
+      <div class="ii"><div class="il">Attendance</div><div class="iv">By personal invitation only. Places are strictly limited to ensure the highest quality of dialogue and interaction.</div></div>
+      <div class="ii"><div class="il">Accommodation &amp; Travel</div><div class="iv">Accommodation and travel to London are to be arranged and funded by participants independently. We are pleased to recommend preferred partner hotels upon request.</div></div>
+    </div>
+    <div>
+      <div class="ii"><div class="il">RSVP Deadline</div><div class="iv">22nd May 2026. Please confirm dietary requirements and any accessibility needs at time of RSVP.</div></div>
+      <div class="ii"><div class="il">Enquiries</div><div class="iv"><a href="mailto:partnerships@inuniglobal.com">partnerships@inuniglobal.com</a><br><a href="https://www.globaluniversitysystems.com">www.globaluniversitysystems.com</a></div></div>
+      <div class="ii"><div class="il">Convened by INUNI</div><div class="iv">INUNI — International Network of Universities<br>In association with GUS Group, London</div></div>
+    </div>
+  </div>
+  <div class="covbox">
+    <div class="covey">INUNI Hospitality</div>
+    <div class="covh">INUNI is pleased to cover the following on behalf of all invited delegates</div>
+    <div class="covgrid">
+      <div class="ci">All Convocation session access (3rd–4th September)</div>
+      <div class="ci">GUS Group UK Universities Showcase Tour</div>
+      <div class="ci">All meals, refreshments &amp; receptions during the Convocation</div>
+      <div class="ci">Welcome Dinner &amp; Opening Keynote (3rd September)</div>
+      <div class="ci hl">Complimentary seat at the INUNI table — PIE Awards Gala (4th September)</div>
+      <div class="ci">Conference materials, programme documentation &amp; delegate pack</div>
+    </div>
+    <div class="covfn">Accommodation and travel to London are the responsibility of the participating delegate.</div>
+  </div>
+</div>
+
+<div class="closing">
+  <div class="clrule"></div>
+  <div class="clorn">✦</div>
+  <div class="clline">We look forward to welcoming you to London.</div>
+  <div class="clfoot">INUNI &nbsp;·&nbsp; The Grand Convocation &nbsp;·&nbsp; London &nbsp;·&nbsp; 2026</div>
+</div>
+
+</body>
+</html>
