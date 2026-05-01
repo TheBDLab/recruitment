@@ -35,16 +35,7 @@ html, body { height: 100%; }
 html { overflow-x: hidden; }
 body {
   overflow-x: hidden;
-  /* Default: lock page scroll. Only unlocked via the @media rule below for short windows. */
-  overflow-y: hidden;
   min-height: 100%;
-}
-
-/* Allow page scroll ONLY when the window is shorter than the canvas — i.e. when scrolling
-   is genuinely needed to reveal content that doesn't fit. On normal/tall windows, the page
-   stays scroll-locked so slide transitions can never accidentally shift vertical position. */
-@media (max-height: 899px) {
-  body { overflow-y: auto; }
 }
 
 body{
@@ -1997,7 +1988,7 @@ body{
   position: relative;
   width: 100%;
   max-width: 460px;
-  min-height: 380px;
+  min-height: 460px;
   padding: 2.4rem 2.2rem 3.4rem;
   background: var(--white);
   border: 1px solid var(--border-light);
@@ -2067,8 +2058,8 @@ body{
   color: var(--accent);
 }
 .cycle-slide .cs-body {
-  font-size: .85rem;
-  line-height: 1.6;
+  font-size: .82rem;
+  line-height: 1.55;
   color: var(--text-mid);
   font-weight: 400;
 }
@@ -2988,10 +2979,6 @@ body{
     /* Reset any scrolly-wrap inner scroll positions (so re-entering starts at top) */
     document.querySelectorAll('.scrolly-wrap').forEach(w => { w.scrollTop = 0; });
 
-    /* Reset page scroll position to 0 — protects against browser auto-scrolling on
-       focus/reveal animations leaving the canvas displaced from the viewport top. */
-    if (window.scrollY !== 0) window.scrollTo(0, 0);
-
     /* If the new active slide contains a scrolly-wrap, re-measure step positions
        once the slide-change transition is settling. Initial measurements taken
        while the slide was translated off-screen may be wrong. */
@@ -3222,9 +3209,6 @@ body{
   })();
 
   /* ===== Init ===== */
-  /* Tell the browser not to restore scroll position from a previous visit */
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  window.scrollTo(0, 0);
   setActive(0);
 })();
 
