@@ -1,0 +1,3260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InUni Global — Horizontal Slide Experience</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --light:#f4f5f7;
+  --light2:#ebedf1;
+  --light3:#dfe2e8;
+  --white:#fff;
+  --black:#0a0d12;
+  --text-dark:#2a3040;
+  --text-mid:#5a6275;
+  --text-light:#8890a4;
+  --text-muted:#8890a4;
+  --accent:#2d6fe0;
+  --accent2:#4a8df5;
+  --gus-navy:#0f2a4f;
+  --border-light:rgba(0,0,0,.08);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Outfit',-apple-system,sans-serif;
+  --gus-height: 180px;  /* persistent infrastructure block height */
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body{
+  font-family:var(--sans);
+  background:var(--light);
+  color:var(--text-dark);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===================== STAGE: viewport-locked ===================== */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr var(--gus-height);
+  overflow: hidden;
+  background: var(--light);
+}
+
+/* ===================== TOP BAR ===================== */
+.topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+  z-index: 100;
+  pointer-events: none;
+}
+.topbar .brand {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--black);
+}
+.topbar .brand b { color: var(--accent); font-weight: 600; }
+.topbar .progress {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  pointer-events: auto;
+}
+.topbar .progress button {
+  background: none;
+  border: 0;
+  padding: 6px 3px;
+  cursor: pointer;
+  display: block;
+}
+.topbar .progress .dot {
+  width: 18px;
+  height: 2px;
+  background: rgba(10,13,18,.18);
+  border-radius: 2px;
+  transition: background .4s, width .4s;
+}
+.topbar .progress button.active .dot {
+  background: var(--accent);
+  width: 30px;
+}
+.topbar .nav-arrows {
+  display: flex;
+  gap: .5rem;
+  pointer-events: auto;
+}
+.nav-arrows button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(10,13,18,.12);
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: var(--text-dark);
+  transition: .25s ease;
+}
+.nav-arrows button:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+.nav-arrows button:disabled { opacity: .35; cursor: not-allowed; transform: none !important; background: rgba(255,255,255,.6) !important; color: var(--text-dark) !important; border-color: rgba(10,13,18,.12) !important; }
+.nav-arrows svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+/* ===================== SLIDES TRACK ===================== */
+.slides-area {
+  position: relative;
+  overflow: hidden;
+}
+.slides-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: max-content;
+  height: 100%;
+  transition: transform 1.05s cubic-bezier(.77,0,.18,1);
+  will-change: transform;
+}
+.slide {
+  width: 100vw;
+  height: 100%;
+  flex: 0 0 100vw;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 8rem 4rem;
+  overflow: hidden;
+}
+
+/* Slide-specific atmospheric backgrounds */
+.slide-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.slide-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: .035;
+  mix-blend-mode: multiply;
+}
+
+/* Parallax layers inside each slide */
+.parallax-layer {
+  position: absolute;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ===================== SLIDE INNER LAYOUT ===================== */
+.slide-inner {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 1280px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.slide-inner.solo { grid-template-columns: 1fr; max-width: 980px; text-align: center; }
+
+.sec-label{
+  display:flex;align-items:center;gap:1.25rem;
+  font-size:.7rem;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+.sec-label::before{
+  content:'';width:48px;height:1.5px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.solo .sec-label { justify-content: center; }
+.solo .sec-label::after{
+  content:'';width:48px;height:1.5px;background: var(--accent);
+}
+/* Variant: both sides have lines regardless of .solo context */
+.sec-label-bothlines::after {
+  content:'';width:48px;height:1.5px;background: var(--accent);
+  flex-shrink: 0;
+}
+
+.slide h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--black);
+  margin-bottom: 1.5rem;
+  letter-spacing: -.01em;
+}
+.slide h1 i { font-style: italic; color: var(--accent); }
+
+.slide h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--black);
+  margin-bottom: 1.25rem;
+  letter-spacing: -.01em;
+}
+
+.slide .lead {
+  font-size: 1.05rem;
+  color: var(--text-mid);
+  max-width: 540px;
+  line-height: 1.75;
+}
+.solo .lead { margin: 0 auto; }
+
+.slide .pill {
+  display:inline-flex;align-items:center;gap:.55rem;
+  padding:.45rem 1rem;
+  background: rgba(45,111,224,.08);
+  border:1px solid rgba(45,111,224,.18);
+  border-radius:99px;
+  font-size:.7rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  color: var(--accent);
+  margin-bottom: 1.75rem;
+}
+.slide .pill .live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  box-shadow: 0 0 0 4px rgba(45,111,224,.18);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(45,111,224,.18); }
+  50% { box-shadow: 0 0 0 8px rgba(45,111,224,0); }
+}
+
+.cta-row { display:flex; gap:1rem; margin-top: 2.25rem; flex-wrap: wrap; }
+.solo .cta-row { justify-content: center; }
+.btn {
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.95rem 1.7rem;
+  font-size:.78rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  border-radius:3px;
+  cursor:pointer;
+  transition: .3s;
+  border:0;
+  font-family: var(--sans);
+}
+.btn.primary { background: var(--black); color:#fff; }
+.btn.primary:hover { background: var(--accent); transform: translateY(-2px); }
+.btn.ghost { background: transparent; color: var(--black); border:1px solid var(--border-light); }
+.btn.ghost:hover { background: var(--black); color:#fff; border-color: var(--black); }
+
+.cta-email {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(45,111,224,.3);
+  padding-bottom: 2px;
+  transition: border-color .25s, color .25s;
+}
+.cta-email:hover { color: var(--black); border-bottom-color: var(--black); }
+
+/* Invitation slide — refined inline CTA */
+.invite-cta {
+  margin-top: 1.5rem;
+}
+.invite-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .85rem 1.4rem;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent);
+  text-decoration: none;
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+  max-width: 100%;
+}
+.invite-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px -10px rgba(45,111,224,.35);
+  border-left-color: var(--gus-navy);
+}
+.invite-link .il-lead {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--black);
+  letter-spacing: -.005em;
+}
+.invite-link .il-rule {
+  width: 1px;
+  height: 18px;
+  background: var(--border-light);
+  flex-shrink: 0;
+}
+.invite-link .il-mail {
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: var(--text-mid);
+}
+.invite-link .il-arrow {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: transform .25s;
+}
+.invite-link:hover .il-arrow { transform: translateX(3px); }
+@media (max-width: 720px) {
+  .invite-link { flex-wrap: wrap; }
+  .invite-link .il-rule { display: none; }
+}
+
+/* ===== Slide 1: Hero ===== */
+.hero-visual {
+  position: relative;
+  height: 480px;
+  display: grid;
+  place-items: center;
+}
+.hero-globe {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.globe-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(45,111,224,.18);
+  border-radius: 50%;
+}
+.globe-ring.r2 { inset: 12%; border-color: rgba(45,111,224,.28); }
+.globe-ring.r3 { inset: 24%; border-color: rgba(45,111,224,.4); }
+.globe-ring.r4 { inset: 36%; border-color: rgba(45,111,224,.55); }
+.globe-core {
+  position: absolute;
+  inset: 42%;
+  background: radial-gradient(circle, var(--accent), var(--gus-navy));
+  border-radius: 50%;
+  box-shadow: 0 0 80px rgba(45,111,224,.4), 0 0 0 8px rgba(255,255,255,.6);
+}
+.globe-pin {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.9), 0 0 0 5px rgba(45,111,224,.3);
+}
+.globe-pin::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--black);
+  white-space: nowrap;
+  text-transform: uppercase;
+  background: #fff;
+  padding: .25rem .55rem;
+  border-radius: 2px;
+  border: 1px solid var(--border-light);
+}
+
+/* ===== Slide 2: Services / What we do ===== */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.svc-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  transition: .3s;
+}
+.svc-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 32px rgba(15,42,79,.08); }
+.svc-num {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  color: var(--accent);
+  font-style: italic;
+  line-height: 1;
+}
+.svc-card h4 {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-top: .65rem;
+  margin-bottom: .45rem;
+}
+.svc-card p {
+  font-size: .8rem;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+
+/* ===== Slide 3: Achievements ===== */
+.ach-display {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 2.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.ach-stars {
+  font-size: 1.4rem;
+  color: #c9993a;
+  letter-spacing: .25em;
+  margin-bottom: 1rem;
+}
+.ach-display h3 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--black);
+  line-height: 1.15;
+  margin-bottom: .85rem;
+}
+.ach-display p { font-size: .9rem; color: var(--text-mid); }
+.ach-display .ach-foot {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+}
+.ach-display .ach-foot div { font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-mid); }
+.ach-display .ach-foot div strong { display: block; font-family: var(--serif); font-size: 1.5rem; color: var(--black); font-style: italic; letter-spacing: 0; text-transform: none; margin-bottom: .15rem; }
+
+/* ===== Slide 5: Contact ===== */
+.contact-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 2.5rem;
+  margin-top: 2rem;
+  text-align: left;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+.contact-card .ci-label {
+  font-size: .6rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 700;
+  margin-bottom: .55rem;
+}
+.contact-card .ci-value {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--black);
+  font-weight: 500;
+}
+
+/* ===== Slide 6: Start with the Problem (intro + stats) ===== */
+.problem-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  width: 100%;
+}
+.problem-headline {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(3rem, 8.5vw, 7rem);
+  line-height: .92;
+  letter-spacing: -.035em;
+  color: var(--black);
+  text-transform: uppercase;
+}
+.problem-headline span { color: var(--accent); }
+.problem-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  margin-top: 1.5rem;
+}
+.problem-stats .ps {
+  padding: 1.25rem 1rem;
+  text-align: left;
+  border-right: 1px solid var(--border-light);
+}
+.problem-stats .ps:last-child { border-right: 0; }
+.problem-stats .ps strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1;
+  letter-spacing: -.01em;
+}
+.problem-stats .ps span {
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 700;
+  margin-top: .55rem;
+  display: block;
+}
+
+/* ===== Slide 7: Method (Listen / Frame / Build / Measure) ===== */
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.method-principle {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border-light);
+}
+.method-principle .mp-tag {
+  font-family: var(--sans);
+  font-size: .62rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.method-principle .mp-line {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--text-dark);
+  font-weight: 400;
+}
+.method-principle .mp-line b {
+  font-weight: 600;
+  color: var(--black);
+}
+.method-principle .mp-line i {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+.method-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1.5rem 1.25rem;
+  position: relative;
+  transition: .3s;
+  display: flex;
+  flex-direction: column;
+}
+.method-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 32px rgba(15,42,79,.08);
+}
+.method-card .m-bars {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 1.25rem;
+}
+.method-card .m-bars i {
+  width: 4px;
+  height: 18px;
+  background: var(--accent);
+  display: block;
+  opacity: .85;
+}
+.method-card .m-num {
+  font-family: var(--serif);
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  letter-spacing: .15em;
+  margin-bottom: .65rem;
+}
+.method-card h5 {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1.2;
+  margin-bottom: .65rem;
+  letter-spacing: -.005em;
+}
+.method-card p {
+  font-size: .78rem;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+
+/* ===== Slide 8 & 9: Tool Spotlights ===== */
+.tools-header {
+  text-align: left;
+  margin-bottom: 2rem;
+  max-width: 900px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+.tools-grid.three-up {
+  grid-template-columns: repeat(3, 1fr);
+}
+/* Five-up combined: 3 on top, 2 centered on bottom */
+.tools-grid.five-up {
+  grid-template-columns: repeat(6, 1fr);
+  gap: .85rem;
+}
+.tools-grid.five-up > .tool-card { grid-column: span 2; }
+.tools-grid.five-up > .tool-card:nth-child(4) { grid-column: 2 / span 2; }
+.tools-grid.five-up > .tool-card:nth-child(5) { grid-column: span 2; }
+
+/* Compact card variant for the 5-up layout */
+.tool-card.compact {
+  padding: .85rem 1rem;
+  gap: .5rem;
+}
+.tool-card.compact .tool-head {
+  padding-bottom: .55rem;
+  gap: .55rem;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.tool-card.compact .tool-id {
+  font-size: .55rem;
+  letter-spacing: .12em;
+  margin-bottom: .15rem;
+}
+.tool-card.compact .tool-head h4 {
+  font-size: .98rem;
+}
+.tool-card.compact .tool-metric {
+  text-align: left;
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  width: 100%;
+  border-top: 1px dashed var(--border-light);
+  padding-top: .45rem;
+}
+.tool-card.compact .tool-metric strong {
+  font-size: .98rem;
+}
+.tool-card.compact .tool-metric span {
+  font-size: .48rem;
+  letter-spacing: .12em;
+  margin-top: 0;
+}
+.tool-card.compact .tool-body { font-size: .68rem; }
+.tool-card.compact .tool-body .tb-row { margin-bottom: .3rem; gap: .5rem; }
+.tool-card.compact .tool-body .tb-key {
+  font-size: .48rem;
+  letter-spacing: .14em;
+  width: 44px;
+}
+.tool-card.compact .tool-body .tb-val .b-headline {
+  font-size: .7rem;
+  margin-bottom: .18rem;
+  line-height: 1.35;
+}
+.tool-card.compact .tool-body li {
+  font-size: .66rem;
+  margin-bottom: .15rem;
+  padding-left: .7rem;
+  line-height: 1.35;
+}
+.tool-card.compact .tool-foot {
+  font-size: .62rem;
+  padding: .4rem .65rem;
+  line-height: 1.3;
+}
+
+/* Special layout for content-heavy slides — align top, tighter padding */
+.slide.tools-slide,
+.slide.content-slide {
+  align-items: flex-start;
+  padding-top: 80px;
+  padding-bottom: 1.5rem;
+  overflow-y: auto;
+}
+.slide.tools-slide .slide-inner,
+.slide.content-slide .slide-inner {
+  align-self: flex-start;
+}
+.slide.tools-slide .slide-inner.solo,
+.slide.content-slide .slide-inner.solo {
+  text-align: left;
+}
+.slide.tools-slide .slide-inner.solo .lead,
+.slide.content-slide .slide-inner.solo .lead {
+  margin: 0;
+}
+.slide.tools-slide .slide-inner.solo .sec-label,
+.slide.content-slide .slide-inner.solo .sec-label {
+  justify-content: flex-start;
+}
+/* Tighten heading on content slides */
+.slide.content-slide h2 {
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  margin-bottom: .5rem;
+  line-height: 1.1;
+}
+.slide.content-slide .lead {
+  font-size: .85rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  max-width: 720px;
+}
+.tool-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  transition: .3s;
+  position: relative;
+  overflow: hidden;
+}
+.tool-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 14px 36px rgba(15,42,79,.08);
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width .5s ease;
+}
+.tool-card:hover::before { width: 100%; }
+.tool-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: .85rem;
+}
+.tool-head .tool-id {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: .7rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: .35rem;
+}
+.tool-head h4 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--black);
+  letter-spacing: -.01em;
+  line-height: 1.1;
+}
+.tool-head h4 b {
+  font-weight: 600;
+  color: var(--accent);
+}
+.tool-metric {
+  text-align: right;
+  flex-shrink: 0;
+}
+.tool-metric strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1;
+  letter-spacing: -.01em;
+}
+.tool-metric strong em {
+  color: var(--accent);
+  font-style: normal;
+}
+.tool-metric span {
+  font-size: .55rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 600;
+  margin-top: .3rem;
+  display: block;
+}
+.tool-body {
+  font-size: .78rem;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+.tool-body .tb-row {
+  display: flex;
+  gap: .9rem;
+  margin-bottom: .55rem;
+}
+.tool-body .tb-row:last-child { margin-bottom: 0; }
+.tool-body .tb-key {
+  font-size: .55rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 700;
+  flex-shrink: 0;
+  width: 60px;
+  padding-top: .15rem;
+}
+.tool-body .tb-val { flex: 1; }
+.tool-body .tb-val .b-headline {
+  color: var(--black);
+  font-weight: 500;
+  font-size: .82rem;
+  margin-bottom: .25rem;
+}
+.tool-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tool-body li {
+  position: relative;
+  padding-left: .9rem;
+  margin-bottom: .25rem;
+  font-size: .76rem;
+  color: var(--text-mid);
+}
+.tool-body li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.tool-foot {
+  margin-top: auto;
+  padding-top: .75rem;
+  border-left: 2px solid var(--accent);
+  padding-left: .85rem;
+  font-size: .72rem;
+  color: var(--black);
+  font-style: italic;
+  font-family: var(--serif);
+  font-weight: 500;
+  background: rgba(45,111,224,.04);
+  padding: .55rem .85rem;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ===== Slide 10: Outcomes Table ===== */
+.outcomes-table {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.outcomes-table .ot-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1.5fr 1.2fr;
+  align-items: center;
+  padding: .55rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  gap: 1rem;
+}
+.outcomes-table .ot-row:last-child { border-bottom: 0; }
+.outcomes-table .ot-row.head {
+  background: var(--light2);
+  padding: .5rem 1.25rem;
+}
+.outcomes-table .ot-row.head > * {
+  font-size: .52rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 700;
+}
+.outcomes-table .ot-id {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: .8rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+.outcomes-table .ot-metric {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1;
+  letter-spacing: -.01em;
+}
+.outcomes-table .ot-metric em {
+  color: var(--accent);
+  font-style: normal;
+}
+.outcomes-table .ot-metric small {
+  font-family: var(--sans);
+  font-size: .6rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-left: .2rem;
+}
+.outcomes-table .ot-outcome {
+  font-size: .76rem;
+  color: var(--black);
+  font-weight: 500;
+  line-height: 1.35;
+}
+.outcomes-table .ot-orig {
+  font-size: .7rem;
+  color: var(--text-mid);
+  line-height: 1.35;
+}
+
+/* ===== Slide 11: Philosophy + Challenge ===== */
+.philo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.philo-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1.6rem 1.4rem;
+  position: relative;
+  transition: .3s;
+  display: flex;
+  flex-direction: column;
+}
+.philo-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 12px 32px rgba(15,42,79,.08);
+  transform: translateY(-2px);
+}
+.philo-card .p-tag {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.philo-card h5 {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--black);
+  line-height: 1.2;
+  margin-bottom: .85rem;
+  letter-spacing: -.005em;
+}
+.philo-card p {
+  font-size: .8rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+
+/* ===== Slide 11: Bring us your challenge ===== */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.challenge-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  padding: 1.5rem 1.4rem;
+  transition: .3s;
+}
+.challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(15,42,79,.08);
+}
+.challenge-card .c-num {
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+.challenge-card p {
+  font-size: .85rem;
+  color: var(--black);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Responsive for new slides */
+@media (max-width: 1100px) {
+  .method-grid, .tools-grid.three-up { grid-template-columns: repeat(2, 1fr); }
+  .tools-grid.five-up { grid-template-columns: repeat(2, 1fr); }
+  .tools-grid.five-up > .tool-card,
+  .tools-grid.five-up > .tool-card:nth-child(4),
+  .tools-grid.five-up > .tool-card:nth-child(5) { grid-column: auto; }
+  .problem-stats { grid-template-columns: repeat(3, 1fr); }
+  .problem-stats .ps:nth-child(3) { border-right: 0; }
+  .problem-stats .ps:nth-child(n+4) { border-top: 1px solid var(--border-light); }
+}
+@media (max-width: 900px) {
+  .method-grid, .tools-grid, .tools-grid.three-up,
+  .philo-grid, .challenge-grid { grid-template-columns: 1fr; }
+  .problem-stats { grid-template-columns: repeat(2, 1fr); }
+  .problem-stats .ps { border-right: 1px solid var(--border-light) !important; border-top: 1px solid var(--border-light); }
+  .problem-stats .ps:nth-child(2n) { border-right: 0 !important; }
+  .outcomes-table .ot-row { grid-template-columns: 1fr; gap: .35rem; padding: 1rem; }
+  .outcomes-table .ot-row.head { display: none; }
+  .outcomes-table .ot-id { font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; }
+}
+
+/* ===== Slide 9: Live Session — Booth 739 ===== */
+.booth-frame {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+.booth-left { padding-right: 1rem; }
+.booth-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .4rem .85rem;
+  background: rgba(45,111,224,.08);
+  border: 1px solid rgba(45,111,224,.2);
+  border-radius: 99px;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+.booth-eyebrow .live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e63946;
+  box-shadow: 0 0 0 4px rgba(230,57,70,.18);
+  animation: pulse-live 1.6s infinite;
+}
+@keyframes pulse-live {
+  0%,100% { box-shadow: 0 0 0 3px rgba(230,57,70,.22); }
+  50% { box-shadow: 0 0 0 7px rgba(230,57,70,0); }
+}
+.booth-headline {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--black);
+  letter-spacing: -.015em;
+  margin-bottom: 1.25rem;
+}
+.booth-headline i { color: var(--accent); font-style: italic; }
+.booth-subline {
+  font-size: .95rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  max-width: 540px;
+  margin-bottom: 1.5rem;
+}
+.booth-credlist {
+  display: grid;
+  gap: .55rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+.booth-credlist .cred {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  font-size: .82rem;
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+.booth-credlist .cred::before {
+  content: '';
+  width: 18px;
+  height: 1px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.booth-foot {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.booth-foot .bf-item {
+  display: flex;
+  flex-direction: column;
+}
+.booth-foot .bf-key {
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: .3rem;
+}
+.booth-foot .bf-val {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--black);
+}
+.booth-foot .bf-val.accent { color: var(--accent); }
+
+/* Right side — booth number visual (simplified) */
+.booth-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 480px;
+}
+.booth-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin-bottom: 1rem;
+}
+.booth-num {
+  font-family: var(--serif);
+  font-size: clamp(11rem, 22vw, 20rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: var(--black);
+  display: block;
+}
+.booth-num em {
+  color: var(--accent);
+  font-style: normal;
+}
+.booth-rule {
+  width: 80px;
+  height: 1.5px;
+  background: var(--accent);
+  margin: 1.5rem 0 1rem;
+}
+.booth-meet {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-mid);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .booth-frame { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .booth-visual { height: 380px; }
+}
+@media (max-width: 900px) {
+  .booth-frame { grid-template-columns: 1fr; gap: 1.5rem; }
+  .booth-visual { height: 240px; order: -1; }
+  .booth-headline { font-size: 1.75rem; }
+}
+
+/* ============================================================
+   SCROLLYTELLING SLIDE — discrete screens, scroll picks active screen
+   ============================================================ */
+.slide.scrolly-slide {
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+.slide.scrolly-slide .scrolly-wrap {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45,111,224,.3) transparent;
+}
+.slide.scrolly-slide .scrolly-wrap::-webkit-scrollbar { width: 6px; }
+.slide.scrolly-slide .scrolly-wrap::-webkit-scrollbar-track { background: transparent; }
+.slide.scrolly-slide .scrolly-wrap::-webkit-scrollbar-thumb { background: rgba(45,111,224,.3); border-radius: 3px; }
+
+/* The fixed stage: sticky overlay that pins to the top of the wrap.
+   Spacers below it provide scroll distance.
+   Trick: stage has negative margin-bottom equal to its height so it doesn't
+   contribute to the wrap's total scroll length — only spacers do. */
+.scrolly-stage-fixed {
+  position: sticky;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  margin-bottom: -100%;
+  pointer-events: none;
+  z-index: 5;
+}
+/* Re-enable interactivity within the stage */
+.scrolly-stage-fixed > * { pointer-events: auto; }
+
+/* Spacers: each one wrap-height tall. They live BELOW the sticky stage. */
+.scrolly-spacer {
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Each screen is full-viewport, absolutely positioned in the stage */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 4rem 3rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .7s cubic-bezier(.4,0,.2,1);
+}
+.screen.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+/* HERO screen */
+.screen-hero {
+  flex-direction: column;
+  text-align: center;
+}
+.screen-hero .hero-eyebrow {
+  font-size: .6rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  transform: translateY(-30px);
+  transition: transform .9s cubic-bezier(.16,1,.3,1) .15s;
+}
+.screen-hero .hero-eyebrow::before,
+.screen-hero .hero-eyebrow::after {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+  display: inline-block;
+}
+.screen-hero .hero-num {
+  font-family: var(--serif);
+  font-size: clamp(5rem, 14vw, 13rem);
+  font-weight: 600;
+  line-height: .9;
+  color: var(--black);
+  letter-spacing: -.04em;
+  margin: 0 0 .5rem 0;
+  transform: translateY(40px);
+  opacity: 0;
+  transition: transform 1s cubic-bezier(.16,1,.3,1) .25s, opacity .9s ease .25s;
+}
+.screen-hero .hero-num em {
+  color: var(--accent);
+  font-style: italic;
+}
+.screen-hero .hero-label {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  color: var(--text-mid);
+  font-weight: 400;
+  letter-spacing: .01em;
+  transform: translateY(40px);
+  opacity: 0;
+  transition: transform 1s cubic-bezier(.16,1,.3,1) .4s, opacity .9s ease .4s;
+}
+.screen-hero .hero-arrow {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .58rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  opacity: 0;
+  transition: opacity .8s ease .8s;
+}
+.screen-hero .hero-arrow svg { width: 14px; height: 14px; stroke: var(--accent); stroke-width: 2; fill: none; animation: bounce-arrow 2s ease-in-out infinite; }
+@keyframes bounce-arrow {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+.screen-hero.is-active .hero-eyebrow { transform: translateY(0); }
+.screen-hero.is-active .hero-num { transform: translateY(0); opacity: 1; }
+.screen-hero.is-active .hero-label { transform: translateY(0); opacity: 1; }
+.screen-hero.is-active .hero-arrow { opacity: 1; }
+
+/* STEP screen — two columns */
+.screen-step {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 4rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+.screen-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.screen-text .ss-num {
+  font-size: .62rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity .7s ease .15s, transform .9s cubic-bezier(.16,1,.3,1) .15s;
+}
+.screen-text .ss-num::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+.screen-text h3 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -.015em;
+  color: var(--black);
+  margin: 0 0 1.25rem 0;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity .8s ease .25s, transform 1s cubic-bezier(.16,1,.3,1) .25s;
+}
+.screen-text h3 i {
+  color: var(--accent);
+  font-style: italic;
+}
+.screen-text p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-mid);
+  max-width: 480px;
+  margin: 0;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity .8s ease .35s, transform 1s cubic-bezier(.16,1,.3,1) .35s;
+}
+.screen-step.is-active .screen-text .ss-num,
+.screen-step.is-active .screen-text h3,
+.screen-step.is-active .screen-text p {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* IMAGE column */
+.screen-image {
+  position: relative;
+  height: 70vh;
+  max-height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screen-image > img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.18);
+  background: #fff;
+  border: 1px solid var(--border-light);
+}
+
+/* Single-image entry animations (run when parent .is-active) */
+.screen-step[data-anim="bottom-right"] .screen-image > img {
+  transform: translate3d(40%, 40%, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+.screen-step[data-anim="top"] .screen-image > img {
+  transform: translate3d(0, -50%, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+.screen-step[data-anim="bottom"] .screen-image > img {
+  transform: translate3d(0, 50%, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+.screen-step[data-anim="zoom"] .screen-image > img {
+  transform: scale(0.85);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+
+/* Dual image (Verify) */
+.screen-image.dual {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+.screen-image.dual > img {
+  width: auto;
+  max-width: 47%;
+  height: auto;
+  max-height: 90%;
+  object-fit: contain;
+  flex: 0 1 auto;
+}
+
+/* Triple image (CreditMap step 4) */
+.screen-image.triple {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+.screen-image.triple > img {
+  width: auto;
+  max-width: 31%;
+  height: auto;
+  max-height: 85%;
+  object-fit: contain;
+  flex: 0 1 auto;
+}
+.screen-step[data-anim="dual"] .screen-image.dual > img:nth-of-type(1) {
+  transform: translate3d(-110%, 0, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+.screen-step[data-anim="dual"] .screen-image.dual > img:nth-of-type(2) {
+  transform: translate3d(110%, 0, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .25s, opacity .85s ease .25s;
+}
+
+/* Triple-image staggered entry (left → center → right, with center scaling in) */
+.screen-step[data-anim="triple"] .screen-image.triple > img:nth-of-type(1) {
+  transform: translate3d(-130%, 0, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .15s, opacity .85s ease .15s;
+}
+.screen-step[data-anim="triple"] .screen-image.triple > img:nth-of-type(2) {
+  transform: scale(0.7);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .3s, opacity .85s ease .3s;
+}
+.screen-step[data-anim="triple"] .screen-image.triple > img:nth-of-type(3) {
+  transform: translate3d(130%, 0, 0);
+  opacity: 0;
+  transition: transform 1.05s cubic-bezier(.16,1,.3,1) .45s, opacity .85s ease .45s;
+}
+
+/* When step is active, image animates to home position */
+.screen-step.is-active[data-anim="bottom-right"] .screen-image > img,
+.screen-step.is-active[data-anim="top"] .screen-image > img,
+.screen-step.is-active[data-anim="bottom"] .screen-image > img,
+.screen-step.is-active[data-anim="zoom"] .screen-image > img {
+  transform: translate3d(0, 0, 0) scale(1);
+  opacity: 1;
+}
+.screen-step.is-active[data-anim="dual"] .screen-image.dual > img:nth-of-type(1),
+.screen-step.is-active[data-anim="dual"] .screen-image.dual > img:nth-of-type(2) {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+.screen-step.is-active[data-anim="triple"] .screen-image.triple > img:nth-of-type(1),
+.screen-step.is-active[data-anim="triple"] .screen-image.triple > img:nth-of-type(3) {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+.screen-step.is-active[data-anim="triple"] .screen-image.triple > img:nth-of-type(2) {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* OUTRO */
+.screen-outro {
+  flex-direction: column;
+  text-align: center;
+  padding: 6rem 4rem;
+}
+.screen-outro p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--text-mid);
+  max-width: 700px;
+  margin: 0;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .9s ease .15s, transform 1s cubic-bezier(.16,1,.3,1) .15s;
+}
+.screen-outro.is-active p {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Counter top-right */
+.stage-counter {
+  position: absolute;
+  top: 1.75rem;
+  right: 2rem;
+  font-size: .55rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  z-index: 10;
+}
+.stage-counter .sc-current {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-style: italic;
+}
+.stage-counter .sc-total {
+  font-family: var(--serif);
+  color: var(--text-light);
+  font-style: italic;
+}
+.stage-counter .sc-bar {
+  width: 80px;
+  height: 2px;
+  background: var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+.stage-counter .sc-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--scp, 0%);
+  background: var(--accent);
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .screen-step { grid-template-columns: 1fr; gap: 1.5rem; padding: 4rem 1.5rem 2rem; }
+  .screen-image { height: 40vh; }
+  .screen { padding: 4rem 1.5rem 2rem; }
+}
+
+/* ===================== PERSISTENT GUS INFRASTRUCTURE BAR ===================== */
+.gus-bar {
+  background: #fff;
+  border-top: 1px solid var(--border-light);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+  z-index: 50;
+  box-shadow: 0 -16px 40px rgba(15,42,79,.05);
+}
+
+.gus-bar .gus-cobrand {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: .55rem 3rem;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--light);
+  flex-wrap: wrap;
+}
+.gus-bar .ecb-label {
+  font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:700;
+}
+.gus-bar .ecb-divider {
+  width:1px;height:14px;background:var(--border-light);
+}
+.gus-bar .ecb-mark {
+  font-size:.78rem;font-weight:600;color:var(--black);
+}
+.gus-bar .ecb-mark b { color: var(--accent); font-weight: 600; }
+.gus-bar .ecb-arrow {
+  margin-left:auto;
+  font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;
+  display:inline-flex;align-items:center;gap:.4rem;
+  transition:.3s;
+  text-decoration: none;
+}
+.gus-bar .ecb-arrow:hover { transform: translateX(3px); }
+.gus-bar .ecb-arrow svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+.gus-bar .eco-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  padding: 0 3rem;
+}
+.gus-bar .eco-s {
+  padding: .65rem .5rem;
+  text-align: center;
+  border-right: 1px solid var(--border-light);
+  position: relative;
+}
+.gus-bar .eco-s:last-child { border-right: 0; }
+.gus-bar .eco-s strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--black);
+  line-height: 1;
+}
+.gus-bar .eco-s span {
+  font-size: .52rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  font-weight: 600;
+  margin-top: .25rem;
+  display: block;
+}
+
+.ticker-wrap {
+  overflow: hidden;
+  position: relative;
+  border-top: 1px solid var(--border-light);
+  background: var(--light);
+}
+.ticker-wrap::before, .ticker-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker-wrap::before { background: linear-gradient(90deg, var(--light), transparent); left: 0; }
+.ticker-wrap::after  { background: linear-gradient(270deg, var(--light), transparent); right: 0; }
+.ticker {
+  display: flex;
+  gap: 2.5rem;
+  animation: scrollT 50s linear infinite;
+  width: max-content;
+  padding: .55rem 0;
+}
+.ticker span {
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+@keyframes scrollT {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ===================== KEYBOARD HINT ===================== */
+.hint {
+  position: absolute;
+  bottom: calc(var(--gus-height) + 1.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  z-index: 90;
+  pointer-events: none;
+  opacity: .7;
+}
+.hint kbd {
+  font-family: var(--sans);
+  background: rgba(255,255,255,.9);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: .58rem;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: 0;
+}
+
+/* ===================== REVEAL ANIMATIONS ===================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
+}
+.slide.is-active .reveal { opacity: 1; transform: translateY(0); }
+.slide.is-active .reveal.d1 { transition-delay: .15s; }
+.slide.is-active .reveal.d2 { transition-delay: .3s; }
+.slide.is-active .reveal.d3 { transition-delay: .45s; }
+.slide.is-active .reveal.d4 { transition-delay: .6s; }
+.slide.is-active .reveal.d5 { transition-delay: .75s; }
+.slide.is-active .reveal.d6 { transition-delay: .9s; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 1100px) {
+  .slide { padding: 90px 4rem 3rem; }
+  .slide-inner { gap: 3rem; }
+}
+@media (max-width: 900px) {
+  :root { --gus-height: 160px; }
+  .slide-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .hero-visual { height: 320px; }
+  .gus-bar .eco-stats { grid-template-columns: repeat(3, 1fr); }
+  .gus-bar .eco-s:nth-child(3) { border-right: 0; }
+  .contact-card { grid-template-columns: 1fr; gap: 1.25rem; }
+  .topbar { padding: 0 1.5rem; }
+  .slide { padding: 90px 1.75rem 2rem; }
+}
+@media (max-width: 560px) {
+  :root { --gus-height: 280px; }
+  .gus-bar .eco-stats { grid-template-columns: repeat(2, 1fr); }
+  .gus-bar .eco-s { border-right: 1px solid var(--border-light) !important; }
+  .gus-bar .eco-s:nth-child(2n) { border-right: 0 !important; }
+  .gus-bar .gus-cobrand { padding: .75rem 1.5rem; }
+  .gus-bar .eco-stats { padding: 0 1rem; }
+  .slide h1 { font-size: 2rem; }
+  .slide h2 { font-size: 1.6rem; }
+  .svc-grid { grid-template-columns: 1fr; }
+  .topbar .progress { display: none; }
+  .hint { display: none; }
+}
+
+/* ===================== SLIDE 2: ABOUT — LIGHT STANDOUT ===================== */
+.about-light-slide {
+  background: var(--light);
+  color: var(--text-dark);
+}
+.about-light-slide .slide-bg { z-index: 1; }
+.about-light-slide .slide-inner { z-index: 2; }
+
+.about-bg-mark {
+  top: 6%;
+  right: 18%;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22rem;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: rgba(45,111,224,.045);
+}
+
+.about-light-slide .sec-label { margin-bottom: 1.5rem; }
+
+.about-brand-mark {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--black);
+  margin-bottom: 2.2rem;
+}
+.about-brand-mark b { color: var(--accent); font-weight: 600; }
+
+.about-headline {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 4.6vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: -.018em;
+  color: var(--black);
+  max-width: 14ch;
+  margin-bottom: 1.5rem;
+}
+.about-headline i {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.about-lead {
+  font-size: clamp(.9rem, 1.05vw, 1rem);
+  line-height: 1.7;
+  color: var(--text-mid);
+  max-width: 62ch;
+  margin-bottom: 1.8rem;
+  font-weight: 400;
+}
+.about-lead strong { color: var(--text-dark); font-weight: 500; }
+
+.about-gus-strip {
+  display: flex;
+  padding: 1.2rem 1.6rem;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--gus-navy);
+  margin-bottom: 1.8rem;
+  max-width: 780px;
+}
+.about-gus-strip .ags-eyebrow {
+  font-family: var(--sans);
+  font-size: .6rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+  margin-bottom: .4rem;
+}
+.about-gus-strip .ags-line {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--gus-navy);
+  line-height: 1.4;
+  font-style: italic;
+}
+.about-gus-strip .ags-line b {
+  font-style: normal;
+  font-weight: 600;
+}
+
+.about-proof {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.2rem;
+  max-width: 880px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 1.4rem;
+}
+.about-proof-item .api-tag {
+  font-family: var(--sans);
+  font-size: .6rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: .5rem;
+}
+.about-proof-item h5 {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: .35rem;
+  line-height: 1.2;
+}
+.about-proof-item h5 i {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
+}
+.about-proof-item p {
+  font-size: .78rem;
+  line-height: 1.6;
+  color: var(--text-mid);
+  font-weight: 400;
+}
+
+.about-foot-mark {
+  position: absolute;
+  bottom: 2rem;
+  right: 2.4rem;
+  font-family: var(--sans);
+  font-size: .65rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  z-index: 3;
+}
+.about-foot-mark b { color: var(--accent); font-weight: 500; }
+
+/* Two-column layout for the about slide */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 4rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+.about-col-left { min-width: 0; }
+.about-col-right {
+  min-width: 0;
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+/* Cycling display */
+.cycle-display {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  min-height: 320px;
+  padding: 2.4rem 2.2rem 2.6rem;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 12px 48px -16px rgba(15,42,79,.18), 0 2px 8px -4px rgba(15,42,79,.08);
+  overflow: hidden;
+}
+.cycle-display .cycle-frame {
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent);
+}
+.cycle-display .cycle-eyebrow {
+  font-family: var(--sans);
+  font-size: .62rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+  margin-bottom: 1.6rem;
+}
+
+.cycle-slide {
+  position: absolute;
+  inset: 2.4rem 2.2rem 2.6rem;
+  top: 4rem;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .7s ease, transform .7s ease;
+  pointer-events: none;
+}
+.cycle-slide.is-active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cycle-slide .cs-roman {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -.01em;
+  margin-bottom: 1rem;
+}
+.cycle-slide .cs-headline {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--black);
+  margin-bottom: .85rem;
+  letter-spacing: -.008em;
+}
+.cycle-slide .cs-headline i {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
+}
+.cycle-slide .cs-body {
+  font-size: .85rem;
+  line-height: 1.6;
+  color: var(--text-mid);
+  font-weight: 400;
+}
+
+.cycle-display .cycle-dots {
+  position: absolute;
+  left: 2.2rem;
+  bottom: 1.4rem;
+  display: flex;
+  gap: .45rem;
+  z-index: 3;
+}
+.cycle-display .cd-dot {
+  width: 22px;
+  height: 2px;
+  background: rgba(10,13,18,.18);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background .35s, width .35s;
+}
+.cycle-display .cd-dot.is-active {
+  background: var(--accent);
+  width: 36px;
+}
+.cycle-display .cd-dot:hover { background: var(--accent); }
+
+@media (max-width: 1100px) {
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .about-col-right { justify-content: flex-start; }
+  .cycle-display { max-width: 100%; min-height: 280px; }
+}
+
+@media (max-width: 900px) {
+  .about-bg-mark { font-size: 12rem; }
+  .about-headline { font-size: 2rem; }
+  .cycle-slide .cs-headline { font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="brand">In<b>Uni</b> Global</div>
+    <div class="progress" id="progress">
+      <button data-go="0" class="active"><div class="dot"></div></button>
+      <button data-go="1"><div class="dot"></div></button>
+      <button data-go="2"><div class="dot"></div></button>
+      <button data-go="3"><div class="dot"></div></button>
+      <button data-go="4"><div class="dot"></div></button>
+      <button data-go="5"><div class="dot"></div></button>
+      <button data-go="6"><div class="dot"></div></button>
+      <button data-go="7"><div class="dot"></div></button>
+      <button data-go="8"><div class="dot"></div></button>
+      <button data-go="9"><div class="dot"></div></button>
+      <button data-go="10"><div class="dot"></div></button>
+    </div>
+  </div>
+
+  <!-- ============ SLIDES ============ -->
+  <div class="slides-area">
+    <div class="slides-track" id="track">
+
+      <!-- ===== SLIDE 1: START WITH THE PROBLEM ===== -->
+      <section class="slide is-active" data-slide="0">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.18" style="top:0;left:0;width:100%;height:50%;background:radial-gradient(ellipse at 50% 0%,rgba(45,111,224,.08),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.1" style="bottom:5%;right:-5%;width:380px;height:380px;border:1px solid rgba(45,111,224,.1);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.22" style="top:12%;left:-3%;width:220px;height:220px;border:1px solid rgba(45,111,224,.15);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1280px">
+          <div class="sec-label reveal d1" style="justify-content:flex-start"><span>NAFSA 2026 · Learning Lab</span></div>
+          <h1 class="problem-headline reveal d2">Start with <span>the problem.</span></h1>
+          <p class="lead reveal d3" style="margin:1rem 0 0 0;max-width:720px">A look inside InUni Global's operating system — how we listen on the floor, frame the friction, and build the system around it. One year in market, one standardised pipeline, every market.</p>
+          <div class="problem-stats reveal d4">
+            <div class="ps"><strong>11,500+</strong><span>Enrolments</span></div>
+            <div class="ps"><strong>132</strong><span>Countries</span></div>
+            <div class="ps"><strong>5,000+</strong><span>Partners</span></div>
+            <div class="ps"><strong>50+</strong><span>Languages</span></div>
+            <div class="ps"><strong>24/7</strong><span>Time-zones</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 2: WHO WE ARE — LIGHT STANDOUT ===== -->
+      <section class="slide about-light-slide" data-slide="1">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.15" style="top:0;right:0;width:60%;height:70%;background:radial-gradient(ellipse at 80% 20%,rgba(45,111,224,.07),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.10" style="bottom:-8%;right:-4%;width:480px;height:480px;border:1px solid rgba(45,111,224,.10);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.18" style="top:14%;left:-3%;width:200px;height:200px;border:1px solid rgba(45,111,224,.14);border-radius:50%"></div>
+          <div class="parallax-layer about-bg-mark" data-depth="0.06">i</div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1320px">
+          <div class="sec-label reveal d2" style="justify-content:flex-start"><span>Who We Are · Before the problem</span></div>
+
+          <div class="about-grid">
+            <div class="about-col-left">
+              <h1 class="about-headline reveal d3">
+                Not a supplier. <i>An extension</i> of your institution.
+              </h1>
+
+              <p class="about-lead reveal d4">
+                InUni Global is the operating partner for international growth in higher education — bringing together <strong>institutions, corporates, governments and faculty</strong> through strategy, technology, and execution. We manage the full admissions lifecycle, from candidate assessment through visa compliance and quality assurance, on one standardised pipeline across every market.
+              </p>
+
+              <div class="about-gus-strip reveal d5">
+                <div>
+                  <div class="ags-eyebrow">Operating within</div>
+                  <div class="ags-line">Global University Systems — <b>31 universities</b>, <b>174,000+ students</b>, four continents.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="about-col-right reveal d5">
+              <div class="cycle-display" id="aboutCycle">
+                <div class="cycle-frame"></div>
+                <div class="cycle-eyebrow">In Practice</div>
+
+                <div class="cycle-slide is-active" data-cycle="0">
+                  <div class="cs-roman">I.</div>
+                  <h5 class="cs-headline">We <i>operate it</i>, not just sell it.</h5>
+                  <p class="cs-body">Every component of InUni SMART is run by our own admissions, compliance and partnerships teams — in production, daily, across markets.</p>
+                </div>
+
+                <div class="cycle-slide" data-cycle="1">
+                  <div class="cs-roman">II.</div>
+                  <h5 class="cs-headline">One <i>system</i>, every market.</h5>
+                  <p class="cs-body">The same standardised pipeline serves 132 countries, 50+ languages and 11 time zones. Variation is removed before decisions are made.</p>
+                </div>
+
+                <div class="cycle-slide" data-cycle="2">
+                  <div class="cs-roman">III.</div>
+                  <h5 class="cs-headline">Built <i>with</i> the sector.</h5>
+                  <p class="cs-body">Designed alongside counsellors, registrars, and compliance leads. Our partners are universities, governments and corporates — not consumers of a tool.</p>
+                </div>
+
+                <div class="cycle-dots">
+                  <button class="cd-dot is-active" data-cycle-go="0" aria-label="Show point one"></button>
+                  <button class="cd-dot" data-cycle-go="1" aria-label="Show point two"></button>
+                  <button class="cd-dot" data-cycle-go="2" aria-label="Show point three"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-foot-mark reveal d6">inuniglobal.com · <b>NAFSA 2026</b></div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 3: METHOD — FIND THE FRICTION ===== -->
+      <section class="slide content-slide" data-slide="2">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.15" style="top:0;right:0;width:55%;height:60%;background:linear-gradient(225deg,rgba(45,111,224,.06),transparent 70%)"></div>
+          <div class="parallax-layer" data-depth="0.2" style="bottom:8%;left:6%;width:160px;height:160px;border:1px dashed rgba(45,111,224,.22);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.12" style="top:18%;right:8%;width:90px;height:90px;background:rgba(45,111,224,.06);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1280px">
+          <div class="sec-label reveal d1" style="justify-content:flex-start;margin-bottom:.4rem"><span>Our Method · How We Work</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.5rem,2.8vw,2.2rem);margin-bottom:.4rem;line-height:1.1">Find the friction. Build the <i>system</i> around it.</h2>
+          <p class="lead reveal d3" style="margin-bottom:0;max-width:720px;font-size:.82rem;line-height:1.5">We work with operators — counsellors, admissions, compliance, partnerships — to find the friction first. Every component of InUni SMART started as a question on the operations floor.</p>
+          <div class="method-grid">
+            <div class="method-card reveal d3">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">01</div>
+              <h5>Listen on the floor</h5>
+              <p>We start with operators. Where does the work hurt? Where is judgment being spent on the wrong thing?</p>
+            </div>
+            <div class="method-card reveal d4">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">02</div>
+              <h5>Frame the system problem</h5>
+              <p>We separate the resourcing question from the structural one. More people don't fix inconsistency — they scale it.</p>
+            </div>
+            <div class="method-card reveal d5">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">03</div>
+              <h5>Build inside the workflow</h5>
+              <p>Tools are designed into the live operation, not bolted on. Every output is auditable, regenerable, and useful.</p>
+            </div>
+            <div class="method-card reveal d6">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">04</div>
+              <h5>Measure, then iterate</h5>
+              <p>We track hours returned, variation removed, time saved. If a tool isn't earning its place, we rebuild or retire it.</p>
+            </div>
+          </div>
+
+          <div class="method-principle reveal d6">
+            <div class="mp-tag">Guided by</div>
+            <div class="mp-line"><b>Fairness by Standardisation.</b> <i>Same criteria. Every applicant. Every market.</i> The structural answer to inconsistency.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 4: FIVE COMPONENTS — ALL TOOLS ===== -->
+      <section class="slide tools-slide" data-slide="3">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:30%;width:40%;height:60%;background:radial-gradient(ellipse,rgba(45,111,224,.08),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.12" style="bottom:10%;right:5%;width:180px;height:180px;border:1px solid rgba(45,111,224,.14);border-radius:8px;transform:rotate(8deg)"></div>
+          <div class="parallax-layer" data-depth="0.08" style="top:8%;left:3%;font-family:var(--serif);font-size:14rem;color:rgba(45,111,224,.04);font-weight:600;line-height:1">5</div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1380px">
+          <div class="tools-header reveal d1" style="margin-bottom:.85rem">
+            <div class="sec-label" style="justify-content:flex-start;margin-bottom:.4rem"><span>Technologies</span></div>
+            <h2 class="reveal d2" style="font-size:clamp(1.5rem,2.8vw,2.2rem);margin-bottom:.4rem;line-height:1.1">Five components. <i>One</i> integrated system.</h2>
+            <p class="lead reveal d3" style="max-width:760px;font-size:.82rem;margin-bottom:0;line-height:1.5">Each addresses a specific point of structural failure. Variation is removed before decisions are made.</p>
+          </div>
+
+          <div class="tools-grid five-up">
+            <div class="tool-card compact reveal d3">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.01 · Tool Spotlight</div>
+                  <h4>InUni / <b>Suitability</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>7,592</strong>
+                  <span>Hrs · 2025</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Inconsistent screening across agents and markets.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Structured AI-led interviews</li>
+                      <li>Essay feedback flags gaps, preserves voice</li>
+                      <li>Pre-assessed applications for reviewers</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Variation removed before decisions are made.</div>
+            </div>
+
+            <div class="tool-card compact reveal d4">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.02 · Tool Spotlight</div>
+                  <h4>InUni / <b>Ready</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>10/15/<em>30%</em></strong>
+                  <span>Visa · Sched · Prep</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Applicants enter interviews unprepared.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Students practise structured responses</li>
+                      <li>Readiness tracked across cohorts</li>
+                      <li>At-risk applicants flagged early</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">21 countries, 11 time zones.</div>
+            </div>
+
+            <div class="tool-card compact reveal d5">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.03 · Tool Spotlight</div>
+                  <h4>InUni / <b>Evaluator</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong><em>57%</em></strong>
+                  <span>Faster · 35→15 min</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Manual GPA and document verification.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Checked against eligibility criteria</li>
+                      <li>Consistent across reviewers and markets</li>
+                      <li>Verified files progress without re-checks</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Judgment applied only to eligible applications.</div>
+            </div>
+
+            <div class="tool-card compact reveal d6">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.04 · Tool Spotlight</div>
+                  <h4>InUni / <b>Navigator</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>50+ / 24-7</strong>
+                  <span>Languages · Always-on</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Inconsistent guidance across time zones and agents.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Students access accurate info independently</li>
+                      <li>Consistent guidance across markets</li>
+                      <li>Institutions control information at scale</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">42% of consultations now outside UK hours.</div>
+            </div>
+
+            <div class="tool-card compact reveal d6">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.05 · Tool Spotlight</div>
+                  <h4>InUni / <b>TNE</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>5-step</strong>
+                  <span>Extract → Output</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Compliance rebuilt from scratch each framework change.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Data extracted and cross-referenced</li>
+                      <li>Teams review outputs, don't build from scratch</li>
+                      <li>Regenerates instantly on framework change</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Compliance becomes a structured, regenerable output.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 5: SUITABILITY DEEP-DIVE — DISCRETE SCREENS ===== -->
+      <section class="slide scrolly-slide" data-slide="4">
+        <div class="scrolly-wrap">
+
+          <!-- FIXED OVERLAY -->
+          <div class="scrolly-stage-fixed">
+
+            <!-- Counter top-right -->
+            <div class="stage-counter">
+              <span class="sc-current">00</span>
+              <span class="sc-total">/ 05</span>
+              <span class="sc-bar"></span>
+            </div>
+
+            <!-- Hero (screen 0 — index "h" for hero) -->
+            <div class="screen screen-hero is-active" data-screen="hero">
+              <div class="hero-eyebrow">InUni / Suitability · Inside the workflow</div>
+              <h2 class="hero-num"><em>7,592</em></h2>
+              <div class="hero-label">hours saved · 2025</div>
+              <div class="hero-arrow">
+                Scroll to explore
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            <!-- Step 1: Capture -->
+            <div class="screen screen-step" data-screen="0" data-anim="bottom-right">
+              <div class="screen-text">
+                <div class="ss-num">Step 01 · Capture</div>
+                <h3><i>Applicant</i> profile.</h3>
+                <p>Applicants upload their CV and SOP alongside core details — one structured intake for every market. Every file lands in the same shape, ready for review.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1zRmuWK4FYqBEHdCqjfGsMu6SmRKhyZRN&sz=w1600" alt="Capture — Applicant Profile">
+              </div>
+            </div>
+
+            <!-- Step 2: Guide -->
+            <div class="screen screen-step" data-screen="1" data-anim="top">
+              <div class="screen-text">
+                <div class="ss-num">Step 02 · Guide</div>
+                <h3><i>Authentic</i> essays.</h3>
+                <p>Feedback highlights what each university is looking to see — applicants address it in their own voice, with AI-content detection on submission. Structural feedback only; the work belongs to the applicant.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1hPoTT2jPTUejVxFCjbtV0CQ03yejpeNJ&sz=w1600" alt="Guide — Authentic Essays">
+              </div>
+            </div>
+
+            <!-- Step 3: Prepare -->
+            <div class="screen screen-step" data-screen="2" data-anim="bottom">
+              <div class="screen-text">
+                <div class="ss-num">Step 03 · Prepare</div>
+                <h3><i>Interview</i> readiness.</h3>
+                <p>Interactive briefings on the city, programmes, and visa rules — applicants build a personal blueprint before the interview. By the time they sit down, they know what they're walking into.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1TriKJnJD_IWJX4WpL9jMzpK7bDFoTfGX&sz=w1600" alt="Prepare — Interview Readiness">
+              </div>
+            </div>
+
+            <!-- Step 4: Verify (dual image) -->
+            <div class="screen screen-step" data-screen="3" data-anim="dual">
+              <div class="screen-text">
+                <div class="ss-num">Step 04 · Verify</div>
+                <h3><i>Identity</i> confirmed.</h3>
+                <p>Live passport and face capture confirm the right person is sitting the interview — no proxies, no surprises at enrolment. The decision and the candidate are linked from the start.</p>
+              </div>
+              <div class="screen-image dual">
+                <img src="https://drive.google.com/thumbnail?id=1O1j5RHYSrsBOQ-My3GLUUtNeSaZZjVZS&sz=w1000" alt="Verify A — Identity capture">
+                <img src="https://drive.google.com/thumbnail?id=1pD70uQnsnkdny6_AYpKc9HGKYcoma6rC&sz=w1000" alt="Verify B — Identity confirmation">
+              </div>
+            </div>
+
+            <!-- Step 5: Assess -->
+            <div class="screen screen-step" data-screen="4" data-anim="zoom">
+              <div class="screen-text">
+                <div class="ss-num">Step 05 · Assess</div>
+                <h3><i>Structured</i> interviews.</h3>
+                <p>An AI-led conversation runs the same structured assessment for every applicant — reviewers receive a consistent, pre-assessed outcome. Variation is removed before judgment is applied.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1bHdtX0kruPeY-P8HgQw-puYqhXR0RUyD&sz=w1600" alt="Assess — Structured Interviews">
+              </div>
+            </div>
+
+            <!-- Outro -->
+            <div class="screen screen-outro" data-screen="outro">
+              <p>One workflow. Five components. Every applicant moves through the same standardised pipeline — across 21 countries and 11 time zones.</p>
+            </div>
+
+          </div>
+
+          <!-- INVISIBLE SPACERS: provide scroll distance to advance through screens.
+               Each spacer = one viewport tall. As user scrolls past spacer N's
+               midpoint, screen N becomes active. Total = 7 spacers (hero + 5 steps + outro). -->
+          <div class="scrolly-spacer" data-screen="hero"></div>
+          <div class="scrolly-spacer" data-screen="0"></div>
+          <div class="scrolly-spacer" data-screen="1"></div>
+          <div class="scrolly-spacer" data-screen="2"></div>
+          <div class="scrolly-spacer" data-screen="3"></div>
+          <div class="scrolly-spacer" data-screen="4"></div>
+          <div class="scrolly-spacer" data-screen="outro"></div>
+
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 6: EVALUATOR DEEP-DIVE — DISCRETE SCREENS ===== -->
+      <section class="slide scrolly-slide" data-slide="5">
+        <div class="scrolly-wrap">
+
+          <!-- FIXED OVERLAY -->
+          <div class="scrolly-stage-fixed">
+
+            <!-- Counter top-right -->
+            <div class="stage-counter">
+              <span class="sc-current">00</span>
+              <span class="sc-total">/ 04</span>
+              <span class="sc-bar"></span>
+            </div>
+
+            <!-- Hero -->
+            <div class="screen screen-hero is-active" data-screen="hero">
+              <div class="hero-eyebrow">InUni / Evaluator · Inside the workflow</div>
+              <h2 class="hero-num"><em>57%</em></h2>
+              <div class="hero-label">faster · 35 → 15 min</div>
+              <div class="hero-arrow">
+                Scroll to explore
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            <!-- Step 1: Upload -->
+            <div class="screen screen-step" data-screen="0" data-anim="bottom-right">
+              <div class="screen-text">
+                <div class="ss-num">Step 01 · Upload</div>
+                <h3><i>Documents</i> in.</h3>
+                <p>Resume, statement, transcript, certificate — submitted against the chosen programme in a single step.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=18yCIwyijrkLrwYVu6L_kV5vpsJfQGphi&sz=w1600" alt="Upload — Documents in">
+              </div>
+            </div>
+
+            <!-- Step 2: Convert -->
+            <div class="screen screen-step" data-screen="1" data-anim="top">
+              <div class="screen-text">
+                <div class="ss-num">Step 02 · Convert</div>
+                <h3><i>Equivalency</i> established.</h3>
+                <p>Foreign transcripts mapped course-by-course; degree benchmarked against the destination system. GPA and equivalence calculated.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1HSGafXTNQEF188MEplnEbqHm3Lv0BvJ_&sz=w1600" alt="Convert — Equivalency established">
+              </div>
+            </div>
+
+            <!-- Step 3: Assess -->
+            <div class="screen screen-step" data-screen="2" data-anim="bottom">
+              <div class="screen-text">
+                <div class="ss-num">Step 03 · Assess</div>
+                <h3><i>Rubric</i> applied.</h3>
+                <p>Every applicant scored against the programme's rubric — same criteria, same weights, written justifications throughout.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=14bDHVd7ICHuXbBSgpasKxACTMDlyxZ0e&sz=w1600" alt="Assess — Rubric applied">
+              </div>
+            </div>
+
+            <!-- Step 4: Decide -->
+            <div class="screen screen-step" data-screen="3" data-anim="zoom">
+              <div class="screen-text">
+                <div class="ss-num">Step 04 · Decide</div>
+                <h3><i>Evaluation</i> delivered.</h3>
+                <p>Strengths, gaps, and fit summarised in plain language. Reviewers receive a pre-assessed outcome with reasoning attached.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1dJ9drSCSVZ_C73FqCDIlbCEwdKr9jN_M&sz=w1600" alt="Decide — Evaluation delivered">
+              </div>
+            </div>
+
+            <!-- Outro -->
+            <div class="screen screen-outro" data-screen="outro">
+              <p>Manual GPA checks become a structured, regenerable evaluation — applied consistently across reviewers and markets.</p>
+            </div>
+
+          </div>
+
+          <!-- Spacers: 4 steps + hero + outro = 6 -->
+          <div class="scrolly-spacer" data-screen="hero"></div>
+          <div class="scrolly-spacer" data-screen="0"></div>
+          <div class="scrolly-spacer" data-screen="1"></div>
+          <div class="scrolly-spacer" data-screen="2"></div>
+          <div class="scrolly-spacer" data-screen="3"></div>
+          <div class="scrolly-spacer" data-screen="outro"></div>
+
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 7: CREDITMAP DEEP-DIVE — DISCRETE SCREENS ===== -->
+      <section class="slide scrolly-slide" data-slide="6">
+        <div class="scrolly-wrap">
+
+          <div class="scrolly-stage-fixed">
+
+            <div class="stage-counter">
+              <span class="sc-current">00</span>
+              <span class="sc-total">/ 04</span>
+              <span class="sc-bar"></span>
+            </div>
+
+            <!-- Hero -->
+            <div class="screen screen-hero is-active" data-screen="hero">
+              <div class="hero-eyebrow">InUni / CreditMap · Inside the workflow</div>
+              <h2 class="hero-num"><em>4</em>-step</h2>
+              <div class="hero-label">extract → output</div>
+              <div class="hero-arrow">
+                Scroll to explore
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            <!-- Step 1: Upload — single image (1st) -->
+            <div class="screen screen-step" data-screen="0" data-anim="bottom-right">
+              <div class="screen-text">
+                <div class="ss-num">Step 01 · Upload</div>
+                <h3><i>Documents</i> in.</h3>
+                <p>Sending and receiving institutions named, syllabi, learning outcomes and study plans uploaded as PDFs. Custom extraction rules added where needed.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1TdB24Pxj5nNLp1vCfHPOTn1csVUeGl4C&sz=w1600" alt="Upload — Documents in">
+              </div>
+            </div>
+
+            <!-- Step 2: Extract — single image (2nd) -->
+            <div class="screen screen-step" data-screen="1" data-anim="top">
+              <div class="screen-text">
+                <div class="ss-num">Step 02 · Extract</div>
+                <h3><i>Courses</i> parsed.</h3>
+                <p>Course codes, credits, learning outcomes, and Bloom's levels pulled from each document automatically. The articulation evidence base is built before any mapping begins.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1vEm2uA1k_xmDL7vxhp6Z3j3jWynawWgQ&sz=w1600" alt="Extract — Courses parsed">
+              </div>
+            </div>
+
+            <!-- Step 3: Review — single image (3rd) -->
+            <div class="screen screen-step" data-screen="2" data-anim="bottom">
+              <div class="screen-text">
+                <div class="ss-num">Step 03 · Review</div>
+                <h3><i>Outcomes</i> verified.</h3>
+                <p>Every extracted course shown side-by-side — credits, Bloom's level, key outcomes editable before the engine runs. Human oversight on the inputs, not just the results.</p>
+              </div>
+              <div class="screen-image">
+                <img src="https://drive.google.com/thumbnail?id=1d70X3rc4nVco9Y9tphr8y8t_iepbawef&sz=w1600" alt="Review — Outcomes verified">
+              </div>
+            </div>
+
+            <!-- Step 4: Map — TRIPLE image (4th, 5th, 6th) -->
+            <div class="screen screen-step" data-screen="3" data-anim="triple">
+              <div class="screen-text">
+                <div class="ss-num">Step 04 · Map</div>
+                <h3><i>Equivalency</i> resolved.</h3>
+                <p>CLO-to-CLO overlap measured against set % thresholds with Bloom's and credit-volume checks. Each pairing returned as direct match, partial match, deficit, or surplus — with rationale and conditions attached.</p>
+              </div>
+              <div class="screen-image triple">
+                <img src="https://drive.google.com/thumbnail?id=1zhlFPlmUglHEwhs_w-ZNcLGXsVA4vS75&sz=w1000" alt="Map — Equivalency resolved A">
+                <img src="https://drive.google.com/thumbnail?id=1kPkH1MUVTONmJ5fzdVxb4UvRnvjVOAKb&sz=w1000" alt="Map — Equivalency resolved B">
+                <img src="https://drive.google.com/thumbnail?id=15_SPXR8ZvHp4ue91gJUK9NikmcUeYFTK&sz=w1000" alt="Map — Equivalency resolved C">
+              </div>
+            </div>
+
+            <!-- Outro -->
+            <div class="screen screen-outro" data-screen="outro">
+              <p>CLO-level articulation as a structured, regenerable output — direct match, partial match, deficit, or surplus, with rationale attached.</p>
+            </div>
+
+          </div>
+
+          <!-- Spacers: hero + 4 steps + outro = 6 -->
+          <div class="scrolly-spacer" data-screen="hero"></div>
+          <div class="scrolly-spacer" data-screen="0"></div>
+          <div class="scrolly-spacer" data-screen="1"></div>
+          <div class="scrolly-spacer" data-screen="2"></div>
+          <div class="scrolly-spacer" data-screen="3"></div>
+          <div class="scrolly-spacer" data-screen="outro"></div>
+
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 8: OUTCOMES — 2025 ===== -->
+      <section class="slide content-slide" data-slide="7">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.18" style="top:0;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(45,111,224,.05),transparent 70%);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:10%;right:3%;font-family:var(--serif);font-size:16rem;color:rgba(45,111,224,.03);font-weight:600;line-height:1;font-style:italic">2025</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1280px">
+          <div class="sec-label reveal d1" style="justify-content:center;margin-bottom:.6rem"><span>Outcomes — 2025</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.5rem,2.8vw,2.2rem);margin-bottom:.4rem;line-height:1.1;text-align:center">What the system delivered. <i>One</i> operating year.</h2>
+          <p class="lead reveal d3" style="max-width:720px;margin:0 auto 1rem;font-size:.82rem;line-height:1.5;text-align:center">Same standardised pipeline. All markets.</p>
+          <div class="outcomes-table reveal d4">
+            <div class="ot-row head">
+              <div>ID</div><div>Metric</div><div>Outcome</div><div>Original Challenge</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.01</div>
+              <div class="ot-metric">30,000<em>+</em></div>
+              <div class="ot-outcome">Applications screened through the system</div>
+              <div class="ot-orig">Variation between agents</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.02</div>
+              <div class="ot-metric"><em>57%</em><small>faster</small></div>
+              <div class="ot-outcome">Application review (35 → 15 min)</div>
+              <div class="ot-orig">Manual GPA checks</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.03</div>
+              <div class="ot-metric">7,592<small>hrs</small></div>
+              <div class="ot-outcome">Returned to professional judgment</div>
+              <div class="ot-orig">Experts trapped in repetition</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.04</div>
+              <div class="ot-metric"><em>42%</em></div>
+              <div class="ot-outcome">Consultations outside UK working hours</div>
+              <div class="ot-orig">Time-zone coverage gaps</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.05</div>
+              <div class="ot-metric">50<em>+</em><small>langs</small></div>
+              <div class="ot-outcome">Served, no additional staffing</div>
+              <div class="ot-orig">Inconsistent guidance</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.06</div>
+              <div class="ot-metric">21<small>countries</small></div>
+              <div class="ot-outcome">Structured interview preparation · 11 time zones</div>
+              <div class="ot-orig">Unprepared cohorts</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.07</div>
+              <div class="ot-metric">5,000<em>+</em></div>
+              <div class="ot-outcome">Partners operating within one system</div>
+              <div class="ot-orig">Channel fragmentation</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 9: PHILOSOPHY ===== -->
+      <section class="slide" data-slide="8">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:0;width:50%;height:100%;background:linear-gradient(135deg,rgba(45,111,224,.06),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.14" style="bottom:10%;right:8%;width:280px;height:280px;border:1px solid rgba(45,111,224,.12);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.08" style="top:14%;right:14%;width:120px;height:120px;border:1px solid rgba(45,111,224,.18);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1180px">
+          <div class="sec-label reveal d1" style="justify-content:flex-start"><span>Philosophy</span></div>
+          <h2 class="reveal d2">The system handles scale. <i>People</i> handle judgment.</h2>
+          <p class="lead reveal d3" style="max-width:720px">Three principles guide every component we build — and every one we retire.</p>
+          <div class="philo-grid">
+            <div class="philo-card reveal d3">
+              <div class="p-tag">P.01</div>
+              <h5>Fairness by Standardisation</h5>
+              <p>Same criteria. Every applicant. Every market. The structural answer to inconsistency.</p>
+            </div>
+            <div class="philo-card reveal d4">
+              <div class="p-tag">P.02</div>
+              <h5>Academic Integrity by Design</h5>
+              <p>Structural feedback only. Student voice is never rewritten. The work belongs to the applicant.</p>
+            </div>
+            <div class="philo-card reveal d5">
+              <div class="p-tag">P.03</div>
+              <h5>Human Judgment at the Point of Decision</h5>
+              <p>AI absorbs volume. Professionals decide. Expertise is preserved for the moments that need it.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 10: BRING US YOUR CHALLENGE ===== -->
+      <section class="slide" data-slide="9">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:0;right:0;height:100%;background:radial-gradient(circle at 50% 0%,rgba(45,111,224,.1),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:8%;left:6%;width:260px;height:260px;border:1px solid rgba(45,111,224,.14);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.16" style="bottom:14%;right:8%;width:200px;height:200px;border:1px solid rgba(45,111,224,.18);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1280px">
+          <div class="sec-label reveal d1" style="justify-content:flex-start;margin-top:1.5rem"><span>From this Learning Lab · An Invitation</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.08;letter-spacing:-.018em;margin-bottom:.5rem">Bring us <i>your</i> challenge.</h2>
+          <p class="lead reveal d3" style="max-width:780px;font-size:.85rem;line-height:1.55;margin-bottom:1.1rem">InUni is actively looking for operational friction in international education — yours, ours, the sector's. The bigger the headache, the better the brief. If your team is rebuilding the same thing twice, applying inconsistent judgment across markets, or losing experts to repetition — we'd like to hear about it.</p>
+          <div class="challenge-grid" style="margin-top:.5rem">
+            <div class="challenge-card reveal d3">
+              <div class="c-num">01</div>
+              <p>Where in your operation is judgment being spent on something a system should do?</p>
+            </div>
+            <div class="challenge-card reveal d4">
+              <div class="c-num">02</div>
+              <p>Where do two of your markets do the same task differently — and nobody's quite sure why?</p>
+            </div>
+            <div class="challenge-card reveal d5">
+              <div class="c-num">03</div>
+              <p>What's the friction you've stopped noticing because it's been there too long?</p>
+            </div>
+          </div>
+          <div class="invite-cta reveal d6">
+            <a class="invite-link" href="mailto:partners@inuniglobal.com">
+              <span class="il-lead">Let's shape your strategy</span>
+              <span class="il-rule"></span>
+              <span class="il-mail">partners@inuniglobal.com</span>
+              <svg class="il-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SLIDE 11: LIVE SESSION — BOOTH 739 ===== -->
+      <section class="slide" data-slide="10">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;right:-5%;width:50%;height:80%;background:radial-gradient(circle,rgba(45,111,224,.1),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:8%;left:6%;width:240px;height:240px;border:1px solid rgba(45,111,224,.12);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.16" style="bottom:10%;left:35%;width:120px;height:120px;border:1px dashed rgba(45,111,224,.18);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1320px">
+          <div class="booth-frame">
+
+            <div class="booth-left">
+              <div class="booth-eyebrow reveal d1">
+                <span class="live-pulse"></span>
+                Live at NAFSA 2026
+              </div>
+              <h2 class="booth-headline reveal d2">Come and meet the team <i>in person</i>.</h2>
+              <p class="booth-subline reveal d3">With backgrounds spanning leadership roles in global institutions, international partnerships, admissions and compliance, and cross-market development — the team represents a breadth of insight shaped by real-world delivery and long-term results.</p>
+
+              <div class="booth-credlist reveal d4">
+                <div class="cred">Leadership in global higher-education institutions</div>
+                <div class="cred">International partnerships and transnational delivery</div>
+                <div class="cred">Admissions, regulatory and compliance operations</div>
+                <div class="cred">Cross-market development and recruitment strategy</div>
+              </div>
+
+              <div class="booth-foot reveal d5">
+                <div class="bf-item">
+                  <span class="bf-key">When</span>
+                  <span class="bf-val">All conference hours</span>
+                </div>
+                <div class="bf-item">
+                  <span class="bf-key">Where</span>
+                  <span class="bf-val accent">Booth 739 · Exhibition Hall</span>
+                </div>
+                <div class="bf-item">
+                  <span class="bf-key">Or write</span>
+                  <span class="bf-val">partners@inuniglobal.com</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="booth-visual reveal d3">
+              <div class="booth-label">Booth Number</div>
+              <div class="booth-num">7<em>3</em>9</div>
+              <div class="booth-rule"></div>
+              <div class="booth-meet">Exhibition Hall · NAFSA 2026</div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- ============ PERSISTENT GUS INFRASTRUCTURE ============ -->
+  <aside class="gus-bar" aria-label="Global University Systems Infrastructure">
+    <div class="gus-cobrand">
+      <span class="ecb-label">A Division of</span>
+      <span class="ecb-divider"></span>
+      <span class="ecb-mark">GUS<b> · </b>Global University Systems</span>
+    </div>
+
+    <div class="eco-stats">
+      <div class="eco-s"><strong>31</strong><span>Institutions</span></div>
+      <div class="eco-s"><strong>174K+</strong><span>Students</span></div>
+      <div class="eco-s"><strong>3K+</strong><span>Courses</span></div>
+      <div class="eco-s"><strong>130+</strong><span>Academic Partners</span></div>
+      <div class="eco-s"><strong>6K+</strong><span>Market Partners</span></div>
+      <div class="eco-s"><strong>11K+</strong><span>Employees</span></div>
+    </div>
+
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span>Arden University</span><span>University of Law</span><span>UPES India</span><span>University Canada West</span><span>UNF Canada</span><span>GISMA</span><span>UE Applied Sciences</span><span>Saba University</span><span>MUA</span><span>FutureLearn</span><span>Pearl Academy</span><span>BSBI Berlin</span><span>LCCA London</span><span>TSOM Toronto</span><span>LSBF Singapore</span><span>CCTB</span><span>Fleming College</span><span>LCCM</span><span>htk Academy</span><span>Niagara College</span><span>St. Matthew's</span>
+        <span>Arden University</span><span>University of Law</span><span>UPES India</span><span>University Canada West</span><span>UNF Canada</span><span>GISMA</span><span>UE Applied Sciences</span><span>Saba University</span><span>MUA</span><span>FutureLearn</span><span>Pearl Academy</span><span>BSBI Berlin</span><span>LCCA London</span><span>TSOM Toronto</span><span>LSBF Singapore</span><span>CCTB</span><span>Fleming College</span><span>LCCM</span><span>htk Academy</span><span>Niagara College</span><span>St. Matthew's</span>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+(function () {
+  const track = document.getElementById('track');
+  const slides = Array.from(track.querySelectorAll('.slide'));
+  const total = slides.length;
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const progressBtns = Array.from(document.querySelectorAll('#progress button'));
+
+  let current = 0;
+  let isAnimating = false;
+  let parallaxProgress = 0; // 0..1 within current slide
+
+  function applyTransform() {
+    /* Combine: slide offset + small parallax shift inside the active slide */
+    const slideOffset = -current * 100;
+    const innerShift = parallaxProgress * 4; // up to ~4vw of intra-slide drift
+    track.style.transform = `translate3d(calc(${slideOffset}vw - ${innerShift}vw), 0, 0)`;
+
+    /* Apply parallax to layers in the active slide */
+    const active = slides[current];
+    const layers = active.querySelectorAll('.parallax-layer');
+    layers.forEach(l => {
+      const depth = parseFloat(l.dataset.depth) || .15;
+      const x = -parallaxProgress * depth * 200;
+      const y = parallaxProgress * depth * 80;
+      // Preserve any existing transform (rotate, translate(-50%,-50%)) by setting custom prop
+      l.style.setProperty('--px', `${x}px`);
+      l.style.setProperty('--py', `${y}px`);
+      // For layers without conflicting inline transforms, apply directly via translate
+      const baseT = l.dataset.baseTransform || l.style.transform || '';
+      if (!l.dataset.baseTransform) l.dataset.baseTransform = baseT;
+      l.style.transform = `${l.dataset.baseTransform} translate3d(${x}px, ${y}px, 0)`;
+    });
+  }
+
+  function setActive(idx) {
+    current = Math.max(0, Math.min(total - 1, idx));
+    parallaxProgress = 0;
+
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+    progressBtns.forEach((b, i) => b.classList.toggle('active', i === current));
+
+    /* Reset any scrolly-wrap inner scroll positions (so re-entering starts at top) */
+    document.querySelectorAll('.scrolly-wrap').forEach(w => { w.scrollTop = 0; });
+
+    /* If the new active slide contains a scrolly-wrap, re-measure step positions
+       once the slide-change transition is settling. Initial measurements taken
+       while the slide was translated off-screen may be wrong. */
+    if (slides[current].querySelector('.scrolly-wrap') && window.__scrollyRemeasure) {
+      setTimeout(window.__scrollyRemeasure, 200);
+      setTimeout(window.__scrollyRemeasure, 600);
+    }
+
+    if (prevBtn) prevBtn.disabled = current === 0;
+    if (nextBtn) nextBtn.disabled = current === total - 1;
+
+    isAnimating = true;
+    applyTransform();
+
+    /* Allow next nav after slide transition completes */
+    setTimeout(() => { isAnimating = false; }, 1100);
+  }
+
+  function next() { if (!isAnimating && current < total - 1) setActive(current + 1); }
+  function prev() { if (!isAnimating && current > 0) setActive(current - 1); }
+
+  /* ===== Buttons ===== */
+  if (nextBtn) nextBtn.addEventListener('click', next);
+  if (prevBtn) prevBtn.addEventListener('click', prev);
+  progressBtns.forEach(b => b.addEventListener('click', () => {
+    if (!isAnimating) setActive(parseInt(b.dataset.go, 10));
+  }));
+
+  /* ===== Keyboard ===== */
+  window.addEventListener('keydown', (e) => {
+    /* Inner scroll handling for scrolly slide on Arrow Up/Down */
+    const activeSlide = slides[current];
+    const wrap = activeSlide ? activeSlide.querySelector('.scrolly-wrap') : null;
+    if (wrap && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      const dir = e.key === 'ArrowDown' ? 1 : -1;
+      const atTop = wrap.scrollTop <= 1;
+      const atBottom = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 1;
+      if ((dir === 1 && !atBottom) || (dir === -1 && !atTop)) {
+        e.preventDefault();
+        wrap.scrollTop += dir * 80;
+        return;
+      }
+    }
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp')  { e.preventDefault(); prev(); }
+    if (e.key === 'Home') { e.preventDefault(); setActive(0); }
+    if (e.key === 'End')  { e.preventDefault(); setActive(total - 1); }
+  });
+
+  /* ===== Wheel: parallax build-up, then advance ===== */
+  let wheelAccum = 0;
+  let wheelTimer = null;
+  const ADVANCE_THRESHOLD = 220;   // accumulated delta before slide change
+  const PARALLAX_DIVISOR = 600;    // how aggressively wheel deepens parallax
+
+  /* Helper: returns the inner scroll element if current slide is a scrolly-slide
+     and the inner scroll has room to scroll in the direction of delta */
+  function getInnerScrollTarget(deltaY) {
+    const activeSlide = slides[current];
+    if (!activeSlide) return null;
+    const wrap = activeSlide.querySelector('.scrolly-wrap');
+    if (!wrap) return null;
+    const atTop = wrap.scrollTop <= 1;
+    const atBottom = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 1;
+    if (deltaY > 0 && !atBottom) return wrap;  // can scroll down inside
+    if (deltaY < 0 && !atTop) return wrap;     // can scroll up inside
+    return null; // scroll exhausted, allow horizontal nav
+  }
+
+  window.addEventListener('wheel', (e) => {
+    const delta = e.deltaY || e.deltaX;
+
+    /* Inner scroll handoff for scrolly-slide */
+    const inner = getInnerScrollTarget(delta);
+    if (inner) {
+      inner.scrollTop += delta;
+      e.preventDefault();
+      return;
+    }
+
+    if (isAnimating) return;
+    e.preventDefault();
+
+    wheelAccum += delta;
+
+    /* Update intra-slide parallax 0..1 (clamped) for live feedback */
+    if (delta > 0 && current < total - 1) {
+      parallaxProgress = Math.min(1, parallaxProgress + Math.abs(delta) / PARALLAX_DIVISOR);
+      applyTransform();
+    } else if (delta < 0 && current > 0) {
+      parallaxProgress = Math.min(1, parallaxProgress + Math.abs(delta) / PARALLAX_DIVISOR);
+      applyTransform();
+    }
+
+    /* When threshold reached, transition slide */
+    if (wheelAccum > ADVANCE_THRESHOLD) {
+      wheelAccum = 0;
+      next();
+    } else if (wheelAccum < -ADVANCE_THRESHOLD) {
+      wheelAccum = 0;
+      prev();
+    }
+
+    /* Decay accumulator + parallax if user stops scrolling */
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+      wheelAccum = 0;
+      parallaxProgress = 0;
+      applyTransform();
+    }, 220);
+  }, { passive: false });
+
+  /* ===== Touch swipe ===== */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchActive = false;
+
+  window.addEventListener('touchstart', (e) => {
+    if (isAnimating) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchActive = true;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!touchActive || isAnimating) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      parallaxProgress = Math.min(1, Math.abs(dx) / 300);
+      applyTransform();
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (!touchActive) return;
+    touchActive = false;
+    const dx = (e.changedTouches[0].clientX) - touchStartX;
+    parallaxProgress = 0;
+    if (Math.abs(dx) > 60) {
+      if (dx < 0) next(); else prev();
+    } else {
+      applyTransform();
+    }
+  });
+
+  /* ===== Resize ===== */
+  window.addEventListener('resize', applyTransform);
+
+  /* =========================================================
+     ===========   DISCRETE-SCREEN SCROLLY DRIVER  ============
+     ========================================================= */
+  (function initAllScrolly() {
+    const wraps = Array.from(document.querySelectorAll('.scrolly-wrap'));
+    if (!wraps.length) return;
+
+    const remeasureHooks = [];
+
+    wraps.forEach(wrap => {
+      const screens = Array.from(wrap.querySelectorAll('.screen'));
+      const spacers = Array.from(wrap.querySelectorAll('.scrolly-spacer'));
+      const scCurrent = wrap.querySelector('.sc-current');
+      const scBar = wrap.querySelector('.sc-bar');
+
+      const screenByIndex = spacers.map(sp => {
+        const key = sp.dataset.screen;
+        return screens.find(s => s.dataset.screen === key);
+      });
+      const totalSpacers = spacers.length;
+      if (!totalSpacers) return;
+
+      function stepIndexFor(spacerIdx) {
+        const screen = screenByIndex[spacerIdx];
+        if (!screen) return null;
+        const k = screen.dataset.screen;
+        if (k === 'hero' || k === 'outro') return null;
+        return parseInt(k, 10);
+      }
+
+      let lastSpacer = -1;
+
+      function setActiveSpacer(idx) {
+        idx = Math.max(0, Math.min(totalSpacers - 1, idx));
+        if (idx === lastSpacer) return;
+
+        screenByIndex.forEach((screen, i) => {
+          if (!screen) return;
+          screen.classList.toggle('is-active', i === idx);
+        });
+
+        const step = stepIndexFor(idx);
+        if (scCurrent) {
+          scCurrent.textContent = step === null ? '00' : String(step + 1).padStart(2, '0');
+        }
+        if (scBar) {
+          scBar.style.setProperty('--scp', `${(idx / (totalSpacers - 1)) * 100}%`);
+        }
+
+        lastSpacer = idx;
+      }
+
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const wrapTop = wrap.scrollTop;
+          const wrapHeight = wrap.clientHeight || 1;
+          const spacerIdx = Math.floor((wrapTop + wrapHeight / 2) / wrapHeight);
+          setActiveSpacer(spacerIdx);
+          ticking = false;
+        });
+      }
+
+      wrap.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+
+      setActiveSpacer(0);
+      onScroll();
+
+      remeasureHooks.push(onScroll);
+    });
+
+    /* Expose a single remeasure that fires all instances */
+    window.__scrollyRemeasure = function() {
+      requestAnimationFrame(() => remeasureHooks.forEach(fn => fn()));
+    };
+  })();
+
+  /* ===== Init ===== */
+  setActive(0);
+})();
+
+/* ===== About slide: cycling proof display ===== */
+(function () {
+  const display = document.getElementById('aboutCycle');
+  if (!display) return;
+
+  const slides = Array.from(display.querySelectorAll('.cycle-slide'));
+  const dots = Array.from(display.querySelectorAll('.cd-dot'));
+  if (!slides.length) return;
+
+  let idx = 0;
+  let timer = null;
+  const INTERVAL = 2750; /* ms per message */
+
+  function show(n) {
+    idx = (n + slides.length) % slides.length;
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
+  }
+
+  function start() {
+    stop();
+    timer = setInterval(() => show(idx + 1), INTERVAL);
+  }
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  /* Manual control via dots — pauses auto-cycle briefly */
+  dots.forEach((d, i) => {
+    d.addEventListener('click', () => {
+      show(i);
+      stop();
+      /* resume auto-cycle after 8s of inactivity */
+      setTimeout(start, 8000);
+    });
+  });
+
+  /* Pause when the about slide is not active (saves attention/energy) */
+  function isAboutSlideActive() {
+    const aboutSection = display.closest('.slide');
+    return aboutSection && aboutSection.classList.contains('is-active');
+  }
+
+  /* Watch for the parent slide becoming active/inactive */
+  const aboutSection = display.closest('.slide');
+  if (aboutSection) {
+    const observer = new MutationObserver(() => {
+      if (isAboutSlideActive()) start();
+      else stop();
+    });
+    observer.observe(aboutSection, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  /* Pause on hover so readers can finish a long sentence */
+  display.addEventListener('mouseenter', stop);
+  display.addEventListener('mouseleave', () => { if (isAboutSlideActive()) start(); });
+
+  /* Start if the about slide happens to be active at load */
+  if (isAboutSlideActive()) start();
+})();
+</script>
+
+</body>
+</html>
