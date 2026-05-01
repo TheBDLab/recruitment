@@ -1989,8 +1989,8 @@ body{
   position: relative;
   width: 100%;
   max-width: 460px;
-  min-height: 320px;
-  padding: 2.4rem 2.2rem 2.6rem;
+  min-height: 380px;
+  padding: 2.4rem 2.2rem 3.4rem;
   background: var(--white);
   border: 1px solid var(--border-light);
   box-shadow: 0 12px 48px -16px rgba(15,42,79,.18), 0 2px 8px -4px rgba(15,42,79,.08);
@@ -2015,12 +2015,18 @@ body{
 
 .cycle-slide {
   position: absolute;
-  inset: 2.4rem 2.2rem 2.6rem;
+  /* Leaves room for the eyebrow at top and the dots at bottom */
   top: 4rem;
+  left: 2.2rem;
+  right: 2.2rem;
+  bottom: 3.2rem;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s ease, transform .7s ease;
   pointer-events: none;
+  /* Vertical room for the longest message */
+  display: flex;
+  flex-direction: column;
 }
 .cycle-slide.is-active {
   opacity: 1;
