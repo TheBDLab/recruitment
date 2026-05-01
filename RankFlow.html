@@ -105,6 +105,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
 .psb-ann{background:rgba(232,41,58,0.1);border-top:1px solid rgba(232,41,58,0.2);padding:6px 10px;text-align:center;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:var(--red2);text-transform:uppercase;animation:glowPulse 2.5s ease-in-out infinite;}
 @keyframes glowPulse{0%,100%{color:var(--red2);}50%{color:#ff8a94;}}
 @keyframes ballSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
 @keyframes goReveal{
   0%{opacity:0;transform:scale(0.3) translateY(10px);letter-spacing:1px;}
   12%{opacity:1;transform:scale(1.12) translateY(-3px);letter-spacing:6px;}
@@ -422,6 +423,32 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
             <th>Goals</th><th>Pts</th><th>Form</th>
           </tr></thead>
           <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+
+      <!-- ── PLAYER LEADERBOARD TABLE ── -->
+      <div id="player-tables-section" style="margin-top:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:6px;">
+            <span style="width:3px;height:13px;background:var(--gold);border-radius:2px;display:inline-block;"></span>
+            &#127942; Player Leaderboard
+          </div>
+          <div style="display:flex;gap:12px;font-size:10px;">
+            <span style="color:#A78BFA;font-family:'Oswald',sans-serif;letter-spacing:1px;">&#9679; UNF = University of Niagara Falls Canada</span>
+            <span style="color:var(--cyan);font-family:'Oswald',sans-serif;letter-spacing:1px;">&#9679; UCW = University Canada West</span>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);">
+              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-align:center;width:30px;">#</th>
+              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-align:left;">Player</th>
+              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:700;text-align:center;">Total</th>
+              <th style="padding:7px 12px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#A78BFA;font-weight:700;text-align:center;">UNF</th>
+              <th style="padding:7px 12px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);font-weight:700;text-align:center;">UCW</th>
+            </tr>
+          </thead>
+          <tbody id="combined-tbody"></tbody>
         </table>
       </div>
     </main>
@@ -786,7 +813,20 @@ function renderTable(){
   var qF=allS.filter(function(p){return applyFilter(p)&&mq(p);});
   var uF=[];
   var tbody=document.getElementById('tbl-body');
-  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="6"><div style="text-align:center;padding:32px 20px;"><div style="font-size:28px;margin-bottom:10px;">&#9917;</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">LEADERBOARD GOES LIVE MAY 1ST</div><div style="font-size:11px;color:var(--muted);letter-spacing:1px;">The official player standings will be published here on 1st May 2026.<br>Stay tuned &mdash; the race to London is about to begin.</div></div></td></tr>';return;}
+  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="6"><div style="text-align:center;padding:28px 20px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(232,41,58,0.12) 0%,transparent 70%);pointer-events:none;"></div>'
+      + '<div style="position:relative;z-index:1;">'
+      + '<div style="font-size:36px;margin-bottom:8px;animation:ballSpin 3s linear infinite;display:inline-block;">&#9917;</div>'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;letter-spacing:5px;background:linear-gradient(90deg,#F5C842,#FF4D5E,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;animation:shimmer 2.5s linear infinite;background-size:200% auto;">LEADERBOARD LIVE NOW</div>'
+      + '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">'
+      + '<div style="height:1px;width:40px;background:linear-gradient(90deg,transparent,var(--red));"></div>'
+      + '<div style="font-family:\'Oswald\',sans-serif;font-size:12px;letter-spacing:3px;color:var(--white);text-transform:uppercase;">The race to London starts here</div>'
+      + '<div style="height:1px;width:40px;background:linear-gradient(90deg,var(--red),transparent);"></div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:center;gap:6px;">'
+      + '<span style="font-size:22px;">&#127865;</span><span style="font-size:22px;">&#127866;</span><span style="font-size:22px;">&#127867;</span>'
+      + '</div>'
+      + '</div></div></td></tr>';return;}
   var html=qF.map(function(p){
     var score=pts(p),pct=Math.round((score/Math.max(maxP,1))*100);
     var ri=allS.indexOf(p),rc=ri<3?rowC[ri]:'',rkd=ri<3?medals[ri]:(ri+1);
@@ -805,7 +845,129 @@ function updateStats(){
   document.getElementById('h-goals').textContent=players.reduce(function(s,p){return s+p.goals;},0);
   document.getElementById('h-pts').textContent=players.reduce(function(s,p){return s+pts(p);},0);
 }
-function renderAll(){renderPodium();renderNations();renderTable();updateStats();}
+
+// ── STATIC PLAYER LEADERBOARD DATA ──
+var staticPlayers = [
+  {region:'Peru',        flag:'&#127477;&#127466;', nick:'Perusito',           unf:0, ucw:0},
+  {region:'Peru',        flag:'&#127477;&#127466;', nick:'SCCanada.',           unf:0, ucw:0},
+  {region:'LATAM/MENA/South Asia', flag:'&#127758;', nick:'CAD',              unf:0, ucw:0},
+  {region:'Peru',        flag:'&#127477;&#127466;', nick:'GS FC',              unf:1, ucw:1},
+  {region:'Canada',      flag:'&#127464;&#127462;', nick:'TGD',                unf:0, ucw:0},
+  {region:'India',       flag:'&#127470;&#127475;', nick:'Ajay',               unf:0, ucw:0},
+  {region:'India',       flag:'&#127470;&#127475;', nick:'HIMS.K',             unf:0, ucw:0},
+  {region:'Colombia',    flag:'&#127464;&#127476;', nick:'AngieClosingQueen',  unf:0, ucw:0},
+  {region:'El Salvador', flag:'&#127480;&#127483;', nick:'GabyEI',             unf:0, ucw:0},
+  {region:'India',       flag:'&#127470;&#127475;', nick:'Maestro',            unf:0, ucw:0},
+  {region:'Vietnam',     flag:'&#127483;&#127475;', nick:'Leap Warrior',       unf:0, ucw:0},
+  {region:'Canada',      flag:'&#127464;&#127462;', nick:'Couselormaple',      unf:0, ucw:0},
+  {region:'Canada',      flag:'&#127464;&#127462;', nick:'El trueno',          unf:0, ucw:0},
+  {region:'Nepal',       flag:'&#127475;&#127477;', nick:'BinodSoltee',        unf:0, ucw:0},
+  {region:'Colombia',    flag:'&#127464;&#127476;', nick:'Maru',               unf:0, ucw:0},
+  {region:'T\u00fcrkiye',flag:'&#127481;&#127479;', nick:'Egal',               unf:0, ucw:2},
+  {region:'Jamaica',     flag:'&#127471;&#127474;', nick:'JamRockaz',          unf:0, ucw:0},
+  {region:'Mexico',      flag:'&#127474;&#127485;', nick:'Roge.Alex',          unf:0, ucw:0},
+  {region:'Nepal',       flag:'&#127475;&#127477;', nick:'Raj',                unf:0, ucw:0},
+  {region:'Ghana',       flag:'&#127468;&#127469;', nick:'Bella',              unf:0, ucw:0},
+  {region:'Ecuador',     flag:'&#127466;&#127464;', nick:'Encebollado',        unf:0, ucw:1},
+  {region:'India',       flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:0, ucw:0},
+  {region:'Turkey',      flag:'&#127481;&#127479;', nick:'Kbrolog',            unf:0, ucw:2},
+  {region:'Canada',      flag:'&#127464;&#127462;', nick:'Immilander',         unf:3, ucw:0},
+  {region:'Canada (Caribbean)', flag:'&#127464;&#127462;', nick:'dd',          unf:0, ucw:0}
+];
+
+function renderPlayerTables(){
+  // Sort by total (unf+ucw) desc
+  var sorted = staticPlayers.slice().sort(function(a,b){
+    var ta=a.unf+a.ucw, tb=b.unf+b.ucw;
+    if(tb!==ta) return tb-ta;
+    if(b.unf!==a.unf) return b.unf-a.unf;
+    return b.ucw-a.ucw;
+  });
+
+  var medals=['&#127865;','&#127866;','&#127867;'];
+
+  function rowStyle(i){
+    if(i===0) return 'background:rgba(245,200,66,0.06);border-left:3px solid rgba(245,200,66,0.45);';
+    if(i===1) return 'background:rgba(192,192,192,0.04);border-left:3px solid rgba(192,192,192,0.28);';
+    if(i===2) return 'background:rgba(232,41,58,0.04);border-left:3px solid rgba(232,41,58,0.3);';
+    return 'border-left:3px solid transparent;';
+  }
+  function rankCell(i){
+    if(i<3) return '<td style="padding:5px 8px;text-align:center;font-size:14px;">'+medals[i]+'</td>';
+    return '<td style="padding:5px 8px;text-align:center;font-family:\'Bebas Neue\',sans-serif;font-size:13px;color:var(--muted);">'+(i+1)+'</td>';
+  }
+
+  function scoreCell(val, total, color){
+    if(val>0){
+      var balls='';
+      for(var i=0;i<Math.min(val,10);i++) balls+='&#9917;';
+      if(val>10) balls+='<span style="font-size:10px;color:rgba(255,255,255,0.4);"> +'+( val-10)+'</span>';
+      return '<td style="padding:5px 10px;text-align:center;">'
+        +'<div style="font-size:13px;letter-spacing:1px;line-height:1.4;color:'+color+';">'+balls+'</div>'
+        +'</td>';
+    }
+    // only show loading message if player has zero goals across both brands
+    if(total===0){
+      return '<td style="padding:5px 10px;text-align:center;font-size:9px;color:var(--muted);font-style:italic;">First goal<br>loading\u2026</td>';
+    }
+    // has goals elsewhere — just show a dash
+    return '<td style="padding:5px 10px;text-align:center;font-size:11px;color:rgba(255,255,255,0.15);">—</td>';
+  }
+
+  function totalCell(val, isLeader){
+    if(val>0){
+      var numStyle = isLeader
+        ? 'font-family:\'Bebas Neue\',sans-serif;font-size:32px;background:linear-gradient(180deg,#FFE066,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;filter:drop-shadow(0 0 8px rgba(245,200,66,0.5));'
+        : 'font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--gold);line-height:1;';
+      var lblStyle = isLeader
+        ? 'font-size:8px;color:rgba(245,200,66,0.7);letter-spacing:2px;text-transform:uppercase;'
+        : 'font-size:9px;color:rgba(245,200,66,0.5);letter-spacing:1px;text-transform:uppercase;';
+      return '<td style="padding:'+(isLeader?'8px':'5px')+' 8px;text-align:center;">'
+        +'<div style="'+numStyle+'">'+val+'</div>'
+        +'<div style="'+lblStyle+'">goals</div>'
+        +'</td>';
+    }
+    return '<td style="padding:5px 8px;text-align:center;font-size:9px;color:var(--muted);font-style:italic;">—</td>';
+  }
+
+  var tbody = document.getElementById('combined-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = sorted.map(function(p,i){
+    var total = p.unf+p.ucw;
+    var isLeader = (i===0 && total>0);
+
+    // Leader row — special glowing treatment
+    var trStyle = isLeader
+      ? 'border-bottom:1px solid rgba(245,200,66,0.2);background:linear-gradient(90deg,rgba(245,200,66,0.1),rgba(232,41,58,0.06),rgba(245,200,66,0.04));border-left:3px solid var(--gold);position:relative;'
+      : 'border-bottom:1px solid rgba(255,255,255,0.025);'+rowStyle(i);
+
+    var leaderBadge = '';
+
+    var nameStyle = isLeader
+      ? 'font-weight:900;font-size:16px;background:linear-gradient(90deg,#FFE066,#F5C842,#FF8C00,#F5C842,#FFE066);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s linear infinite;letter-spacing:0.5px;'
+      : 'font-weight:800;font-size:13px;color:var(--white);';
+
+    var flagSize = isLeader ? '22px' : '18px';
+
+    return '<tr style="'+trStyle+'">'
+      + rankCell(i)
+      + '<td style="padding:'+(isLeader?'8px':'5px')+' 8px;">'
+        + '<div style="display:flex;align-items:center;gap:7px;">'
+          + '<span style="font-size:'+flagSize+';'+(isLeader?'filter:drop-shadow(0 0 6px rgba(245,200,66,0.8));':'')+'" title="'+p.region+'">'+p.flag+'</span>'
+          + '<div>'
+            + '<div style="'+nameStyle+'">'+p.nick+leaderBadge+'</div>'
+            + '<div style="font-size:9px;color:'+(isLeader?'rgba(245,200,66,0.55)':'var(--muted)')+';">'+p.region+'</div>'
+          + '</div>'
+        + '</div>'
+      + '</td>'
+      + totalCell(total, isLeader)
+      + scoreCell(p.unf,total,'#A78BFA')
+      + scoreCell(p.ucw,total,'var(--cyan)')
+      + '</tr>';
+  }).join('');
+}
+
+function renderAll(){renderPodium();renderNations();renderTable();updateStats();renderPlayerTables();}
 
 // ── STADIUM BIG SCREEN ──
 var bsSlides=[
