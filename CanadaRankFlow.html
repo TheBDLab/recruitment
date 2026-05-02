@@ -3,1102 +3,206 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GUS Canada Cup 2026 — FIFA Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>GUS Canada · Win Your London Adventure</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#07090F;--panel:#0C1020;--card:#121830;--card2:#1A2240;
-  --red:#E8293A;--red2:#FF4D5E;--gold:#F5C842;--gold2:#FFE066;
-  --cyan:#29B6F6;--purple:#7C5CFC;--maple:#FF6B35;--green:#22C55E;
-  --white:#EEF0FF;--muted:#6B7399;--border:rgba(255,255,255,0.07);
-}
-html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);font-size:13px;}
-
-/* ── INTRO ── */
-#intro{position:fixed;inset:0;z-index:1000;background:#05060E;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity 1s ease;}
-#intro.fade-out{opacity:0;pointer-events:none;}
-#intro-canvas{position:absolute;inset:0;}
-.intro-inner{position:relative;text-align:center;z-index:2;padding:0 20px;}
-.intro-flag{font-size:60px;opacity:0;animation:fadeUp 0.5s ease-out 0.3s forwards;margin-bottom:10px;}
-.intro-logo{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:8px;color:#fff;line-height:1;animation:introZoom 1s ease-out forwards;text-shadow:0 0 60px rgba(232,41,58,0.4);}
-.intro-logo span{color:var(--red);}
-.intro-edition{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);margin-top:6px;opacity:0;animation:fadeUp 0.6s ease-out 0.7s forwards;}
-.intro-prize{margin-top:22px;opacity:0;animation:fadeUp 0.6s ease-out 1.1s forwards;}
-.intro-prize-inner{background:rgba(232,41,58,0.12);border:1px solid rgba(232,41,58,0.35);border-radius:12px;padding:12px 24px;display:inline-block;}
-.intro-prize-label{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,255,255,0.5);text-transform:uppercase;}
-.intro-prize-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);margin-top:2px;}
-.intro-winners{display:flex;justify-content:center;gap:14px;margin-top:10px;}
-.iw{font-size:24px;animation:bounceIn 0.5s ease-out forwards;opacity:0;}
-.iw:nth-child(1){animation-delay:1.3s;}
-.iw:nth-child(2){animation-delay:1.5s;}
-.iw:nth-child(3){animation-delay:1.7s;}
-.intro-prompt{margin-top:28px;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);opacity:0;animation:fadeUp 0.5s ease-out 2s forwards;}
-.intro-prompt span{display:inline-block;width:7px;height:7px;background:var(--gold);border-radius:50%;margin-left:8px;animation:blink 1s infinite 2s;vertical-align:middle;}
-@keyframes introZoom{from{transform:scale(0.4) translateY(20px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
-@keyframes fadeUp{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-@keyframes bounceIn{0%{transform:scale(0) rotate(-20deg);opacity:0;}70%{transform:scale(1.2) rotate(5deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-/* ── BACKGROUND ── */
-#stadium-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
-
-/* ── APP ── */
-#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;opacity:0;transition:opacity 0.8s ease;}
-#app.visible{opacity:1;}
-
-/* ── TOPBAR ── */
-.topbar{background:rgba(10,14,28,0.98);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:50px;flex-shrink:0;z-index:10;position:relative;}
-.tb-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--white);display:flex;align-items:center;gap:5px;}
-.tb-logo .red{color:var(--red);}
-.tb-maple{font-size:14px;display:inline-block;animation:spin 9s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.tb-nav{display:flex;gap:3px;}
-.tnav{background:transparent;border:none;padding:5px 13px;border-radius:20px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.14s;font-weight:600;}
-.tnav.active{background:var(--red);color:#fff;}
-.tnav:hover:not(.active){background:rgba(255,255,255,0.06);color:var(--white);}
-.tb-right{display:flex;align-items:center;gap:8px;}
-.tb-cd{display:flex;gap:4px;}
-.cd-u{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 6px;text-align:center;min-width:34px;}
-.cd-n{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--gold);line-height:1;}
-.cd-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.tb-deadline{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;}
-.music-btn{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:4px 11px;font-size:10px;color:var(--gold);cursor:pointer;transition:all 0.14s;font-family:'DM Sans',sans-serif;font-weight:600;}
-.music-btn:hover{border-color:var(--gold);}
-
-/* ── LAYOUT ── */
-.layout{display:grid;grid-template-columns:245px 1fr 210px;gap:0;flex:1;overflow:hidden;}
-.sidebar,.rsidebar,.main{overflow-y:auto;overflow-x:hidden;}
-.sidebar::-webkit-scrollbar,.rsidebar::-webkit-scrollbar,.main::-webkit-scrollbar{width:2px;}
-.sidebar::-webkit-scrollbar-thumb,.rsidebar::-webkit-scrollbar-thumb,.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
-
-/* ── LEFT SIDEBAR ── */
-.sidebar{background:rgba(10,14,28,0.96);backdrop-filter:blur(10px);border-right:1px solid var(--border);padding:14px 11px;display:flex;flex-direction:column;gap:14px;}
-.sb-ttl{font-size:9px;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:6px;font-weight:700;}
-.nations-list{display:flex;flex-direction:column;gap:2px;}
-.ni{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:6px;transition:background 0.1s;}
-.ni:hover{background:rgba(255,255,255,0.05);}
-.ni-flag{font-size:14px;flex-shrink:0;}
-.ni-name{font-size:11px;color:var(--white);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
-.ni-n{background:rgba(255,255,255,0.06);border-radius:8px;padding:1px 5px;font-size:9px;color:var(--muted);}
-.sl-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--card);border-radius:6px;margin-bottom:3px;border:1px solid var(--border);}
-.sl-l{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.55);}
-.sl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.sl-pts{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);}
-
-/* Prize mini sidebar */
-.prize-sidebar{border-radius:10px;overflow:hidden;border:1px solid rgba(232,41,58,0.3);position:relative;}
-.psb-top{background:linear-gradient(135deg,#1a0d0d,#0d0a20);padding:11px 10px;text-align:center;position:relative;overflow:hidden;}
-.psb-top::before{content:'';position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:120px;height:120px;background:radial-gradient(circle,rgba(232,41,58,0.25),transparent 70%);}
-.psb-stadium{font-size:32px;position:relative;animation:float 3.5s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
-.psb-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--gold);position:relative;margin-top:2px;}
-.psb-sub{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;position:relative;margin-top:1px;}
-.psb-body{background:rgba(12,16,32,0.95);padding:9px 10px;}
-.psb-perk{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:10px;color:rgba(255,255,255,0.55);}
-.psb-perk:last-child{border-bottom:none;padding-bottom:0;}
-.psb-pi{font-size:12px;flex-shrink:0;}
-.psb-winners{display:flex;align-items:center;gap:5px;padding:7px 10px;background:rgba(245,200,66,0.07);border-top:1px solid rgba(245,200,66,0.15);}
-.psb-w-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:700;flex:1;}
-.psb-medals{display:flex;gap:3px;font-size:16px;}
-.psb-ann{background:rgba(232,41,58,0.1);border-top:1px solid rgba(232,41,58,0.2);padding:6px 10px;text-align:center;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:var(--red2);text-transform:uppercase;animation:glowPulse 2.5s ease-in-out infinite;}
-@keyframes glowPulse{0%,100%{color:var(--red2);}50%{color:#ff8a94;}}
-@keyframes ballSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-@keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
-@keyframes goReveal{
-  0%{opacity:0;transform:scale(0.3) translateY(10px);letter-spacing:1px;}
-  12%{opacity:1;transform:scale(1.12) translateY(-3px);letter-spacing:6px;}
-  22%{opacity:1;transform:scale(1) translateY(0);}
-  75%{opacity:1;transform:scale(1) translateY(0);}
-  92%{opacity:0.15;transform:scale(0.85) translateY(4px);}
-  100%{opacity:0;transform:scale(0.3) translateY(10px);}
-}
-@keyframes canadaReveal{
-  0%{opacity:0;transform:scale(0.25) translateY(14px);letter-spacing:0px;}
-  10%{opacity:0;transform:scale(0.25) translateY(14px);}
-  22%{opacity:1;transform:scale(1.1) translateY(-2px);letter-spacing:5px;}
-  32%{opacity:1;transform:scale(1) translateY(0);letter-spacing:3px;}
-  75%{opacity:1;transform:scale(1) translateY(0);letter-spacing:3px;}
-  92%{opacity:0.12;transform:scale(0.8) translateY(6px);}
-  100%{opacity:0;transform:scale(0.25) translateY(14px);}
-}
-
-/* ── MAIN ── */
-.main{padding:13px;display:flex;flex-direction:column;gap:11px;}
-
-/* ── HERO ── */
-.hero-card{border-radius:14px;overflow:hidden;position:relative;min-height:170px;border:1px solid rgba(255,255,255,0.07);}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(125deg,#14082a 0%,#0a1030 30%,#1a0c08 65%,#071a0a 100%);}
-#hero-canvas{position:absolute;inset:0;width:100%;height:100%;}
-.hero-content{position:relative;z-index:2;padding:17px 20px;display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:170px;}
-.hero-eyebrow{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
-.live-badge{background:var(--red);border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:1.5px;animation:pulseBadge 2s infinite;}
-@keyframes pulseBadge{0%,100%{opacity:1;}50%{opacity:0.7;}}
-.eyebrow-txt{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:2.5px;text-transform:uppercase;}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:3px;color:#fff;line-height:1;text-shadow:0 2px 40px rgba(0,0,0,0.7);}
-.hero-title .gold{color:var(--gold);}
-.hero-meta{display:flex;gap:14px;margin-top:5px;flex-wrap:wrap;}
-.hm{font-size:10px;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:4px;}
-.hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;margin-top:10px;}
-.hero-stats{display:flex;gap:7px;flex-wrap:wrap;}
-.hstat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:7px;padding:5px 11px;text-align:center;}
-.hstat-n{font-family:'Bebas Neue',sans-serif;font-size:21px;line-height:1;}
-.hstat-l{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
-.hero-prize-badge{background:linear-gradient(135deg,rgba(232,41,58,0.2),rgba(124,92,252,0.15));border:1px solid rgba(245,200,66,0.3);border-radius:8px;padding:7px 12px;text-align:center;flex-shrink:0;}
-.hpb-top{font-size:18px;line-height:1;}
-.hpb-label{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gold);margin-top:2px;}
-.hpb-sub{font-size:9px;color:rgba(255,255,255,0.4);}
-
-/* ── TABLE ── */
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.sh-title{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:6px;}
-.sh-title::before{content:'';width:3px;height:12px;background:var(--red);border-radius:2px;}
-.filter-row{display:flex;gap:3px;align-items:center;}
-.sw-wrap{position:relative;}
-.si{position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:10px;opacity:0.3;}
-.search-input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 8px 4px 24px;font-size:11px;color:var(--white);font-family:'DM Sans',sans-serif;outline:none;width:120px;}
-.search-input:focus{border-color:var(--cyan);}
-.search-input::placeholder{color:var(--muted);}
-.fbtn{background:transparent;border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:10px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all 0.1s;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
-.fbtn.on{background:var(--purple);border-color:var(--purple);color:#fff;}
-.fbtn:hover:not(.on){border-color:rgba(255,255,255,0.2);color:var(--white);}
-.tbl{width:100%;border-collapse:collapse;}
-.tbl thead tr{border-bottom:1px solid var(--border);}
-.tbl thead th{padding:5px 6px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-align:center;}
-.tbl thead th:nth-child(3){text-align:left;}
-.tbl tbody tr{border-bottom:1px solid rgba(255,255,255,0.02);transition:background 0.1s;}
-.tbl tbody tr:hover{background:rgba(255,255,255,0.03);}
-.tbl tbody tr.gr{background:rgba(245,200,66,0.05);}
-.tbl tbody tr.sr{background:rgba(192,192,192,0.03);}
-.tbl tbody tr.br{background:rgba(232,41,58,0.04);}
-.tbl td{padding:6px 6px;text-align:center;font-size:12px;vertical-align:middle;}
-.tbl td:nth-child(3){text-align:left;}
-.rk{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted);width:24px;}
-.gr .rk{color:var(--gold);}.sr .rk{color:#C0C0C0;}.br .rk{color:var(--red2);}
-.fl-c{width:20px;font-size:14px;}
-.pn{font-weight:700;font-size:12px;color:var(--white);}
-.pa{font-size:9px;color:var(--muted);}
-.sv{color:var(--cyan);font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;}
-.gv{color:var(--maple);font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;}
-.ptv{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--gold);}
-.bw{width:58px;}
-.mb{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
-.mf{height:100%;border-radius:2px;transition:width 0.5s ease;}
-.unq-sep td{padding:4px 8px;font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);background:rgba(255,255,255,0.012);border-top:1px solid var(--border);}
-.unq-row{opacity:0.38;}
-
-/* ── RIGHT SIDEBAR ── */
-.rsidebar{background:rgba(10,14,28,0.96);backdrop-filter:blur(10px);border-left:1px solid var(--border);padding:13px 12px;display:flex;flex-direction:column;gap:13px;}
-
-/* Podium cards */
-.pod-card{border-radius:10px;border:1px solid var(--border);background:var(--card);overflow:hidden;margin-bottom:5px;transition:border-color 0.15s;}
-.pod-card.p1{border-color:rgba(245,200,66,0.4);background:linear-gradient(135deg,rgba(245,200,66,0.07),rgba(20,15,5,0.8));}
-.pod-card.p2{border-color:rgba(192,192,192,0.25);}
-.pod-card.p3{border-color:rgba(232,41,58,0.32);}
-.pod-header{display:flex;align-items:center;gap:8px;padding:9px 10px 7px;}
-.pod-medal{font-size:20px;flex-shrink:0;}
-.pod-flag{font-size:15px;flex-shrink:0;}
-.pod-info{flex:1;min-width:0;}
-.pod-name{font-weight:700;font-size:12px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pod-sub{font-size:9px;color:var(--muted);}
-.pod-pts-big{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;flex-shrink:0;}
-.p1 .pod-pts-big{color:var(--gold);}
-.p2 .pod-pts-big{color:#C0C0C0;}
-.p3 .pod-pts-big{color:var(--red2);}
-.pod-footer{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.05);}
-.pod-stat{flex:1;text-align:center;padding:5px 4px;font-size:10px;}
-.pod-stat:first-child{border-right:1px solid rgba(255,255,255,0.05);}
-.pod-stat-n{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;}
-.pod-stat-l{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
-.shots-col .pod-stat-n{color:var(--cyan);}
-.goals-col .pod-stat-n{color:var(--maple);}
-
-/* London Prize card */
-.london-card{border-radius:12px;overflow:hidden;border:1px solid rgba(124,92,252,0.3);position:relative;}
-.lc-hero{position:relative;padding:16px 14px 12px;text-align:center;overflow:hidden;background:#0A0715;}
-.lc-glow{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(124,92,252,0.22),transparent 65%);pointer-events:none;}
-.lc-stadium{font-size:42px;position:relative;display:block;animation:stadiumPulse 2.5s ease-in-out infinite;}
-@keyframes stadiumPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
-.lc-city{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:5px;color:var(--gold);position:relative;line-height:1;margin-top:4px;}
-.lc-tagline{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.45);text-transform:uppercase;position:relative;margin-top:2px;}
-.lc-flags{display:flex;justify-content:center;gap:6px;margin-top:8px;position:relative;}
-.lc-flag{font-size:18px;}
-.lc-body{background:rgba(12,10,22,0.97);padding:10px 12px;}
-.lc-perk{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.lc-perk:last-child{border-bottom:none;}
-.lc-perk-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
-.lc-perk-text{flex:1;}
-.lc-perk-title{font-size:11px;font-weight:700;color:var(--white);margin-bottom:1px;}
-.lc-perk-sub{font-size:9px;color:rgba(255,255,255,0.38);line-height:1.4;}
-.lc-winners-row{display:flex;align-items:center;padding:8px 12px;background:rgba(245,200,66,0.06);border-top:1px solid rgba(245,200,66,0.12);}
-.lc-w-label{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;flex:1;}
-.lc-w-medals{display:flex;gap:4px;font-size:20px;}
-.lc-announce{padding:7px 12px;background:rgba(232,41,58,0.1);border-top:1px solid rgba(232,41,58,0.2);text-align:center;}
-.lc-announce-txt{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:var(--red2);text-transform:uppercase;animation:glowPulse 2s ease-in-out infinite;}
-
-/* ── STADIUM BIG SCREEN ── */
-.bigscreen{border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.12);position:relative;background:#05060a;flex:1;display:flex;flex-direction:column;min-height:0;}
-.bigscreen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0px,rgba(0,0,0,0.18) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:3;}
-.bs-topbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(0,0,0,0.7);border-bottom:1px solid rgba(255,255,255,0.07);position:relative;z-index:4;flex-shrink:0;}
-.bs-live-dot{width:6px;height:6px;border-radius:50%;background:#E8293A;animation:pulseDot 1.4s infinite;flex-shrink:0;}
-@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.7);}}
-.bs-live-txt{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:#E8293A;}
-.bs-channel{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.55);text-transform:uppercase;flex:1;}
-.bs-time{font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--gold);letter-spacing:1px;}
-#bs-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
-.bs-content{position:relative;z-index:4;padding:12px 12px 8px;flex:1;display:flex;flex-direction:column;justify-content:center;}
-.bs-category{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:4px;padding:2px 8px;border-radius:3px;display:inline-block;margin-bottom:7px;width:fit-content;}
-.bs-category.cat-eco{background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.3);}
-.bs-category.cat-ai{background:rgba(124,92,252,0.2);color:#A78BFA;border:1px solid rgba(124,92,252,0.3);}
-.bs-category.cat-edu{background:rgba(41,182,246,0.2);color:#29B6F6;border:1px solid rgba(41,182,246,0.3);}
-.bs-category.cat-life{background:rgba(245,200,66,0.18);color:#F5C842;border:1px solid rgba(245,200,66,0.28);}
-.bs-headline{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:#fff;line-height:1.15;margin-bottom:8px;text-shadow:0 0 20px rgba(255,255,255,0.15);}
-.bs-stat-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-.bs-stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:4px 9px;text-align:center;flex-shrink:0;}
-.bs-stat-n{font-family:'Bebas Neue',sans-serif;font-size:18px;line-height:1;}
-.bs-stat-l{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);}
-.bs-body{font-size:10px;color:rgba(255,255,255,0.5);line-height:1.55;flex:1;}
-.bs-progress-bar{height:2px;background:rgba(255,255,255,0.06);position:relative;z-index:4;flex-shrink:0;}
-.bs-progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));width:0%;transition:width 0.1s linear;}
-.bs-ticker-wrap{display:flex;align-items:center;gap:0;background:rgba(232,41,58,0.85);position:relative;z-index:4;flex-shrink:0;}
-.bs-ticker-label{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:#fff;padding:4px 8px;background:var(--red);flex-shrink:0;border-right:1px solid rgba(255,255,255,0.2);}
-.bs-ticker-track{flex:1;overflow:hidden;height:22px;display:flex;align-items:center;}
-.bs-ticker-inner{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;color:#fff;white-space:nowrap;animation:tickerScroll 28s linear infinite;}
-@keyframes tickerScroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
-/* ── TOAST & CONFETTI ── */
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:#141830;border:1px solid var(--gold);border-radius:8px;padding:8px 18px;font-size:12px;color:var(--gold);font-family:'Oswald',sans-serif;letter-spacing:1px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;}
-.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
-#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:150;}
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0eaf8;display:flex;justify-content:center;padding:32px 16px;min-height:100vh;font-family:'DM Sans',sans-serif}
+  .fl{background:#fff;color:#1a1a2e;font-family:'DM Sans',sans-serif;max-width:600px;width:100%;margin:0 auto;border-radius:20px;overflow:hidden;border:2px solid #e0d4f8}
+  .hero{background:#2d1b69;position:relative;overflow:hidden}
+  .pitch-top{background:#1a7a3c;padding:10px 32px;display:flex;align-items:center;justify-content:space-between}
+  .pitch-lines{display:flex;gap:3px;align-items:center}
+  .pl{width:18px;height:3px;background:rgba(255,255,255,0.35);border-radius:2px}
+  .pitch-mid{font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase}
+  .pitch-flags{display:flex;gap:8px;align-items:center;font-size:20px}
+  .hero-inner{padding:28px 32px 30px;position:relative;overflow:hidden}
+  .ball-bg{position:absolute;right:-30px;top:10px;opacity:0.08;font-size:180px;line-height:1;pointer-events:none;transform:rotate(15deg)}
+  .maple-bg{position:absolute;left:-20px;bottom:-10px;opacity:0.07;font-size:140px;line-height:1;pointer-events:none}
+  .excl-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,210,63,0.22);border:1.5px solid rgba(255,210,63,0.7);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;color:#ffd23f;letter-spacing:0.03em;margin-bottom:18px;position:relative;z-index:1}
+  .dot{width:7px;height:7px;border-radius:50%;background:#ffd23f;flex-shrink:0}
+  .hl{font-family:'Bebas Neue','Impact',sans-serif;font-size:64px;line-height:0.88;letter-spacing:1px;color:#fff;position:relative;z-index:1}
+  .hl .ac{color:#ffd23f}
+  .sub{font-size:14px;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:12px;position:relative;z-index:1}
+  .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1}
+  .stbadge{display:inline-flex;align-items:center;gap:7px;background:#e8401a;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;color:#fff}
+  .stbadge2{display:inline-flex;align-items:center;gap:7px;background:#1a7a3c;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;color:#fff}
+  .sticon{font-size:16px;animation:pb 2.5s ease-in-out infinite}
+  @keyframes pb{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+  .scoreboard{background:#1a7a3c;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
+  .sc-left{display:flex;align-items:center;gap:10px}
+  .sc-logo{font-size:22px}
+  .sc-title{font-size:12px;font-weight:500;color:#fff;line-height:1.3}
+  .sc-sub{font-size:10px;color:rgba(255,255,255,0.6)}
+  .sc-right{display:flex;align-items:center;gap:6px}
+  .sc-score{background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#ffd23f;letter-spacing:2px}
+  .podium{background:#f9f5ff;padding:22px 32px}
+  .slbl{font-size:10px;font-weight:500;letter-spacing:0.13em;color:#9b8ac4;text-transform:uppercase;margin-bottom:14px}
+  .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .wc{border-radius:14px;padding:15px 10px;text-align:center}
+  .wc.g{background:#fff9e0;border:2px solid #ffd23f}
+  .wc.s{background:#f0f4ff;border:2px solid #a0b4f0}
+  .wc.b{background:#fff2ec;border:2px solid #ffaa80}
+  .med{font-size:26px;display:block;margin-bottom:5px}
+  .plbl{font-size:11px;font-weight:500;letter-spacing:0.06em;margin-bottom:3px}
+  .g .plbl{color:#a07800}.s .plbl{color:#2a4690}.b .plbl{color:#a04010}
+  .pdesc{font-size:11px;color:#7a6f8a;line-height:1.4}
+  .fnote{font-size:11px;color:#9b8ac4;margin-top:10px;line-height:1.5}
+  .pitch-divider{background:#1a7a3c;padding:8px 32px;display:flex;align-items:center;gap:6px}
+  .pd-line{flex:1;height:1px;background:rgba(255,255,255,0.25)}
+  .pd-icon{font-size:18px}
+  .pd-text{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+  .howsec{background:#fff;padding:20px 32px}
+  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hitem{background:#f5f0ff;border:1.5px solid #e0d4f8;border-radius:12px;padding:13px 14px}
+  .hitem.full{grid-column:1/-1}
+  .htitle{font-size:12px;font-weight:500;color:#2d1b69;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .hico{font-size:16px}
+  .hbody{font-size:11px;color:#7a6f8a;line-height:1.45}
+  .qualify{background:#fff8f0;padding:20px 32px;border-top:1.5px solid #ffe5cc}
+  .qtag{display:inline-flex;align-items:center;gap:6px;background:#e8401a;border-radius:6px;padding:5px 12px;font-size:11px;color:#fff;font-weight:500;margin-bottom:14px}
+  .qrow{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+  .qrow:last-child{margin-bottom:0}
+  .qnum{width:23px;height:23px;border-radius:50%;background:#e8401a;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;margin-top:1px}
+  .qtext{font-size:12px;color:#5a4a3a;line-height:1.55}
+  .qtext strong{color:#2d1b69;font-weight:500}
+  .regsec{background:#f0f8ff;padding:20px 32px;border-top:1.5px solid #d0e8ff}
+  .regsteps{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .rstep{display:flex;align-items:flex-start;gap:10px}
+  .rarrow{font-size:14px;color:#3b82f6;margin-top:1px;flex-shrink:0}
+  .rtext{font-size:12px;color:#4a5568;line-height:1.5}
+  .rtext strong{color:#1e3a8a;font-weight:500}
+  .rtext a{color:#3b82f6;text-decoration:none}
+  .regfields{background:#fff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-top:12px}
+  .rfrow{display:flex;flex-wrap:wrap;gap:7px 18px}
+  .rftag{font-size:11px;color:#4a5568;display:flex;align-items:center;gap:5px}
+  .rfdot{width:5px;height:5px;border-radius:50%;background:#ffd23f;flex-shrink:0}
+  .datebar{background:#2d1b69;padding:18px 32px;display:grid;grid-template-columns:1fr 1fr;gap:0;position:relative;overflow:hidden}
+  .datebar::before{content:'⚽';position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(20deg);font-size:56px;opacity:0.08;pointer-events:none}
+  .ditem{text-align:center;padding:2px 0}
+  .ditem:first-child{border-right:1px solid rgba(255,255,255,0.2)}
+  .dlbl{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px}
+  .dval{font-family:'Bebas Neue','Impact',sans-serif;font-size:27px;letter-spacing:1px;color:#ffd23f;line-height:1}
+  .lboard{background:#fff;padding:13px 32px;border-top:1.5px solid #e8f5e9;display:flex;align-items:center;gap:10px}
+  .lbtxt{font-size:12px;color:#7a6f8a;line-height:1.5}
+  .lbtxt strong{color:#1a7a3c;font-weight:500}
+  .lbtxt a{color:#3b82f6;font-size:11px}
+  .footer-strip{background:#e8401a;padding:10px 32px;display:flex;align-items:center;justify-content:center;gap:16px}
+  .fs-flag{font-size:22px}
+  .fs-sep{font-size:16px;color:rgba(255,255,255,0.4)}
+  .fs-text{font-size:11px;font-weight:500;color:rgba(255,255,255,0.85);letter-spacing:0.06em;text-transform:uppercase}
+  .disc{background:#fafafa;padding:14px 32px;border-top:1.5px solid #f0f0f0}
+  .dtxt{font-size:10px;color:#aaa;line-height:1.6}
+  .dtxt strong{color:#888;font-weight:500}
 </style>
 </head>
 <body>
-
-<!-- INTRO -->
-<div id="intro" onclick="startApp()">
-  <canvas id="intro-canvas"></canvas>
-  <div class="intro-inner">
-    <div class="intro-flag">🍁</div>
-    <div class="intro-logo">GUS <span>Canada</span> Cup</div>
-    <div class="intro-edition">&#9917;&nbsp;&nbsp;FIFA Edition 2026&nbsp;&nbsp;&#9917;</div>
-    <div class="intro-prize">
-      <div class="intro-prize-inner">
-        <div class="intro-prize-label">Grand Prize &mdash; Top 3 Winners</div>
-        <div class="intro-prize-text">&#127967; London &bull; Stadium Experience</div>
-      </div>
+<div class="fl">
+  <div class="hero">
+    <div class="pitch-top">
+      <div class="pitch-lines"><div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div></div>
+      <div class="pitch-mid">⚽ GUS Canada Fantasy Recruitment League ⚽</div>
+      <div class="pitch-flags"><span style="font-size:18px">🇨🇦</span><span style="font-size:18px">🇬🇧</span></div>
     </div>
-    <div class="intro-winners"><span class="iw">&#127865;</span><span class="iw">&#127866;</span><span class="iw">&#127867;</span></div>
-    <div class="intro-prompt">Click anywhere to kick off<span></span></div>
-  </div>
-</div>
-
-<canvas id="confetti-canvas"></canvas>
-<canvas id="stadium-canvas"></canvas>
-
-<!-- APP -->
-<div id="app">
-  <div class="topbar">
-    <div class="tb-logo">GUS <span class="red">Canada</span> Cup <span class="tb-maple">🍁</span></div>
-    <nav class="tb-nav">
-      <button class="tnav active" onclick="setFilter('all',this)">All Players</button>
-      <button class="tnav" onclick="setFilter('unf',this)">UNF</button>
-      <button class="tnav" onclick="setFilter('ucw',this)">UCW</button>
-    </nav>
-    <div class="tb-right">
-      <button class="music-btn" id="music-btn" onclick="toggleMusic()">&#127925; Music ON</button>
-      <span class="tb-deadline">Deadline: Jun 30 &nbsp;&bull;&nbsp; Results: Jul 3</span>
-      <div class="tb-cd">
-        <div class="cd-u"><div class="cd-n" id="cd-d">--</div><div class="cd-l">d</div></div>
-        <div class="cd-u"><div class="cd-n" id="cd-h">--</div><div class="cd-l">h</div></div>
-        <div class="cd-u"><div class="cd-n" id="cd-m">--</div><div class="cd-l">m</div></div>
-        <div class="cd-u"><div class="cd-n" id="cd-s">--</div><div class="cd-l">s</div></div>
+    <div class="hero-inner">
+      <div class="ball-bg">⚽</div>
+      <div class="maple-bg">🍁</div>
+      <div class="excl-badge"><span class="dot"></span>GUS Canada UNF &amp; UCW Brand Ambassadors only</div>
+      <div class="hl">WIN YOUR<br><span class="ac">LONDON</span><br>ADVENTURE</div>
+      <p class="sub">Top 3 players in the GUS Canada fantasy recruitment league<br>win a return trip to London for a live stadium experience.</p>
+      <div class="badge-row">
+        <div class="stbadge"><span class="sticon">🏟</span>Live stadium match · London</div>
+        <div class="stbadge2"><span style="font-size:16px">🍁</span>Canada × UK</div>
       </div>
     </div>
   </div>
 
-  <div class="layout">
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar">
+  <div class="scoreboard">
+    <div class="sc-left">
+      <div class="sc-logo">📋</div>
       <div>
-        <div class="sb-ttl">Nations</div>
-        <div class="nations-list" id="nations-list"><div style="font-size:11px;color:var(--muted)">No players yet</div></div>
+        <div class="sc-title">Live scoreboard</div>
+        <div class="sc-sub">Updated every day</div>
       </div>
-      <div>
-        <div class="sb-ttl">Scoring</div>
-        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Goal scored</div><div class="sl-pts">+1 &#9917;</div></div>
+    </div>
+    <div class="sc-right">
+      <span style="font-size:18px">🇨🇦</span>
+      <div class="sc-score">VS</div>
+      <span style="font-size:18px">🇬🇧</span>
+    </div>
+  </div>
 
-      </div>
-      <!-- CANADA SPOTLIGHT BIG SCREEN -->
-      <div class="bigscreen" id="bigscreen">
-        <div class="bs-topbar">
-          <div class="bs-live-dot"></div>
-          <span class="bs-live-txt">LIVE</span>
-          <span class="bs-channel">&#127464;&#127462; CANADA SPOTLIGHT</span>
-          <span style="font-size:12px;margin-right:3px;">&#127468;&#127463;</span><span class="bs-time" id="bs-time">--:--</span>
-        </div>
-        <canvas id="bs-canvas"></canvas>
-        <div class="bs-content">
-          <div class="bs-category" id="bs-category">ECONOMY</div>
-          <div class="bs-headline" id="bs-headline"></div>
-          <div class="bs-stat-row" id="bs-stat-row"></div>
-          <div class="bs-body" id="bs-body"></div>
-        </div>
-        <div class="bs-progress-bar"><div class="bs-progress-fill" id="bs-progress-fill"></div></div>
-        <div class="bs-ticker-wrap">
-          <div class="bs-ticker-label">&#127464;&#127462;</div>
-          <div class="bs-ticker-track"><div class="bs-ticker-inner" id="bs-ticker"></div></div>
-        </div>
-      </div>
-    </aside>
+  <div class="podium">
+    <div class="slbl">3 winners · all fly to London</div>
+    <div class="wgrid">
+      <div class="wc g"><span class="med">🥇</span><div class="plbl">1st place</div><div class="pdesc">Return flights + VIP stadium experience</div></div>
+      <div class="wc s"><span class="med">🥈</span><div class="plbl">2nd place</div><div class="pdesc">Return flights + live matchday seats</div></div>
+      <div class="wc b"><span class="med">🥉</span><div class="plbl">3rd place</div><div class="pdesc">Return flights + stadium tour</div></div>
+    </div>
+    <p class="fnote">✈️ Return flights from your nearest international airport · 🏨 Accommodation included</p>
+  </div>
 
-    <!-- MAIN -->
-    <main class="main">
-      <div class="hero-card">
-        <div class="hero-bg"></div>
-        <canvas id="hero-canvas"></canvas>
-        <!-- Stadium poster graphic — bold typographic treatment -->
-        <div style="position:absolute;right:0;top:0;bottom:0;width:220px;z-index:2;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-          <!-- radial glow behind text -->
-          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(232,41,58,0.22) 0%,transparent 70%);"></div>
-          <!-- big silhouette number -->
-          <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',Impact,sans-serif;font-size:220px;line-height:1;color:rgba(255,255,255,0.04);letter-spacing:-10px;user-select:none;pointer-events:none;">10</div>
-          <!-- poster content -->
-          <div style="position:relative;z-index:3;text-align:right;padding-right:18px;">
-            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:11px;letter-spacing:6px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px;">&#127464;&#127462; &nbsp; 2026</div>
-            <!-- football icon -->
-            <div style="font-size:52px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(232,41,58,0.6));animation:ballSpin 6s linear infinite;">&#9917;</div>
-            <!-- main slogan — animated pulse every 10s -->
-            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px;letter-spacing:4px;line-height:0.95;color:#FFFFFF;text-shadow:0 0 30px rgba(232,41,58,0.8);opacity:0;animation:goReveal 10s ease-in-out infinite;">GO</div>
-            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:46px;letter-spacing:3px;line-height:0.95;color:#F5C842;text-shadow:0 0 30px rgba(245,200,66,0.6);opacity:0;animation:canadaReveal 10s ease-in-out infinite;">CANADA</div>
-            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:20px;letter-spacing:8px;color:rgba(255,255,255,0.7);margin-top:4px;">&#127865; &#127866; &#127867;</div>
-            <!-- divider -->
-            <div style="width:80px;height:2px;background:linear-gradient(90deg,transparent,#E8293A,#F5C842);margin:8px 0 0 auto;border-radius:1px;"></div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <div>
-            <div class="hero-eyebrow">
-              <div class="live-badge">LIVE</div>
-              <span class="eyebrow-txt">FIFA Edition &middot; Apr &ndash; Jun 2026 &middot; Top 3 Win</span>
-            </div>
-            <div class="hero-title">GUS <span class="gold">Canada</span> Cup 2026</div>
-            <div class="hero-meta">
-              <div class="hm">&#128205; Global Competition</div>
-              <div class="hm">&#127967; London Stadium Experience</div>
-              <div class="hm">&#127942; 3 Winners Fly to London</div>
-            </div>
-          </div>
-          <div class="hero-bottom">
-            <div class="hero-stats">
-              <div class="hstat"><div class="hstat-n" id="h-players" style="color:var(--red2)">0</div><div class="hstat-l">Players</div></div>
-              <div class="hstat"><div class="hstat-n" id="h-nations" style="color:var(--cyan)">0</div><div class="hstat-l">Nations</div></div>
-              <div class="hstat"><div class="hstat-n" id="h-goals" style="color:var(--gold)">0</div><div class="hstat-l">Goals</div></div>
-              <div class="hstat"><div class="hstat-n" id="h-pts" style="color:var(--gold)">0</div><div class="hstat-l">Total Pts</div></div>
-            </div>
-            <div class="hero-prize-badge">
-              <div class="hpb-top">&#127865;&#127866;&#127867;</div>
-              <div class="hpb-label">3 Winners</div>
-              <div class="hpb-sub">Fly to London</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="pitch-divider">
+    <div class="pd-line"></div>
+    <span class="pd-icon">⚽</span>
+    <div class="pd-text">How the game works</div>
+    <span class="pd-icon">⚽</span>
+    <div class="pd-line"></div>
+  </div>
 
-      <div>
-        <div class="section-head">
-          <div class="sh-title">&#9917; Full Standings</div>
-          <div class="filter-row">
-            <div class="sw-wrap">
-              <span class="si">&#128269;</span>
-              <input class="search-input" id="search-bar" placeholder="Search..." oninput="renderAll()">
-            </div>
-            <button class="fbtn on" onclick="setFilter('all',this)">All</button>
-            <button class="fbtn" onclick="setFilter('unf',this)">UNF</button>
-            <button class="fbtn" onclick="setFilter('ucw',this)">UCW</button>
-          </div>
-        </div>
-        <table class="tbl">
-          <thead><tr>
-            <th>#</th><th></th><th style="text-align:left">Player</th>
-            <th>Goals</th><th>Pts</th><th>Form</th>
-          </tr></thead>
-          <tbody id="tbl-body"></tbody>
-        </table>
-      </div>
+  <div class="howsec">
+    <div class="hgrid">
+      <div class="hitem full"><div class="htitle"><span class="hico">🥅</span>Goal = 1 point</div><div class="hbody">Every confirmed payment to UCW or UNF scores a goal — payments are the only way to score points</div></div>
+      <div class="hitem"><div class="htitle"><span class="hico">📊</span>Daily updates</div><div class="hbody">Dashboard and rankings refresh every single day</div></div>
+      <div class="hitem"><div class="htitle"><span class="hico">🏫</span>UCW &amp; UNF only</div><div class="hbody">Only GUS Canada university payments count toward your score</div></div>
+    </div>
+  </div>
 
-      <!-- ── PLAYER LEADERBOARD TABLE ── -->
-      <div id="player-tables-section" style="margin-top:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:6px;">
-            <span style="width:3px;height:13px;background:var(--gold);border-radius:2px;display:inline-block;"></span>
-            &#127942; Player Leaderboard
-          </div>
-          <div style="display:flex;gap:12px;font-size:10px;">
-            <span style="color:#A78BFA;font-family:'Oswald',sans-serif;letter-spacing:1px;">&#9679; UNF = University of Niagara Falls Canada</span>
-            <span style="color:var(--cyan);font-family:'Oswald',sans-serif;letter-spacing:1px;">&#9679; UCW = University Canada West</span>
-          </div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:10px;overflow:hidden;">
-          <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);">
-              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-align:center;width:30px;">#</th>
-              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;text-align:left;">Player</th>
-              <th style="padding:7px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:700;text-align:center;">Total</th>
-              <th style="padding:7px 12px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#A78BFA;font-weight:700;text-align:center;">UNF</th>
-              <th style="padding:7px 12px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);font-weight:700;text-align:center;">UCW</th>
-            </tr>
-          </thead>
-          <tbody id="combined-tbody"></tbody>
-        </table>
-      </div>
-    </main>
+  <div class="qualify">
+    <div class="qtag"><span style="font-size:13px">📋</span> Qualification requirement</div>
+    <div class="qrow"><div class="qnum">1</div><div class="qtext">You must secure <strong>at least 2 confirmed payments</strong> to GUS Canada universities (UCW or UNF) to qualify for a prize</div></div>
+    <div class="qrow"><div class="qnum">2</div><div class="qtext">Open to <strong>registered GUS Canada UNF &amp; UCW Brand Ambassadors</strong> only</div></div>
+    <div class="qrow"><div class="qnum">3</div><div class="qtext"><strong>Register before submitting</strong> — retroactive entries are not accepted</div></div>
+  </div>
 
-    <!-- RIGHT SIDEBAR -->
-    <aside class="rsidebar">
-      <div>
-        <div class="sb-ttl">&#127885; Top 3 &mdash; London Bound</div>
-        <div id="podium-wrap"><div style="font-size:11px;color:var(--muted);padding:4px">Add players to see standings</div></div>
+  <div class="regsec">
+    <div class="slbl">🎽 How to register</div>
+    <div class="regsteps">
+      <div class="rstep"><div class="rarrow">▸</div><div class="rtext">Speak to any <strong>GUS Canada account manager</strong></div></div>
+      <div class="rstep"><div class="rarrow">▸</div><div class="rtext">Or email <strong><a href="mailto:partnerhub.ca@gus.global">partnerhub.ca@gus.global</a></strong></div></div>
+    </div>
+    <div class="regfields">
+      <div class="slbl" style="margin-bottom:8px">Include in your registration</div>
+      <div class="rfrow">
+        <div class="rftag"><span class="rfdot"></span>Full name</div>
+        <div class="rftag"><span class="rfdot"></span>Agency you represent</div>
+        <div class="rftag"><span class="rfdot"></span>Country you play for</div>
+        <div class="rftag"><span class="rfdot"></span>Your nickname (for the scoreboard)</div>
       </div>
+    </div>
+  </div>
 
-      <!-- LONDON PRIZE CARD -->
-      <div class="london-card">
-        <div class="lc-hero">
-          <div class="lc-glow"></div>
-          <span class="lc-stadium">&#127967;&#65039;</span>
-          <div class="lc-city">LONDON</div>
-          <div class="lc-tagline">Capital of Football</div>
-          <div class="lc-flags">
-            <span class="lc-flag">&#127988;&#8205;&#9898;</span>
-            <span class="lc-flag">&#9917;</span>
-            <span class="lc-flag">&#127464;&#127462;</span>
-          </div>
-        </div>
-        <div class="lc-body">
-          <div class="lc-perk">
-            <span class="lc-perk-icon">&#127967;&#65039;</span>
-            <div class="lc-perk-text"><div class="lc-perk-title">Live Stadium Match</div><div class="lc-perk-sub">Experience the roar of a London football stadium</div></div>
-          </div>
-          <div class="lc-perk">
-            <span class="lc-perk-icon">&#9992;&#65039;</span>
-            <div class="lc-perk-text"><div class="lc-perk-title">Return Flights</div><div class="lc-perk-sub">Fully covered return flights to London</div></div>
-          </div>
-          <div class="lc-perk">
-            <span class="lc-perk-icon">&#127968;</span>
-            <div class="lc-perk-text"><div class="lc-perk-title">GUS HQ Tour</div><div class="lc-perk-sub">Behind-the-scenes at GUS headquarters</div></div>
-          </div>
-          <div class="lc-perk">
-            <span class="lc-perk-icon">&#129346;</span>
-            <div class="lc-perk-text"><div class="lc-perk-title">Hosted Dinner</div><div class="lc-perk-sub">Evening with the GUS leadership team</div></div>
-          </div>
-        </div>
-        <div class="lc-winners-row">
-          <span class="lc-w-label">3 Winners Announced</span>
-          <span class="lc-w-medals">&#127865;&#127866;&#127867;</span>
-        </div>
-        <div class="lc-announce">
-          <div class="lc-announce-txt">&#128680; July 3rd 2026</div>
-        </div>
-      </div>
-    </aside>
+  <div class="datebar">
+    <div class="ditem"><div class="dlbl">⏱ Entry deadline</div><div class="dval">June 30, 2026</div></div>
+    <div class="ditem"><div class="dlbl">🏆 Winners announced</div><div class="dval">July 3, 2026</div></div>
+  </div>
+
+  <div class="lboard">
+    <span style="font-size:22px">📈</span>
+    <div class="lbtxt"><strong>Live scoreboard — updated daily</strong><br><a href="https://thebdlab.github.io/recruitment/RankFlow.html" target="_blank">thebdlab.github.io/recruitment/RankFlow.html</a></div>
+  </div>
+
+  <div class="footer-strip">
+    <span class="fs-flag">🇨🇦</span>
+    <span class="fs-sep">⚽</span>
+    <span class="fs-text">GUS Canada · UCW · UNF</span>
+    <span class="fs-sep">⚽</span>
+    <span class="fs-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+  </div>
+
+  <div class="disc">
+    <div class="dtxt"><strong>Privacy &amp; data notice:</strong> By registering, you consent to GUS Canada storing and processing your name, agency, country, and chosen nickname solely for the purpose of administering this competition and displaying your nickname on the public scoreboard. Your personal data will not be shared with third parties or used for any other purpose. You may request removal at any time by contacting partnerhub.ca@gus.global.</div>
+    <div class="dtxt" style="margin-top:8px"><strong>No monetary exchange:</strong> This is a non-cash incentive programme. The prize is a sponsored travel experience with no cash equivalent or transferable monetary value. This competition is not a lottery, raffle, or gambling activity. GUS Canada reserves the right to amend or withdraw the competition at any time. Participation constitutes acceptance of these terms.</div>
   </div>
 </div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-var SK='gus_fifa_players_v2';
-var players=[];
-function loadPlayers(){try{var d=localStorage.getItem(SK);if(d)players=JSON.parse(d);}catch(e){players=[];}}
-function savePlayers(){try{localStorage.setItem(SK,JSON.stringify(players));}catch(e){}}
-
-// ── AUDIO: OLÉ OLÉ OLÉ — Football crowd anthem ──
-var audioCtx=null,musicPlaying=false,loopTimer=null;
-function createAnthem(ctx){
-  var sr=ctx.sampleRate, now=ctx.currentTime;
-  var totalDur=28.0;
-
-  var master=ctx.createGain();
-  master.gain.setValueAtTime(0,now);
-  master.gain.linearRampToValueAtTime(0.44,now+2.0);
-  master.gain.setValueAtTime(0.44,now+totalDur-2.5);
-  master.gain.linearRampToValueAtTime(0,now+totalDur);
-  master.connect(ctx.destination);
-
-  var comp=ctx.createDynamicsCompressor();
-  comp.threshold.value=-12;comp.knee.value=8;comp.ratio.value=4;comp.attack.value=0.002;comp.release.value=0.15;
-  comp.connect(master);
-
-  // Stadium reverb
-  var revBuf=ctx.createBuffer(2,sr*3.5,sr);
-  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.6);}
-  var rev=ctx.createConvolver(); rev.buffer=revBuf;
-  var revG=ctx.createGain(); revG.gain.value=0.5; rev.connect(revG); revG.connect(master);
-
-  // Crowd roar — warm band-limited noise swell
-  function crowdSwell(t,dur,vol){
-    var buf=ctx.createBuffer(1,Math.floor(sr*dur),sr);
-    var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-    var src=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-    f.type='bandpass';f.frequency.value=700;f.Q.value=0.4;
-    src.buffer=buf;src.connect(f);f.connect(g);g.connect(master);
-    g.gain.setValueAtTime(0,now+t);
-    g.gain.linearRampToValueAtTime(vol,now+t+0.6);
-    g.gain.setValueAtTime(vol,now+t+dur-0.8);
-    g.gain.linearRampToValueAtTime(0,now+t+dur);
-    src.start(now+t);
-  }
-
-  // Brass stab for accent
-  function brass(freq,t,dur,vol){
-    [1,2,3].forEach(function(h){
-      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-      o.type='sawtooth';o.frequency.value=freq*h;
-      f.type='lowpass';f.frequency.value=Math.min(freq*h*2.5,4000);
-      g.gain.setValueAtTime(0,now+t);
-      g.gain.linearRampToValueAtTime((vol/(h*1.5)),now+t+0.03);
-      g.gain.setValueAtTime(vol/(h*1.5)*0.8,now+t+dur-0.05);
-      g.gain.linearRampToValueAtTime(0,now+t+dur);
-      o.connect(f);f.connect(g);g.connect(rev);g.connect(comp);
-      o.start(now+t);o.stop(now+t+dur+0.06);
-    });
-  }
-
-  // Choir "OLÉ" — sung note cluster
-  function ole(fund,t,dur,vol){
-    var ratios=[1,1.004,0.996,2,0.5];
-    ratios.forEach(function(r,i){
-      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-      o.type=(i<3)?'sine':'triangle';
-      o.frequency.value=fund*r;
-      f.type='bandpass';f.frequency.value=fund*r*1.5;f.Q.value=2.5;
-      var v=(i<3)?(vol*0.22):(vol*0.08);
-      g.gain.setValueAtTime(0,now+t);
-      g.gain.linearRampToValueAtTime(v,now+t+0.08);
-      g.gain.setValueAtTime(v*0.9,now+t+dur-0.1);
-      g.gain.linearRampToValueAtTime(0,now+t+dur);
-      o.connect(f);f.connect(g);g.connect(rev);
-      o.start(now+t);o.stop(now+t+dur+0.08);
-    });
-  }
-
-  // Hand-clap
-  function clap(t){
-    var buf=ctx.createBuffer(1,Math.floor(sr*0.1),sr);
-    var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
-    var src=ctx.createBufferSource(),g=ctx.createGain(),hp=ctx.createBiquadFilter();
-    hp.type='highpass';hp.frequency.value=1200;
-    src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(comp);g.connect(rev);
-    g.gain.setValueAtTime(0.35,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.1);
-    src.start(now+t);
-  }
-
-  // Kick drum
-  function kick(t,vol){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.frequency.setValueAtTime(200,now+t);o.frequency.exponentialRampToValueAtTime(45,now+t+0.15);
-    g.gain.setValueAtTime(vol||0.65,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.2);
-    o.connect(g);g.connect(comp);o.start(now+t);o.stop(now+t+0.28);
-  }
-
-  // ── OLÉ OLÉ OLÉ melody ──
-  // The famous chant: "Olé olé olé olé… Olé… Olé…"
-  // In E major — E=329.63, F#=369.99, G#=415.30, A=440, B=493.88
-  // Pattern: short-short-LONG, short-short-LONG, short-LONG
-  // Each "olé" = one rising figure
-  // Bar = 0.5s per beat, 4/4 at ~120bpm
-
-  var B=0.5; // beat duration
-
-  // ── INTRO: crowd builds (0–3s) ──
-  crowdSwell(0,6,0.12);
-  crowdSwell(6,8,0.18);
-  crowdSwell(14,14,0.22);
-  for(var i=0;i<6;i++) clap(i*0.5);
-
-  // ── VERSE 1: First OLÉ phrase (3–11s) ──
-  // "O - LÉ  O-LÉ  O-LÉ  O-LÉ"
-  var T=3.0;
-  // Phrase 1: Olé olé olé olé
-  ole(329.63,T+0*B,0.35,0.7);      // O
-  ole(415.30,T+0.4*B,0.55,0.8);    // LÉ (rise)
-  ole(329.63,T+1.0*B,0.35,0.65);   // O
-  ole(415.30,T+1.4*B,0.55,0.75);   // LÉ
-  ole(329.63,T+2.0*B,0.35,0.65);   // O
-  ole(415.30,T+2.4*B,0.55,0.75);   // LÉ
-  ole(329.63,T+3.0*B,0.35,0.65);   // O
-  ole(440,T+3.4*B,0.9,0.85);       // LÉ (higher)
-
-  // Phrase 2: Olé… Olé…
-  ole(329.63,T+4.5*B,0.35,0.7);
-  ole(493.88,T+5.0*B,1.2,0.9);     // OLÉ (top note, long hold)
-  ole(329.63,T+6.5*B,0.35,0.7);
-  ole(440,T+7.0*B,1.4,0.88);       // OLÉ
-
-  // Brass stabs under the melody
-  brass(164.81,T+0,0.3,0.32);brass(196,T+2*B,0.3,0.3);
-  brass(220,T+4*B,0.3,0.35);brass(246.94,T+6*B,0.3,0.32);
-
-  // Kick + clap rhythm through verse
-  for(var i=0;i<16;i++){
-    kick(T+i*B*0.5, 0.5);
-    if(i%4===2) clap(T+i*B*0.5+0.25*B);
-    if(i%2===1) clap(T+i*B*0.5);
-  }
-
-  // ── BUILDUP: rising energy (11–16s) ──
-  T=11.0;
-  ole(329.63,T+0,0.3,0.75);ole(369.99,T+0.35,0.3,0.78);ole(415.30,T+0.7,0.3,0.82);ole(440,T+1.05,0.3,0.86);
-  ole(329.63,T+1.5,0.3,0.75);ole(369.99,T+1.85,0.3,0.78);ole(415.30,T+2.2,0.3,0.82);ole(493.88,T+2.55,1.0,0.92);
-  brass(261.63,T,0.4,0.4);brass(329.63,T+1.5,0.4,0.42);brass(392,T+2.5,0.6,0.45);
-  for(var i=0;i<10;i++){kick(T+i*0.4,0.6);clap(T+i*0.4+0.2);}
-
-  // ── CHORUS CLIMAX: full OLÉ (16–24s) ──
-  T=16.0;
-  // All together now — louder, higher
-  ole(392,T+0*B,0.35,0.9);ole(493.88,T+0.4*B,0.55,0.95);
-  ole(392,T+1.0*B,0.35,0.9);ole(493.88,T+1.4*B,0.55,0.95);
-  ole(392,T+2.0*B,0.35,0.9);ole(493.88,T+2.4*B,0.55,0.95);
-  ole(392,T+3.0*B,0.35,0.88);ole(523.25,T+3.4*B,1.0,1.0);   // peak C5
-
-  ole(392,T+4.5*B,0.35,0.88);ole(587.33,T+5.0*B,1.4,1.0);   // D5 long
-  ole(392,T+6.5*B,0.35,0.85);ole(523.25,T+7.0*B,1.6,0.95);  // C5 settle
-
-  brass(196,T,0.45,0.5);brass(246.94,T+2*B,0.45,0.5);brass(261.63,T+4*B,0.45,0.52);brass(329.63,T+6*B,0.45,0.5);
-
-  // Dense crowd clapping
-  for(var i=0;i<32;i++){
-    kick(T+i*B*0.5, 0.55);
-    clap(T+i*B*0.5);
-    if(i%4===2) clap(T+i*B*0.5+0.15);
-  }
-
-  // ── OUTRO: fade with final Olé (24–28s) ──
-  T=24.0;
-  ole(329.63,T+0,0.4,0.7);ole(415.30,T+0.5,0.4,0.72);ole(440,T+1.0,0.5,0.75);
-  ole(329.63,T+2.0,0.4,0.65);ole(493.88,T+2.5,1.8,0.78);
-  brass(164.81,T,0.5,0.3);brass(196,T+2,0.5,0.28);
-  for(var i=0;i<8;i++) clap(T+i*0.5);
-
-  return totalDur;
-}
-function playMusic(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var dur=createAnthem(audioCtx);loopTimer=setTimeout(function(){if(musicPlaying)playMusic();},(dur-0.3)*1000);}
-function stopMusic(){if(loopTimer)clearTimeout(loopTimer);loopTimer=null;if(audioCtx){try{audioCtx.close();}catch(e){}audioCtx=null;}}
-function toggleMusic(){musicPlaying=!musicPlaying;var btn=document.getElementById('music-btn');if(musicPlaying){playMusic();btn.innerHTML='&#127925; Music ON';btn.style.color='var(--gold)';}else{stopMusic();btn.innerHTML='&#128263; Music OFF';btn.style.color='var(--muted)';}}
-
-// ── INTRO CANVAS ──
-(function(){
-  var c=document.getElementById('intro-canvas'),ctx=c.getContext('2d');
-  function rz(){c.width=innerWidth;c.height=innerHeight;}rz();window.addEventListener('resize',rz);
-  var balls=[];for(var i=0;i<18;i++)balls.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*1.1,vy:(Math.random()-.5)*1.1,r:12+Math.random()*20,rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.04});
-  var maples=[];for(var i=0;i<28;i++)maples.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vy:.3+Math.random()*.6,vx:(Math.random()-.5)*.4,sz:11+Math.random()*22,rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.03,a:.06+Math.random()*.25});
-  // London icons floating too
-  var icons=['&#127967;','&#127942;','&#9917;','&#127941;'];
-  var floaters=[];for(var i=0;i<8;i++)floaters.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vy:.2+Math.random()*.4,sz:18+Math.random()*20,a:.05+Math.random()*.1});
-  function drawBall(x,y,r,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.13)';ctx.lineWidth=1.5;ctx.stroke();for(var k=0;k<5;k++){var a=(k/5)*Math.PI*2-Math.PI/2;ctx.beginPath();for(var j=0;j<5;j++){var a2=a+(j/5)*Math.PI*2;var px=Math.cos(a2)*r*.5,py=Math.sin(a2)*r*.5;j===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.closePath();ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=.8;ctx.stroke();}ctx.restore();}
-  function anim(){
-    ctx.clearRect(0,0,c.width,c.height);
-    var spots=[[.15,'rgba(232,41,58,.07)'],[.85,'rgba(124,92,252,.07)'],[.5,'rgba(245,200,66,.04)'],[.35,'rgba(41,182,246,.04)']];
-    spots.forEach(function(s){var g=ctx.createRadialGradient(c.width*s[0],0,0,c.width*s[0],0,c.height*.85);g.addColorStop(0,s[1]);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);});
-    balls.forEach(function(b){b.x+=b.vx;b.y+=b.vy;b.rot+=b.vr;if(b.x<-b.r)b.x=c.width+b.r;if(b.x>c.width+b.r)b.x=-b.r;if(b.y<-b.r)b.y=c.height+b.r;if(b.y>c.height+b.r)b.y=-b.r;drawBall(b.x,b.y,b.r,b.rot);});
-    maples.forEach(function(m){m.y+=m.vy;m.x+=m.vx;m.rot+=m.vr;if(m.y>c.height+30)m.y=-30;ctx.save();ctx.translate(m.x,m.y);ctx.rotate(m.rot);ctx.globalAlpha=m.a;ctx.font=m.sz+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('\uD83C\uDF41',0,0);ctx.restore();});
-    requestAnimationFrame(anim);
-  }
-  anim();
-})();
-
-// ── STADIUM BG CANVAS ──
-(function(){
-  var c=document.getElementById('stadium-canvas'),ctx=c.getContext('2d');
-  function rz(){c.width=innerWidth;c.height=innerHeight;}rz();window.addEventListener('resize',rz);
-  var active=false;window.activateStadium=function(){active=true;};
-  var pts2=[];for(var i=0;i<60;i++)pts2.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.3,vy:-.1-Math.random()*.4,r:1+Math.random()*2.5,a:.08+Math.random()*.28,col:['#E8293A','#F5C842','#29B6F6','#FF6B35','#7C5CFC','#22C55E'][Math.floor(Math.random()*6)]});
-  var ml2=[];for(var i=0;i<12;i++)ml2.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vy:.25+Math.random()*.5,vx:(Math.random()-.5)*.3,sz:9+Math.random()*14,rot:Math.random()*Math.PI*2,vr:(Math.random()-.5)*.02,a:.04+Math.random()*.09});
-  function anim(){
-    ctx.clearRect(0,0,c.width,c.height);
-    if(!active){requestAnimationFrame(anim);return;}
-    var t=Date.now()/4500;
-    [[.12+Math.sin(t)*.09,'rgba(232,41,58,.04)'],[.88+Math.cos(t)*.07,'rgba(124,92,252,.04)'],[.5+Math.sin(t*.8)*.13,'rgba(245,200,66,.025)'],[.3+Math.cos(t*.6)*.1,'rgba(41,182,246,.03)']].forEach(function(s){var g=ctx.createRadialGradient(c.width*s[0],0,0,c.width*s[0],0,c.height*.6);g.addColorStop(0,s[1]);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);});
-    pts2.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.y<-5){p.y=c.height+5;p.x=Math.random()*c.width;}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.col;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;});
-    ml2.forEach(function(m){m.y+=m.vy;m.x+=m.vx;m.rot+=m.vr;if(m.y>c.height+20)m.y=-20;ctx.save();ctx.translate(m.x,m.y);ctx.rotate(m.rot);ctx.globalAlpha=m.a;ctx.font=m.sz+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('\uD83C\uDF41',0,0);ctx.restore();});
-    requestAnimationFrame(anim);
-  }
-  anim();
-})();
-
-// ── HERO PITCH CANVAS ──
-(function(){
-  var c=document.getElementById('hero-canvas'),ctx=c.getContext('2d');
-  function rz(){var r=c.parentElement.getBoundingClientRect();c.width=r.width||600;c.height=r.height||170;}
-  setTimeout(rz,120);window.addEventListener('resize',rz);
-  var ball={x:300,y:88,vx:1.4,vy:.9,r:7,rot:0};
-  var plrs=[];for(var i=0;i<6;i++)plrs.push({x:70+i*100,y:36+Math.random()*96,vx:(Math.random()-.5)*.85,vy:(Math.random()-.5)*.65,col:i<3?'rgba(232,41,58,.5)':'rgba(41,182,246,.5)'});
-  function anim(){
-    if(!c.width){requestAnimationFrame(anim);return;}
-    ctx.clearRect(0,0,c.width,c.height);
-    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.arc(c.width/2,c.height/2,c.height*.3,0,Math.PI*2);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(c.width/2,0);ctx.lineTo(c.width/2,c.height);ctx.stroke();
-    ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1.5;
-    ctx.strokeRect(2,c.height*.27,15,c.height*.46);ctx.strokeRect(c.width-17,c.height*.27,15,c.height*.46);
-    plrs.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<14||p.x>c.width-14)p.vx*=-1;if(p.y<9||p.y>c.height-9)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();});
-    ball.x+=ball.vx;ball.y+=ball.vy;ball.rot+=.055;if(ball.x<9||ball.x>c.width-9)ball.vx*=-1;if(ball.y<9||ball.y>c.height-9)ball.vy*=-1;
-    ctx.save();ctx.translate(ball.x,ball.y);ctx.rotate(ball.rot);ctx.beginPath();ctx.arc(0,0,ball.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=.8;ctx.stroke();ctx.restore();
-    requestAnimationFrame(anim);
-  }
-  anim();
-})();
-
-// ── CONFETTI ──
-function launchConfetti(){
-  var c=document.getElementById('confetti-canvas');c.width=innerWidth;c.height=innerHeight;
-  var ctx=c.getContext('2d');
-  var pcs=[];for(var i=0;i<130;i++)pcs.push({x:Math.random()*c.width,y:-20,vx:(Math.random()-.5)*5,vy:2+Math.random()*4,col:['#E8293A','#F5C842','#29B6F6','#FF6B35','#7C5CFC','#22C55E','#fff'][Math.floor(Math.random()*7)],sz:4+Math.random()*8,rot:Math.random()*360,vr:(Math.random()-.5)*8});
-  var f=0;
-  function anim(){if(f>120){ctx.clearRect(0,0,c.width,c.height);return;}ctx.clearRect(0,0,c.width,c.height);pcs.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=.07;var a=Math.max(0,1-f/120);ctx.save();ctx.globalAlpha=a;ctx.fillStyle=p.col;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);ctx.restore();});f++;requestAnimationFrame(anim);}
-  anim();
-}
-
-// ── APP START ──
-var appStarted=false;
-function startApp(){
-  if(appStarted)return;appStarted=true;
-  var intro=document.getElementById('intro');intro.classList.add('fade-out');
-  setTimeout(function(){intro.style.display='none';},900);
-  document.getElementById('app').classList.add('visible');
-  window.activateStadium();
-  musicPlaying=true;setTimeout(function(){playMusic();},600);
-  loadPlayers();renderAll();
-  setInterval(updateCountdown,1000);updateCountdown();
-  setTimeout(initBigScreen,800);
-}
-
-// ── DATA & RENDER ──
-var activeFilter='all';
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2600);}
-function pts(p){return p.goals;}
-function qual(p){return true;}
-function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.tnav,.fbtn').forEach(function(b){b.classList.remove('active','on');});btn.classList.contains('tnav')?btn.classList.add('active'):btn.classList.add('on');renderAll();}
-function applyFilter(p){if(activeFilter==='all')return true;if(activeFilter==='unf')return p.school==='UNF'||p.school==='Both';if(activeFilter==='ucw')return p.school==='UCW'||p.school==='Both';return true;}
-function barCol(pct){if(pct>70)return'linear-gradient(90deg,#E8293A,#F5C842)';if(pct>40)return'linear-gradient(90deg,#7C5CFC,#29B6F6)';return'linear-gradient(90deg,#29B6F6,#22C55E)';}
-
-function renderPodium(){
-  var sorted=players.filter(qual).sort(function(a,b){return pts(b)-pts(a);});
-  var pw=document.getElementById('podium-wrap');
-  if(!sorted.length){pw.innerHTML='<div style="font-size:11px;color:var(--muted);padding:4px">Add players to see standings</div>';return;}
-  var medals=['&#127865;','&#127866;','&#127867;'],cls=['p1','p2','p3'];
-  pw.innerHTML=sorted.slice(0,3).map(function(p,i){
-    var flag=(p.country||'').replace(/[A-Za-z ]/g,'').trim()||'&#127758;';
-    var score=pts(p);
-    return'<div class="pod-card '+cls[i]+'"><div class="pod-header"><div class="pod-medal">'+medals[i]+'</div><div class="pod-flag">'+flag+'</div><div class="pod-info"><div class="pod-name">'+p.name+'</div><div class="pod-sub">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></div><div class="pod-pts-big">'+score+'</div></div><div class="pod-footer"><div class="pod-stat goals-col" style="flex:1"><div class="pod-stat-n">'+p.goals+'</div><div class="pod-stat-l">Goals</div></div></div></div>';
-  }).join('');
-}
-
-function renderNations(){
-  // Build nation counts from staticPlayers
-  var regionMap={
-    'Perusito':'&#127477;&#127466; Peru',
-    'SCCanada.':'&#127477;&#127466; Peru',
-    'CAD':'&#127758; LATAM/MENA/S.Asia',
-    'GS FC':'&#127477;&#127466; Peru',
-    'TGD':'&#127464;&#127462; Canada',
-    'Ajay':'&#127470;&#127475; India',
-    'HIMS.K':'&#127470;&#127475; India',
-    'AngieClosingQueen':'&#127464;&#127476; Colombia',
-    'GabyEI':'&#127480;&#127483; El Salvador',
-    'Maestro':'&#127470;&#127475; India',
-    'Leap Warrior':'&#127483;&#127475; Vietnam',
-    'Couselormaple':'&#127464;&#127462; Canada',
-    'El trueno':'&#127464;&#127462; Canada',
-    'BinodSoltee':'&#127475;&#127477; Nepal',
-    'Maru':'&#127464;&#127476; Colombia',
-    'Egal':'&#127481;&#127479; Türkiye',
-    'JamRockaz':'&#127471;&#127474; Jamaica',
-    'Roge.Alex':'&#127474;&#127485; Mexico',
-    'Raj':'&#127475;&#127477; Nepal',
-    'Bella':'&#127468;&#127469; Ghana',
-    'Encebollado':'&#127466;&#127464; Ecuador',
-    'Karan Bajaj (KB)':'&#127470;&#127475; India',
-    'Kbrolog':'&#127481;&#127479; Turkey',
-    'Immilander':'&#127464;&#127462; Canada',
-    'dd':'&#127464;&#127462; Canada'
-  };
-  var map={};
-  staticPlayers.forEach(function(p){
-    var label=regionMap[p.nick]||('&#127758; '+p.region);
-    map[label]=(map[label]||0)+1;
-  });
-  var nl=document.getElementById('nations-list');
-  var entries=Object.entries(map).sort(function(a,b){return b[1]-a[1];});
-  if(!entries.length){nl.innerHTML='<div style="font-size:11px;color:var(--muted)">No players yet</div>';return;}
-  nl.innerHTML=entries.map(function(e){
-    var parts=e[0].split(' ');var flag=parts[0];var name=parts.slice(1).join(' ');
-    return'<div class="ni"><span class="ni-flag">'+flag+'</span><span class="ni-name">'+name+'</span><span class="ni-n">'+e[1]+'</span></div>';
-  }).join('');
-}
-
-function renderTable(){
-  var q=(document.getElementById('search-bar').value||'').toLowerCase();
-  var allS=players.filter(qual).sort(function(a,b){return pts(b)-pts(a);});
-  var unq=[];
-  var maxP=allS.length?pts(allS[0]):1;
-  var medals=['&#127865;','&#127866;','&#127867;'],rowC=['gr','sr','br'];
-  function mq(p){return!q||p.name.toLowerCase().includes(q)||(p.country||'').toLowerCase().includes(q)||(p.agency||'').toLowerCase().includes(q);}
-  var qF=allS.filter(function(p){return applyFilter(p)&&mq(p);});
-  var uF=[];
-  var tbody=document.getElementById('tbl-body');
-  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="6"><div style="text-align:center;padding:28px 20px;position:relative;overflow:hidden;">'
-      + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(232,41,58,0.12) 0%,transparent 70%);pointer-events:none;"></div>'
-      + '<div style="position:relative;z-index:1;">'
-      + '<div style="font-size:36px;margin-bottom:8px;animation:ballSpin 3s linear infinite;display:inline-block;">&#9917;</div>'
-      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;letter-spacing:5px;background:linear-gradient(90deg,#F5C842,#FF4D5E,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;animation:shimmer 2.5s linear infinite;background-size:200% auto;">LEADERBOARD LIVE NOW</div>'
-      + '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">'
-      + '<div style="height:1px;width:40px;background:linear-gradient(90deg,transparent,var(--red));"></div>'
-      + '<div style="font-family:\'Oswald\',sans-serif;font-size:12px;letter-spacing:3px;color:var(--white);text-transform:uppercase;">The race to London starts here</div>'
-      + '<div style="height:1px;width:40px;background:linear-gradient(90deg,var(--red),transparent);"></div>'
-      + '</div>'
-      + '<div style="display:flex;justify-content:center;gap:6px;">'
-      + '<span style="font-size:22px;">&#127865;</span><span style="font-size:22px;">&#127866;</span><span style="font-size:22px;">&#127867;</span>'
-      + '</div>'
-      + '</div></div></td></tr>';return;}
-  var html=qF.map(function(p){
-    var score=pts(p),pct=Math.round((score/Math.max(maxP,1))*100);
-    var ri=allS.indexOf(p),rc=ri<3?rowC[ri]:'',rkd=ri<3?medals[ri]:(ri+1);
-    var flag=(p.country||'').replace(/[A-Za-z ]/g,'').trim()||'&#127758;';
-    var londonBadge=ri<3?' <span style="font-size:9px;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.25);border-radius:3px;padding:1px 4px;color:var(--gold);letter-spacing:1px;font-family:Oswald,sans-serif;">LDN</span>':'';
-    return'<tr class="'+rc+'"><td class="rk">'+rkd+'</td><td class="fl-c">'+flag+'</td><td><div class="pn">'+p.name+londonBadge+'</div><div class="pa">'+(p.agency||'')+(p.school?' &middot; '+p.school:'')+'</div></td><td class="gv">'+p.goals+'</td><td class="ptv">'+score+'</td><td class="bw"><div class="mb"><div class="mf" style="width:'+pct+'%;background:'+barCol(pct)+'"></div></div></td></tr>';
-  }).join('');
-
-  tbody.innerHTML=html;
-}
-
-function updateStats(){
-  // Use staticPlayers as the authoritative source for hero stats
-  var staticGoals = staticPlayers.reduce(function(s,p){return s+p.unf+p.ucw;},0);
-  var staticNations = (function(){
-    var regions=['Peru','Peru','LATAM/MENA/South Asia','Peru','Canada','India','India',
-      'Colombia','El Salvador','India','Vietnam','Canada','Canada','Nepal',
-      'Colombia','Turkiye','Jamaica','Mexico','Nepal','Ghana','Ecuador',
-      'India','Turkey','Canada','Canada'];
-    var s=new Set(regions.map(function(r){return r.split('/')[0].trim();}));
-    return s.size;
-  })();
-  document.getElementById('h-players').textContent=staticPlayers.length;
-  document.getElementById('h-nations').textContent=staticNations;
-  document.getElementById('h-goals').textContent=staticGoals;
-  document.getElementById('h-pts').textContent=staticGoals;
-}
-
-// ── STATIC PLAYER LEADERBOARD DATA ──
-var staticPlayers = [
-  {region:'Peru',        flag:'&#127477;&#127466;', nick:'Perusito',           unf:0, ucw:0},
-  {region:'Peru',        flag:'&#127477;&#127466;', nick:'SCCanada.',           unf:0, ucw:0},
-  {region:'LATAM/MENA/South Asia', flag:'&#127758;', nick:'CAD',              unf:0, ucw:0},
-  {region:'Peru',        flag:'&#127477;&#127466;', nick:'GS FC',              unf:1, ucw:1},
-  {region:'Canada',      flag:'&#127464;&#127462;', nick:'TGD',                unf:0, ucw:0},
-  {region:'India',       flag:'&#127470;&#127475;', nick:'Ajay',               unf:0, ucw:0},
-  {region:'India',       flag:'&#127470;&#127475;', nick:'HIMS.K',             unf:0, ucw:0},
-  {region:'Colombia',    flag:'&#127464;&#127476;', nick:'AngieClosingQueen',  unf:0, ucw:0},
-  {region:'El Salvador', flag:'&#127480;&#127483;', nick:'GabyEI',             unf:0, ucw:0},
-  {region:'India',       flag:'&#127470;&#127475;', nick:'Maestro',            unf:0, ucw:0},
-  {region:'Vietnam',     flag:'&#127483;&#127475;', nick:'Leap Warrior',       unf:0, ucw:0},
-  {region:'Canada',      flag:'&#127464;&#127462;', nick:'Couselormaple',      unf:0, ucw:0},
-  {region:'Canada',      flag:'&#127464;&#127462;', nick:'El trueno',          unf:0, ucw:0},
-  {region:'Nepal',       flag:'&#127475;&#127477;', nick:'BinodSoltee',        unf:0, ucw:0},
-  {region:'Colombia',    flag:'&#127464;&#127476;', nick:'Maru',               unf:0, ucw:0},
-  {region:'T\u00fcrkiye',flag:'&#127481;&#127479;', nick:'Egal',               unf:0, ucw:2},
-  {region:'Jamaica',     flag:'&#127471;&#127474;', nick:'JamRockaz',          unf:0, ucw:0},
-  {region:'Mexico',      flag:'&#127474;&#127485;', nick:'Roge.Alex',          unf:0, ucw:0},
-  {region:'Nepal',       flag:'&#127475;&#127477;', nick:'Raj',                unf:0, ucw:0},
-  {region:'Ghana',       flag:'&#127468;&#127469;', nick:'Bella',              unf:0, ucw:0},
-  {region:'Ecuador',     flag:'&#127466;&#127464;', nick:'Encebollado',        unf:0, ucw:1},
-  {region:'India',       flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:0, ucw:0},
-  {region:'Turkey',      flag:'&#127481;&#127479;', nick:'Kbrolog',            unf:0, ucw:2},
-  {region:'Canada',      flag:'&#127464;&#127462;', nick:'Immilander',         unf:3, ucw:0},
-  {region:'Canada (Caribbean)', flag:'&#127464;&#127462;', nick:'dd',          unf:0, ucw:0}
-];
-
-function renderPlayerTables(){
-  // Sort by total (unf+ucw) desc
-  var sorted = staticPlayers.slice().sort(function(a,b){
-    var ta=a.unf+a.ucw, tb=b.unf+b.ucw;
-    if(tb!==ta) return tb-ta;
-    if(b.unf!==a.unf) return b.unf-a.unf;
-    return b.ucw-a.ucw;
-  });
-
-  var medals=['&#127865;','&#127866;','&#127867;'];
-
-  function rowStyle(i){
-    if(i===0) return 'background:rgba(245,200,66,0.06);border-left:3px solid rgba(245,200,66,0.45);';
-    if(i===1) return 'background:rgba(192,192,192,0.04);border-left:3px solid rgba(192,192,192,0.28);';
-    if(i===2) return 'background:rgba(232,41,58,0.04);border-left:3px solid rgba(232,41,58,0.3);';
-    return 'border-left:3px solid transparent;';
-  }
-  function rankCell(i){
-    if(i<3) return '<td style="padding:5px 8px;text-align:center;font-size:14px;">'+medals[i]+'</td>';
-    return '<td style="padding:5px 8px;text-align:center;font-family:\'Bebas Neue\',sans-serif;font-size:13px;color:var(--muted);">'+(i+1)+'</td>';
-  }
-
-  function scoreCell(val, total, color){
-    if(val>0){
-      var balls='';
-      for(var i=0;i<Math.min(val,10);i++) balls+='&#9917;';
-      if(val>10) balls+='<span style="font-size:10px;color:rgba(255,255,255,0.4);"> +'+( val-10)+'</span>';
-      return '<td style="padding:5px 10px;text-align:center;">'
-        +'<div style="font-size:13px;letter-spacing:1px;line-height:1.4;color:'+color+';">'+balls+'</div>'
-        +'</td>';
-    }
-    // only show loading message if player has zero goals across both brands
-    if(total===0){
-      return '<td style="padding:5px 10px;text-align:center;font-size:9px;color:var(--muted);font-style:italic;">First goal<br>loading\u2026</td>';
-    }
-    // has goals elsewhere — just show a dash
-    return '<td style="padding:5px 10px;text-align:center;font-size:11px;color:rgba(255,255,255,0.15);">—</td>';
-  }
-
-  function totalCell(val, isLeader){
-    if(val>0){
-      var numStyle = isLeader
-        ? 'font-family:\'Bebas Neue\',sans-serif;font-size:32px;background:linear-gradient(180deg,#FFE066,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;filter:drop-shadow(0 0 8px rgba(245,200,66,0.5));'
-        : 'font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--gold);line-height:1;';
-      var lblStyle = isLeader
-        ? 'font-size:8px;color:rgba(245,200,66,0.7);letter-spacing:2px;text-transform:uppercase;'
-        : 'font-size:9px;color:rgba(245,200,66,0.5);letter-spacing:1px;text-transform:uppercase;';
-      return '<td style="padding:'+(isLeader?'8px':'5px')+' 8px;text-align:center;">'
-        +'<div style="'+numStyle+'">'+val+'</div>'
-        +'<div style="'+lblStyle+'">goals</div>'
-        +'</td>';
-    }
-    return '<td style="padding:5px 8px;text-align:center;font-size:9px;color:var(--muted);font-style:italic;">—</td>';
-  }
-
-  var tbody = document.getElementById('combined-tbody');
-  if(!tbody) return;
-  tbody.innerHTML = sorted.map(function(p,i){
-    var total = p.unf+p.ucw;
-    var isLeader = (i===0 && total>0);
-
-    // Leader row — special glowing treatment
-    var trStyle = isLeader
-      ? 'border-bottom:1px solid rgba(245,200,66,0.2);background:linear-gradient(90deg,rgba(245,200,66,0.1),rgba(232,41,58,0.06),rgba(245,200,66,0.04));border-left:3px solid var(--gold);position:relative;'
-      : 'border-bottom:1px solid rgba(255,255,255,0.025);'+rowStyle(i);
-
-    var leaderBadge = '';
-
-    var nameStyle = isLeader
-      ? 'font-weight:900;font-size:16px;background:linear-gradient(90deg,#FFE066,#F5C842,#FF8C00,#F5C842,#FFE066);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s linear infinite;letter-spacing:0.5px;'
-      : 'font-weight:800;font-size:13px;color:var(--white);';
-
-    var flagSize = isLeader ? '22px' : '18px';
-
-    return '<tr style="'+trStyle+'">'
-      + rankCell(i)
-      + '<td style="padding:'+(isLeader?'8px':'5px')+' 8px;">'
-        + '<div style="display:flex;align-items:center;gap:7px;">'
-          + '<span style="font-size:'+flagSize+';'+(isLeader?'filter:drop-shadow(0 0 6px rgba(245,200,66,0.8));':'')+'" title="'+p.region+'">'+p.flag+'</span>'
-          + '<div>'
-            + '<div style="'+nameStyle+'">'+p.nick+leaderBadge+'</div>'
-            + '<div style="font-size:9px;color:'+(isLeader?'rgba(245,200,66,0.55)':'var(--muted)')+';">'+p.region+'</div>'
-          + '</div>'
-        + '</div>'
-      + '</td>'
-      + totalCell(total, isLeader)
-      + scoreCell(p.unf,total,'#A78BFA')
-      + scoreCell(p.ucw,total,'var(--cyan)')
-      + '</tr>';
-  }).join('');
-}
-
-function renderAll(){renderPodium();renderNations();renderTable();updateStats();renderPlayerTables();}
-
-// ── STADIUM BIG SCREEN ──
-var bsSlides=[
-  {cat:'cat-ai',catLabel:'AI',headline:'BIRTHPLACE OF\nDEEP LEARNING',stats:[{n:'Mila',l:'World\'s Largest AI Lab'},{n:'3',l:'Turing Award Winners'},{n:'#3',l:'Global AI Talent'},{n:'1980s',l:'Deep Learning Born Here'}],body:'Geoffrey Hinton, Yoshua Bengio and Yann LeCun — the "Godfathers of AI" — built the foundations of modern deep learning at Canadian universities. Montreal\'s Mila institute remains the world\'s largest academic AI research centre.',ticker:'Yoshua Bengio\'s Mila institute employs 900+ AI researchers  &#183;  Geoffrey Hinton won 2024 Nobel Prize in Physics for AI work  &#183;  Toronto Vector Institute home to 700+ AI specialists'},
-  {cat:'cat-eco',catLabel:'ECONOMY',headline:'G7 ECONOMY.\nAAA CREDIT.\nROCK SOLID.',stats:[{n:'$2.14T',l:'GDP (2024)'},{n:'AAA',l:'S&P Credit Rating'},{n:'Top 10',l:'Global Trading Nation'},{n:'50+ Yrs',l:'Trade Surplus History'}],body:'Canada holds one of only a handful of AAA credit ratings globally, reflecting exceptional fiscal management. The economy is underpinned by vast natural resources, a world-class financial sector and deep trade ties across 51 countries through CETA and CUSMA.',ticker:'Canada-EU trade deal (CETA) covers 800M consumers  &#183;  Toronto Stock Exchange ranked top 10 globally by market cap  &#183;  Bank of Canada among world\'s most stable central banks'},
-  {cat:'cat-ai',catLabel:'TECH',headline:'$40 BILLION\nTECH ECOSYSTEM',stats:[{n:'$40B+',l:'VC Investment 2019-24'},{n:'15,000+',l:'Tech Companies'},{n:'#5',l:'Global Startup Hub'},{n:'Shopify',l:'$100B+ Canadian Tech Co'}],body:'Canada is home to a thriving technology ecosystem stretching from Vancouver to Montreal. Shopify, OpenText, Coveo and hundreds of scale-ups are headquartered here. The Toronto-Waterloo tech corridor is now one of the fastest-growing in North America.',ticker:'Shopify processes $235B in merchant sales annually  &#183;  Toronto ranked #2 in North America for tech job growth  &#183;  Waterloo Region produces more engineering graduates per capita than Silicon Valley'},
-  {cat:'cat-life',catLabel:'INNOVATION',headline:'WORLD\'S MOST\nLIVEABLE CITIES',stats:[{n:'#1',l:'Vancouver — EIU 2024'},{n:'#3',l:'Calgary — EIU 2024'},{n:'#5',l:'Toronto — Mercer 2024'},{n:'Top 5',l:'Montreal Quality of Life'}],body:'Four Canadian cities rank in the global top 10 for liveability, safety and infrastructure — measured annually by the Economist Intelligence Unit and Mercer. Canada consistently scores highest in healthcare quality, environmental standards and urban safety.',ticker:'Vancouver ranked world\'s most liveable city 2024 (EIU)  &#183;  Calgary & Calgary both top 3 globally  &#183;  Canada scores 9.1/10 for urban safety index'},
-  {cat:'cat-eco',catLabel:'CLEAN ENERGY',headline:'83% OF CANADA\'S\nPOWER IS CLEAN',stats:[{n:'83%',l:'Renewable Electricity'},{n:'#1',l:'Hydro Power Per Capita'},{n:'$15B',l:'Clean Tech Investment'},{n:'2050',l:'Net Zero Target'}],body:'Canada generates 83% of its electricity from renewable sources — primarily hydroelectric — making it one of the cleanest power grids on earth. This clean energy advantage is attracting major data centre and semiconductor investments requiring low-carbon power.',ticker:'Quebec offers cheapest & cleanest electricity in North America  &#183;  Canada home to 7 of world\'s 20 largest hydroelectric dams  &#183;  Microsoft, Google & Amazon building major Canadian data centres'},
-  {cat:'cat-ai',catLabel:'RESEARCH',headline:'CANADA INVESTS\nIN THE FUTURE',stats:[{n:'$3.1B',l:'Pan-Canadian AI Strategy'},{n:'200+',l:'Research Institutions'},{n:'#6',l:'Global R&D Spend'},{n:'NSERC',l:'Since 1978'}],body:'The Canadian government has committed over $3 billion to its national AI strategy — funding three world-class institutes: Mila in Montreal, Vector in Toronto, and Amii in Edmonton. This makes Canada one of the few nations with a coordinated, fully-funded national AI plan.',ticker:'Canada\'s Pan-Canadian AI Strategy renewed with $2.4B in 2024  &#183;  Vector Institute graduates 500+ AI specialists annually  &#183;  Canadian AI research cited more per paper than global average'}
-];
-
-var bsCurrent=0,bsProgress=0,bsDuration=7000,bsInterval=null,bsProgressInterval=null;
-
-function bsRenderSlide(idx,animate){
-  var s=bsSlides[idx];
-  var cat=document.getElementById('bs-category');
-  var hl=document.getElementById('bs-headline');
-  var sr=document.getElementById('bs-stat-row');
-  var bd=document.getElementById('bs-body');
-  cat.className='bs-category '+s.cat;cat.textContent=s.catLabel;
-  hl.innerHTML=s.headline.replace(/\n/g,'<br>');
-  sr.innerHTML=s.stats.map(function(st){return'<div class="bs-stat"><div class="bs-stat-n" style="color:'+({cat_eco:'#22C55E',cat_ai:'#A78BFA',cat_edu:'#29B6F6',cat_life:'#F5C842'}[s.cat.replace('-','_')]||'#F5C842')+'">'+st.n+'</div><div class="bs-stat-l">'+st.l+'</div></div>';}).join('');
-  bd.textContent=s.body;
-  if(animate){cat.style.opacity='0';hl.style.opacity='0';sr.style.opacity='0';bd.style.opacity='0';setTimeout(function(){[cat,hl,sr,bd].forEach(function(el,i){setTimeout(function(){el.style.transition='opacity 0.5s ease';el.style.opacity='1';},i*80);});},30);}
-  document.getElementById('bs-ticker').innerHTML=s.ticker+'&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;'+bsSlides[(idx+1)%bsSlides.length].ticker;
-}
-
-function bsColorForCat(cat){
-  var m={cat_eco:'#22C55E',cat_ai:'#A78BFA',cat_edu:'#29B6F6',cat_life:'#F5C842'};
-  return m[cat.replace('-','_')]||'#F5C842';
-}
-
-function bsStartCycle(){
-  bsProgress=0;document.getElementById('bs-progress-fill').style.width='0%';
-  if(bsProgressInterval)clearInterval(bsProgressInterval);
-  bsProgressInterval=setInterval(function(){
-    bsProgress+=100/(bsDuration/100);
-    if(bsProgress>100)bsProgress=100;
-    document.getElementById('bs-progress-fill').style.width=bsProgress+'%';
-  },100);
-  if(bsInterval)clearTimeout(bsInterval);
-  bsInterval=setTimeout(function(){bsCurrent=(bsCurrent+1)%bsSlides.length;bsRenderSlide(bsCurrent,true);bsStartCycle();},bsDuration);
-}
-
-function bsUpdateClock(){
-  var now=new Date();
-  var ukTime=new Date(now.toLocaleString('en-GB',{timeZone:'Europe/London'}));
-  var h=String(ukTime.getHours()).padStart(2,'0'),m=String(ukTime.getMinutes()).padStart(2,'0'),s=String(ukTime.getSeconds()).padStart(2,'0');
-  var el=document.getElementById('bs-time');if(el)el.textContent=h+':'+m+':'+s;
-}
-
-// Big screen background canvas — subtle animated glow
-(function(){
-  var c=document.getElementById('bs-canvas'),ctx=c.getContext('2d');
-  function rz(){var r=c.parentElement.getBoundingClientRect();c.width=r.width||206;c.height=r.height||300;}
-  setTimeout(rz,200);window.addEventListener('resize',rz);
-  function anim(){
-    if(!c.width){requestAnimationFrame(anim);return;}
-    ctx.clearRect(0,0,c.width,c.height);
-    var t=Date.now()/3000;
-    // subtle flag-colour atmospheric glow
-    var spots=[[0.15+Math.sin(t)*0.08,0.3,'rgba(232,41,58,0.07)'],[0.85+Math.cos(t*0.9)*0.07,0.5,'rgba(232,41,58,0.05)'],[0.5,0.2+Math.sin(t*0.7)*0.1,'rgba(245,200,66,0.04)']];
-    spots.forEach(function(s){var g=ctx.createRadialGradient(c.width*s[0],c.height*s[1],0,c.width*s[0],c.height*s[1],c.width*0.55);g.addColorStop(0,s[2]);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);});
-    // faint maple watermark
-    ctx.save();ctx.globalAlpha=0.04;ctx.font='120px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#E8293A';ctx.fillText('\uD83C\uDF41',c.width/2,c.height/2);ctx.restore();
-    requestAnimationFrame(anim);
-  }
-  anim();
-})();
-
-function initBigScreen(){
-  bsRenderSlide(0,false);
-  bsStartCycle();
-  setInterval(bsUpdateClock,1000);
-  bsUpdateClock();
-}
-
-
-function updateCountdown(){
-  var end=new Date('2026-06-30T23:59:59');
-  var diff=Math.max(0,end-new Date());
-  function pad(n){return String(n).padStart(2,'0');}
-  document.getElementById('cd-d').textContent=pad(Math.floor(diff/86400000));
-  document.getElementById('cd-h').textContent=pad(Math.floor((diff%86400000)/3600000));
-  document.getElementById('cd-m').textContent=pad(Math.floor((diff%3600000)/60000));
-  document.getElementById('cd-s').textContent=pad(Math.floor((diff%60000)/1000));
-}
-</script>
 </body>
 </html>
