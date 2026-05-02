@@ -325,7 +325,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
       </div>
       <div>
         <div class="sb-ttl">Scoring</div>
-        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Goal scored</div><div class="sl-pts">+1 pt</div></div>
+        <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Goal scored</div><div class="sl-pts">+1 &#9917;</div></div>
 
       </div>
       <!-- CANADA SPOTLIGHT BIG SCREEN -->
@@ -334,7 +334,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
           <div class="bs-live-dot"></div>
           <span class="bs-live-txt">LIVE</span>
           <span class="bs-channel">&#127464;&#127462; CANADA SPOTLIGHT</span>
-          <span class="bs-time" id="bs-time">--:--</span>
+          <span style="font-size:12px;margin-right:3px;">&#127468;&#127463;</span><span class="bs-time" id="bs-time">--:--</span>
         </div>
         <canvas id="bs-canvas"></canvas>
         <div class="bs-content">
@@ -379,7 +379,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
           <div>
             <div class="hero-eyebrow">
               <div class="live-badge">LIVE</div>
-              <span class="eyebrow-txt">FIFA Edition &middot; Jan &ndash; Jun 2026 &middot; Top 3 Win</span>
+              <span class="eyebrow-txt">FIFA Edition &middot; Apr &ndash; Jun 2026 &middot; Top 3 Win</span>
             </div>
             <div class="hero-title">GUS <span class="gold">Canada</span> Cup 2026</div>
             <div class="hero-meta">
@@ -796,11 +796,46 @@ function renderPodium(){
 }
 
 function renderNations(){
-  var map={};players.forEach(function(p){if(p.country)map[p.country]=(map[p.country]||0)+1;});
+  // Build nation counts from staticPlayers
+  var regionMap={
+    'Perusito':'&#127477;&#127466; Peru',
+    'SCCanada.':'&#127477;&#127466; Peru',
+    'CAD':'&#127758; LATAM/MENA/S.Asia',
+    'GS FC':'&#127477;&#127466; Peru',
+    'TGD':'&#127464;&#127462; Canada',
+    'Ajay':'&#127470;&#127475; India',
+    'HIMS.K':'&#127470;&#127475; India',
+    'AngieClosingQueen':'&#127464;&#127476; Colombia',
+    'GabyEI':'&#127480;&#127483; El Salvador',
+    'Maestro':'&#127470;&#127475; India',
+    'Leap Warrior':'&#127483;&#127475; Vietnam',
+    'Couselormaple':'&#127464;&#127462; Canada',
+    'El trueno':'&#127464;&#127462; Canada',
+    'BinodSoltee':'&#127475;&#127477; Nepal',
+    'Maru':'&#127464;&#127476; Colombia',
+    'Egal':'&#127481;&#127479; Türkiye',
+    'JamRockaz':'&#127471;&#127474; Jamaica',
+    'Roge.Alex':'&#127474;&#127485; Mexico',
+    'Raj':'&#127475;&#127477; Nepal',
+    'Bella':'&#127468;&#127469; Ghana',
+    'Encebollado':'&#127466;&#127464; Ecuador',
+    'Karan Bajaj (KB)':'&#127470;&#127475; India',
+    'Kbrolog':'&#127481;&#127479; Turkey',
+    'Immilander':'&#127464;&#127462; Canada',
+    'dd':'&#127464;&#127462; Canada'
+  };
+  var map={};
+  staticPlayers.forEach(function(p){
+    var label=regionMap[p.nick]||('&#127758; '+p.region);
+    map[label]=(map[label]||0)+1;
+  });
   var nl=document.getElementById('nations-list');
   var entries=Object.entries(map).sort(function(a,b){return b[1]-a[1];});
   if(!entries.length){nl.innerHTML='<div style="font-size:11px;color:var(--muted)">No players yet</div>';return;}
-  nl.innerHTML=entries.map(function(e){var flag=e[0].replace(/[A-Za-z ]/g,'').trim()||'&#127758;';var name=e[0].replace(/[^\w\s]/gu,'').trim()||e[0];return'<div class="ni"><span class="ni-flag">'+flag+'</span><span class="ni-name">'+name+'</span><span class="ni-n">'+e[1]+'</span></div>';}).join('');
+  nl.innerHTML=entries.map(function(e){
+    var parts=e[0].split(' ');var flag=parts[0];var name=parts.slice(1).join(' ');
+    return'<div class="ni"><span class="ni-flag">'+flag+'</span><span class="ni-name">'+name+'</span><span class="ni-n">'+e[1]+'</span></div>';
+  }).join('');
 }
 
 function renderTable(){
@@ -839,11 +874,20 @@ function renderTable(){
 }
 
 function updateStats(){
-  var q=players.filter(qual);
-  document.getElementById('h-players').textContent=q.length;
-  document.getElementById('h-nations').textContent=new Set(players.map(function(p){return p.country;}).filter(Boolean)).size;
-  document.getElementById('h-goals').textContent=players.reduce(function(s,p){return s+p.goals;},0);
-  document.getElementById('h-pts').textContent=players.reduce(function(s,p){return s+pts(p);},0);
+  // Use staticPlayers as the authoritative source for hero stats
+  var staticGoals = staticPlayers.reduce(function(s,p){return s+p.unf+p.ucw;},0);
+  var staticNations = (function(){
+    var regions=['Peru','Peru','LATAM/MENA/South Asia','Peru','Canada','India','India',
+      'Colombia','El Salvador','India','Vietnam','Canada','Canada','Nepal',
+      'Colombia','Turkiye','Jamaica','Mexico','Nepal','Ghana','Ecuador',
+      'India','Turkey','Canada','Canada'];
+    var s=new Set(regions.map(function(r){return r.split('/')[0].trim();}));
+    return s.size;
+  })();
+  document.getElementById('h-players').textContent=staticPlayers.length;
+  document.getElementById('h-nations').textContent=staticNations;
+  document.getElementById('h-goals').textContent=staticGoals;
+  document.getElementById('h-pts').textContent=staticGoals;
 }
 
 // ── STATIC PLAYER LEADERBOARD DATA ──
@@ -1014,7 +1058,8 @@ function bsStartCycle(){
 
 function bsUpdateClock(){
   var now=new Date();
-  var h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
+  var ukTime=new Date(now.toLocaleString('en-GB',{timeZone:'Europe/London'}));
+  var h=String(ukTime.getHours()).padStart(2,'0'),m=String(ukTime.getMinutes()).padStart(2,'0'),s=String(ukTime.getSeconds()).padStart(2,'0');
   var el=document.getElementById('bs-time');if(el)el.textContent=h+':'+m+':'+s;
 }
 
