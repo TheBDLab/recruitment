@@ -2115,6 +2115,189 @@ body{
   .about-headline { font-size: 2rem; }
   .cycle-slide .cs-headline { font-size: 1.3rem; }
 }
+
+/* =====================================================================
+   ===== Slide 1: PIEoneer Awards finalist badge — ANIMATED SVG  =====
+   =====================================================================
+   Replaces the previous PNG-based badge with a fully inline animated
+   SVG. The badge is positioned slightly lower than the original PNG so
+   that it doesn't crowd the "Recognised" eyebrow or the protruding
+   horizontal lines from the section label.
+
+   Animation choreography:
+   1. Small silver pie spins in (top-right of the badge)
+   2. Large gold slice slides in from the lower-left and expands
+   3. The text inside the gold slice fades + slides up
+   4. The bottom caption (award category + URL) slides up
+   5. After the entry sequence, the entire pie composition gently
+      floats / rotates / scales in a continuous loop (drives the
+      sense of "presence" without being noisy).
+   ===================================================================== */
+
+/* The parallax layer wrapping our badge — positions it in the top-right
+   corner. We've shifted it DOWN compared to the original PNG version so
+   it sits clearly below the "RECOGNISED" eyebrow line and gives the bars
+   room to breathe. */
+.pie-badge-layer {
+  /* Was top:0 with padding inside; now nudged down ~80px */
+  top: 80px;
+  right: 0;
+  width: 360px;
+  height: 360px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Inner stage — fades the whole composition in once the slide is active */
+.pie-badge-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .9s cubic-bezier(.2,.6,.2,1),
+              transform .9s cubic-bezier(.2,.6,.2,1);
+}
+.slide.is-active .pie-badge-stage {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .35s;
+}
+
+/* The SVG itself — sized to fill its layer */
+.pie-badge-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* Subtle drop shadow — gold against cream slide */
+  filter: drop-shadow(0 8px 24px rgba(15,42,79,.12))
+          drop-shadow(0 1px 3px rgba(15,42,79,.08));
+}
+
+/* Soft golden radial glow behind the badge — atmospheric */
+.pie-badge-glow {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle at 50% 35%,
+    rgba(212,175,55,.20) 0%,
+    rgba(212,175,55,.08) 30%,
+    transparent 65%);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  pointer-events: none;
+}
+.slide.is-active .pie-badge-glow {
+  opacity: 1;
+  transition-delay: .25s;
+}
+
+/* "Recognised" eyebrow — placed above the badge, anchored editorially.
+   Now sits above the lower badge so the spacing reads cleanly. */
+.pie-badge-eyebrow {
+  position: absolute;
+  top: 24px;     /* sits in the gap above the badge */
+  right: 24px;
+  font-family: var(--sans);
+  font-size: .58rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity .8s ease, transform .8s ease;
+  z-index: 5;
+}
+.pie-badge-eyebrow span {
+  display: inline-block;
+  padding: 4px 0;
+  border-top: 1px solid rgba(45,111,224,.3);
+}
+.slide.is-active .pie-badge-eyebrow {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 1.4s;
+}
+
+/* ===== ENTRANCE ANIMATIONS — only run when the slide is active ===== */
+
+/* 1. Small silver pie (top-right) spins in
+   transform-origin set on the <g> via SVG attribute (rotation pivot
+   is the centre of that small composition) */
+.slide.is-active .small-pie-anim {
+  animation: pie-spin-in 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) .55s forwards;
+}
+@keyframes pie-spin-in {
+  0%   { transform: translate(560px, 210px) rotate(-180deg) scale(0); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translate(560px, 210px) rotate(0deg)    scale(1); opacity: 1; }
+}
+
+/* 2. Large gold slice slides in from lower-left and expands */
+.slide.is-active .large-slice-anim {
+  animation: large-slice-in 1.2s 1.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes large-slice-in {
+  0%   { transform: translate(-100px, 100px) scale(0.8); opacity: 0; }
+  100% { transform: translate(0, 0)           scale(1);   opacity: 1; }
+}
+
+/* 3. Text inside the gold slice fades + slides up */
+.slide.is-active .pie-text-anim {
+  animation: pie-text-in 1s 2.15s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes pie-text-in {
+  0%   { transform: translateY(15px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* 4. Bottom caption (award category + URL) slides up */
+.slide.is-active .bottom-text-anim {
+  animation: bottom-text-in 1.2s 2.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes bottom-text-in {
+  0%   { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* Initial states (before any animation kicks in) */
+.small-pie-anim   { opacity: 0; transform: translate(560px, 210px) rotate(-180deg) scale(0); transform-origin: 560px 210px; }
+.large-slice-anim { opacity: 0; transform: translate(-100px, 100px) scale(0.8);             transform-origin: 173px 573px; }
+.pie-text-anim    { opacity: 0; transform: translateY(15px) scale(0.95); }
+.bottom-text-anim { opacity: 0; transform: translateY(30px); }
+
+/* 5. Continuous gentle dance — kicks in AFTER the entrance sequence
+   finishes (entrance ends ~3.95s after slide-active). Wraps the whole
+   pie composition. transform-origin at the visual centre keeps the
+   motion grounded. */
+.slide.is-active .continuous-pie-float {
+  animation: pie-dance 4.5s ease-in-out 4s infinite;
+  transform-origin: 360px 360px;
+}
+@keyframes pie-dance {
+  0%   { transform: rotate(0deg)  scale(1)    translateY(0);   }
+  25%  { transform: rotate(8deg)  scale(1.05) translateY(-12px); }
+  50%  { transform: rotate(0deg)  scale(1)    translateY(0);   }
+  75%  { transform: rotate(-8deg) scale(0.96) translateY(12px); }
+  100% { transform: rotate(0deg)  scale(1)    translateY(0);   }
+}
+
+/* On smaller windows, scale the badge down so it doesn't crowd */
+@media (max-width: 1100px) {
+  .pie-badge-layer { width: 260px; height: 260px; top: 70px; }
+  .pie-badge-glow { width: 280px; height: 280px; }
+  .pie-badge-eyebrow { font-size: .54rem; top: 18px; right: 18px; }
+}
+@media (max-width: 800px) {
+  .pie-badge-layer { display: none; }
+}
+
 </style>
 </head>
 <body>
@@ -2150,6 +2333,120 @@ body{
           <div class="parallax-layer" data-depth="0.18" style="top:0;left:0;width:100%;height:50%;background:radial-gradient(ellipse at 50% 0%,rgba(45,111,224,.08),transparent 65%)"></div>
           <div class="parallax-layer" data-depth="0.1" style="bottom:5%;right:-5%;width:380px;height:380px;border:1px solid rgba(45,111,224,.1);border-radius:50%"></div>
           <div class="parallax-layer" data-depth="0.22" style="top:12%;left:-3%;width:220px;height:220px;border:1px solid rgba(45,111,224,.15);border-radius:50%"></div>
+
+          <!-- ============================================================
+               PIEoneer Awards finalist badge — INLINE ANIMATED SVG
+               (replaces the former PNG block).
+               Sits inside a parallax layer so it drifts subtly with the
+               rest of the slide; the SVG itself runs its own animation
+               choreography (entrance sequence + continuous float).
+               ============================================================ -->
+          <div class="parallax-layer pie-badge-layer" data-depth="0.08">
+            <div class="pie-badge-stage">
+              <div class="pie-badge-glow"></div>
+
+              <!-- The animated badge SVG. viewBox 0 0 800 800; the entire
+                   composition is rendered inside `.continuous-pie-float`
+                   so the post-entrance gentle dance applies to all parts
+                   uniformly. -->
+              <svg class="pie-badge-svg" xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 800 800"
+                   role="img"
+                   aria-label="The PIEoneer Awards 2026 — Digital Innovation of the Year, Student Recruitment, Finalist">
+                <defs>
+                  <!-- Gold gradient for the large slice -->
+                  <linearGradient id="pie-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#9E8142"/>
+                    <stop offset="40%"  stop-color="#C5A45A"/>
+                    <stop offset="70%"  stop-color="#EADD8E"/>
+                    <stop offset="100%" stop-color="#FDF0A6"/>
+                  </linearGradient>
+
+                  <!-- Silver gradient for the small slices (top-right cluster) -->
+                  <linearGradient id="pie-silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#DCDDDE"/>
+                    <stop offset="100%" stop-color="#8F9699"/>
+                  </linearGradient>
+
+                  <!-- Drop shadow for 3D depth on the gold slice -->
+                  <filter id="pie-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="-8" dy="12" stdDeviation="10"
+                                  flood-color="#000000" flood-opacity="0.15"/>
+                  </filter>
+
+                  <!-- Single 60-degree small pie slice — reused 5x for the cluster -->
+                  <path id="pie-small-slice"
+                        d="M 0,0 L 90,0 A 90,90 0 0,1 45,77.94 Z"
+                        fill="url(#pie-silver-grad)"
+                        stroke="#FFFFFF"
+                        stroke-width="6"
+                        stroke-linejoin="round"/>
+                </defs>
+
+                <!-- Wrapper for continuous gentle dance after entrance.
+                     Bottom caption sits OUTSIDE this group so it stays
+                     anchored while the pie composition floats. -->
+                <g class="continuous-pie-float">
+
+                  <!-- GROUP 1: Small silver pie (top-right cluster) -->
+                  <g class="small-pie-anim">
+                    <use href="#pie-small-slice" transform="rotate(40)"/>
+                    <use href="#pie-small-slice" transform="rotate(160)"/>
+                    <use href="#pie-small-slice" transform="rotate(220)"/>
+                    <use href="#pie-small-slice" transform="rotate(-80)"/>
+                    <use href="#pie-small-slice" transform="rotate(-20)"/>
+                  </g>
+
+                  <!-- GROUP 2: Large gold slice — the hero element -->
+                  <g class="large-slice-anim" filter="url(#pie-shadow)">
+                    <path d="M 480,260 L 173,346 A 320,320 0 0,0 426,573 Z"
+                          fill="url(#pie-gold-grad)"
+                          stroke="#FFFFFF"
+                          stroke-width="2"/>
+                  </g>
+
+                  <!-- GROUP 3: Text inside the gold slice -->
+                  <g class="pie-text-anim">
+                    <!-- 10TH ANNIVERSARY ribbon — runs parallel to the
+                         top-straight edge of the wedge -->
+                    <g transform="translate(245, 318) rotate(-15.6)">
+                      <text font-family="Arial, Helvetica, sans-serif" fill="#5E7A8C">
+                        <tspan font-size="44" font-weight="900" letter-spacing="-1" fill="#2C4A5D">10</tspan>
+                        <tspan font-size="16" font-weight="800" dy="-20" dx="2" fill="#2C4A5D">TH</tspan>
+                        <tspan font-size="20" font-weight="700" dy="20" dx="12" letter-spacing="1">ANNIVERSARY</tspan>
+                      </text>
+                    </g>
+
+                    <!-- Main badge title block -->
+                    <text x="325" y="380" font-family="Arial, Helvetica, sans-serif"
+                          fill="#2C4A5D" text-anchor="middle">
+                      <tspan font-size="22" font-weight="500" x="325" dy="0">The</tspan>
+                      <tspan font-size="44" x="325" dy="44" letter-spacing="1">
+                        <tspan font-weight="900">PIE</tspan><tspan font-weight="400">oneer</tspan>
+                      </tspan>
+                      <tspan font-size="28" font-weight="400" x="325" dy="38" letter-spacing="2">Awards</tspan>
+                      <tspan font-size="30" font-weight="800" x="325" dy="38" letter-spacing="1">2026</tspan>
+                    </text>
+                  </g>
+                </g>
+
+                <!-- GROUP 4: Bottom caption — stays static while pie dances above -->
+                <g class="bottom-text-anim">
+                  <text x="400" y="670" font-family="Arial, Helvetica, sans-serif"
+                        fill="#2C4A5D" text-anchor="middle">
+                    <tspan font-size="24" font-weight="700" letter-spacing="0.5">Digital innovation of the year -</tspan>
+                    <tspan font-size="24" x="400" dy="32">
+                      <tspan font-weight="700" letter-spacing="0.5">student recruitment</tspan>
+                      <tspan font-weight="300" fill="#7D8C94"> Finalist</tspan>
+                    </tspan>
+                    <tspan font-size="16" x="400" dy="40" fill="#7D8C94" font-weight="600" letter-spacing="0.5">pieoneerawards.com</tspan>
+                  </text>
+                </g>
+              </svg>
+
+              <div class="pie-badge-eyebrow"><span>Recognised</span></div>
+            </div>
+          </div>
         </div>
 
         <div class="slide-inner solo" style="text-align:left;max-width:1280px">
@@ -2889,7 +3186,7 @@ body{
                 </div>
                 <div class="bf-item">
                   <span class="bf-key">Or write</span>
-                  <span class="bf-val">partners@inuniglobal.com</span>
+                  <span class="bf-val accent">partnerships@inuniglobal.com</span>
                 </div>
               </div>
             </div>
