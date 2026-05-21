@@ -13,44 +13,26 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  /* === V2 visibility palette — darker text, stronger accent ============= */
   --light:#f4f5f7;
   --light2:#e6e9ef;
   --light3:#d4d8e0;
   --white:#fff;
-  --black:#05080d;            /* was #0a0d12 — pushed darker */
-  --text-dark:#15192a;        /* was #2a3040 — pushed darker */
-  --text-mid:#3a4150;         /* was #5a6275 — pushed much darker for 3–6m read */
-  --text-light:#5a6275;       /* was #8890a4 — pushed darker */
+  --black:#05080d;
+  --text-dark:#15192a;
+  --text-mid:#3a4150;
+  --text-light:#5a6275;
   --text-muted:#5a6275;
-  --accent:#1f5fd4;            /* was #2d6fe0 — slightly deeper blue, more punch */
+  --accent:#1f5fd4;
   --accent2:#3a7ef0;
-  --accent-deep:#143f8f;       /* new — used for shadows / borders / hovers */
-  --gus-navy:#0a1f3d;          /* was #0f2a4f — deeper */
-  --border-light:rgba(5,8,13,.15);  /* was .08 — almost doubled */
-  --border-mid:rgba(5,8,13,.22);    /* new — for stronger dividers */
+  --accent-deep:#143f8f;
+  --gus-navy:#0a1f3d;
+  --border-light:rgba(5,8,13,.15);
+  --border-mid:rgba(5,8,13,.22);
   --serif:'Cormorant Garamond',Georgia,serif;
   --sans:'Outfit',-apple-system,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --gus-height: 172px;  /* tightened — was 200 — give slides more vertical room */
+  --gus-height: 172px;
 }
-
-/* =====================================================================
-   ===== TECH ORNAMENTS — dot grid + monospace metadata corners  ======
-   =====================================================================
-   Goal: deepen the "operating system" atmosphere without competing with
-   the editorial typography. All elements sit at very low opacity, in
-   parallax layers when possible, and ignore pointer events.
-
-   1. .tech-grid — a 24px dot lattice rendered as a tiled CSS background
-      image. Used as a subtle ground plane on selected slides. Placed
-      INSIDE .slide-bg so it inherits parallax behaviour.
-
-   2. .tech-meta — monospace metadata corner labels. Tiny (10–11px),
-      uppercase-tolerant, deliberately understated. Used to mark
-      coordinates, status, version numbers, conference identifiers.
-      Lives absolutely-positioned inside the slide.
-   ===================================================================== */
 
 .tech-grid {
   position: absolute;
@@ -60,8 +42,6 @@
   background-size: 28px 28px;
   background-position: 0 0;
   opacity: .35;
-  /* Soft radial mask so the grid fades toward the slide edges and never
-     competes with the content focal area. */
   -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
           mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
   pointer-events: none;
@@ -102,7 +82,6 @@
   margin: 0 .55rem;
   opacity: .5;
 }
-/* Corner anchor variants — kept clear of slide padding zones */
 .tech-meta.tm-tl { top: 92px;    left: 2.5rem; }
 .tech-meta.tm-tr { top: 92px;    right: 2.5rem; text-align: right; }
 .tech-meta.tm-bl { bottom: 1.4rem; left: 2.5rem; }
@@ -167,12 +146,19 @@ body{
 }
 .topbar .brand {
   font-family: var(--serif);
-  font-size: 1.65rem;          /* was 1.4 */
-  font-weight: 700;            /* was 600 */
+  font-size: 1.65rem;
+  font-weight: 700;
   letter-spacing: .015em;
   color: var(--black);
+  display: flex;
+  align-items: center;
 }
 .topbar .brand b { color: var(--accent); font-weight: 700; }
+.topbar .brand img.brand-logo {
+  height: 38px;
+  width: auto;
+  display: block;
+}
 .topbar .progress {
   display: flex;
   align-items: center;
@@ -187,15 +173,15 @@ body{
   display: block;
 }
 .topbar .progress .dot {
-  width: 22px;                 /* was 18 */
-  height: 3px;                 /* was 2 */
-  background: rgba(5,8,13,.28); /* was .18 */
+  width: 22px;
+  height: 3px;
+  background: rgba(5,8,13,.28);
   border-radius: 2px;
   transition: background .4s, width .4s;
 }
 .topbar .progress button.active .dot {
   background: var(--accent);
-  width: 38px;                 /* was 30 */
+  width: 38px;
 }
 .topbar .nav-arrows {
   display: flex;
@@ -242,7 +228,7 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 88px 8rem 2.5rem;     /* tightened — was 100/4rem */
+  padding: 88px 8rem 2.5rem;
   overflow: hidden;
 }
 
@@ -280,7 +266,6 @@ body{
 }
 .slide-inner.solo { grid-template-columns: 1fr; max-width: 980px; text-align: center; }
 
-/* === Section label — thicker rule, larger type, darker ============== */
 .sec-label{
   display:flex;align-items:center;gap:1.25rem;
   font-size:.85rem;
@@ -288,10 +273,10 @@ body{
   letter-spacing:.18em;
   text-transform:uppercase;
   color: var(--accent-deep);
-  margin-bottom: 1.1rem;         /* was 1.75 */
+  margin-bottom: 1.1rem;
 }
 .sec-label::before{
-  content:'';width:56px;height:3px;  /* was 48px / 1.5px */
+  content:'';width:56px;height:3px;
   background: var(--accent);
   flex-shrink: 0;
 }
@@ -310,7 +295,7 @@ body{
   font-weight: 600;
   line-height: 1.04;
   color: var(--black);
-  margin-bottom: 1rem;           /* was 1.5 */
+  margin-bottom: 1rem;
   letter-spacing: -.012em;
 }
 .slide h1 i { font-style: italic; color: var(--accent); font-weight: 500; }
@@ -321,14 +306,13 @@ body{
   font-weight: 600;
   line-height: 1.08;
   color: var(--black);
-  margin-bottom: .85rem;         /* was 1.25 */
+  margin-bottom: .85rem;
   letter-spacing: -.012em;
 }
 .slide h2 i { font-style: italic; color: var(--accent); font-weight: 500; }
 
-/* === Lead paragraphs — 1.05rem floor, darker colour =================== */
 .slide .lead {
-  font-size: 1.15rem;           /* was 1.05rem, but smaller variants pushed down to .82rem — base raised */
+  font-size: 1.15rem;
   color: var(--text-mid);
   max-width: 580px;
   line-height: 1.65;
@@ -339,10 +323,10 @@ body{
 .slide .pill {
   display:inline-flex;align-items:center;gap:.6rem;
   padding:.55rem 1.1rem;
-  background: rgba(31,95,212,.12);    /* was .08 */
-  border:2px solid rgba(31,95,212,.32);/* was 1px / .18 */
+  background: rgba(31,95,212,.12);
+  border:2px solid rgba(31,95,212,.32);
   border-radius:99px;
-  font-size:.82rem;              /* was .7rem */
+  font-size:.82rem;
   font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;
   color: var(--accent-deep);
@@ -364,7 +348,7 @@ body{
 .btn {
   display:inline-flex;align-items:center;gap:.6rem;
   padding:1rem 1.8rem;
-  font-size:.88rem;             /* was .78rem */
+  font-size:.88rem;
   font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;
   border-radius:3px;
@@ -389,7 +373,7 @@ body{
 .globe-ring {
   position: absolute;
   inset: 0;
-  border: 2px solid rgba(31,95,212,.3);   /* was 1px / .18 */
+  border: 2px solid rgba(31,95,212,.3);
   border-radius: 50%;
 }
 .globe-ring.r2 { inset: 12%; border-color: rgba(31,95,212,.42); }
@@ -413,7 +397,7 @@ body{
 .problem-headline {
   font-family: var(--sans);
   font-weight: 800;
-  font-size: clamp(2.8rem, 7.8vw, 6.4rem);  /* was 3.2/8.8/7.4 */
+  font-size: clamp(2.8rem, 7.8vw, 6.4rem);
   line-height: .94;
   letter-spacing: -.032em;
   color: var(--black);
@@ -423,12 +407,12 @@ body{
 .problem-stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  border-top: 3px solid var(--border-mid);   /* was 1px */
+  border-top: 3px solid var(--border-mid);
   border-bottom: 3px solid var(--border-mid);
   margin-top: 1.5rem;
 }
 .problem-stats .ps {
-  padding: 1.1rem 1rem;          /* was 1.5 */
+  padding: 1.1rem 1rem;
   text-align: left;
   border-right: 2px solid var(--border-light);
 }
@@ -436,19 +420,19 @@ body{
 .problem-stats .ps strong {
   display: block;
   font-family: var(--serif);
-  font-size: clamp(1.85rem, 3vw, 2.55rem);  /* was 2/3.2/2.8 */
+  font-size: clamp(1.85rem, 3vw, 2.55rem);
   font-weight: 700;
   color: var(--black);
   line-height: 1;
   letter-spacing: -.015em;
 }
 .problem-stats .ps span {
-  font-size: .7rem;              /* was .75 */
+  font-size: .7rem;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--text-mid);
   font-weight: 700;
-  margin-top: .5rem;             /* was .65 */
+  margin-top: .5rem;
   display: block;
 }
 
@@ -457,19 +441,19 @@ body{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: .9rem;
-  margin-top: 1.25rem;           /* was 2 */
+  margin-top: 1.25rem;
 }
 .method-principle {
   display: flex;
   align-items: baseline;
   gap: 1.25rem;
-  margin-top: 1rem;              /* was 1.6 */
-  padding-top: .85rem;            /* was 1.25 */
+  margin-top: 1rem;
+  padding-top: .85rem;
   border-top: 2px solid var(--border-light);
 }
 .method-principle .mp-tag {
   font-family: var(--sans);
-  font-size: .78rem;             /* was .82 */
+  font-size: .78rem;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -479,7 +463,7 @@ body{
 }
 .method-principle .mp-line {
   font-family: var(--serif);
-  font-size: 1.15rem;            /* was 1.25 */
+  font-size: 1.15rem;
   line-height: 1.35;
   color: var(--text-dark);
   font-weight: 500;
@@ -491,7 +475,7 @@ body{
   background: #fff;
   border: 2px solid var(--border-light);
   border-radius: 4px;
-  padding: 1.2rem 1.15rem;       /* was 1.75/1.4 */
+  padding: 1.2rem 1.15rem;
   position: relative;
   transition: .3s;
   display: flex;
@@ -505,34 +489,34 @@ body{
 .method-card .m-bars {
   display: flex;
   gap: 4px;
-  margin-bottom: .9rem;          /* was 1.4 */
+  margin-bottom: .9rem;
 }
 .method-card .m-bars i {
   width: 5px;
-  height: 18px;                  /* was 22 */
+  height: 18px;
   background: var(--accent);
   display: block;
   opacity: 1;
 }
 .method-card .m-num {
   font-family: var(--serif);
-  font-size: .85rem;             /* was .95 */
+  font-size: .85rem;
   font-weight: 700;
   color: var(--accent-deep);
   letter-spacing: .14em;
-  margin-bottom: .55rem;          /* was .75 */
+  margin-bottom: .55rem;
 }
 .method-card h5 {
   font-family: var(--serif);
-  font-size: 1.3rem;             /* was 1.45 */
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--black);
   line-height: 1.15;
-  margin-bottom: .55rem;          /* was .8 */
+  margin-bottom: .55rem;
   letter-spacing: -.005em;
 }
 .method-card p {
-  font-size: .9rem;              /* was .95 */
+  font-size: .9rem;
   color: var(--text-mid);
   line-height: 1.5;
 }
@@ -540,7 +524,7 @@ body{
 /* ===== Slides 8: Five tool cards ===== */
 .tools-header {
   text-align: left;
-  margin-bottom: 1.1rem;         /* was 2 */
+  margin-bottom: 1.1rem;
   max-width: 900px;
 }
 .tools-grid {
@@ -550,16 +534,14 @@ body{
   width: 100%;
 }
 .tools-grid.three-up { grid-template-columns: repeat(3, 1fr); }
-/* Five-up: SINGLE ROW of 5 (was 3+2). Eliminates the second row that clipped. */
 .tools-grid.five-up {
   grid-template-columns: repeat(5, 1fr);
   gap: .7rem;
 }
 .tools-grid.five-up > .tool-card { grid-column: auto; }
 
-/* Compact card — bumped type for 3-6m readability, tightened vertical */
 .tool-card.compact {
-  padding: .85rem 1rem;          /* was 1.1/1.2 */
+  padding: .85rem 1rem;
   gap: .5rem;
 }
 .tool-card.compact .tool-head {
@@ -569,14 +551,14 @@ body{
   align-items: flex-start;
 }
 .tool-card.compact .tool-id {
-  font-size: .62rem;             /* was .68 */
+  font-size: .62rem;
   font-weight: 700;
   letter-spacing: .14em;
   margin-bottom: .15rem;
   color: var(--accent-deep);
 }
 .tool-card.compact .tool-head h4 {
-  font-size: 1.05rem;            /* was 1.2 */
+  font-size: 1.05rem;
   line-height: 1.15;
 }
 .tool-card.compact .tool-metric {
@@ -589,7 +571,7 @@ body{
   padding-top: .4rem;
 }
 .tool-card.compact .tool-metric strong {
-  font-size: 1.05rem;            /* was 1.25 */
+  font-size: 1.05rem;
 }
 .tool-card.compact .tool-metric span {
   font-size: .55rem;
@@ -599,7 +581,7 @@ body{
 }
 .tool-card.compact .tool-body { font-size: .78rem; }
 .tool-card.compact .tool-body .tb-row {
-  display: block;                /* stack the key above the value when narrow */
+  display: block;
   margin-bottom: .55rem;
 }
 .tool-card.compact .tool-body .tb-key {
@@ -633,7 +615,6 @@ body{
   font-weight: 600;
 }
 
-/* Special layout for content-heavy slides */
 .slide.tools-slide,
 .slide.content-slide {
   align-items: flex-start;
@@ -641,7 +622,6 @@ body{
   padding-bottom: 1.5rem;
   overflow-y: auto;
 }
-/* Tools slide: needs full canvas width for the five-card row */
 .slide.tools-slide {
   padding-left: 2.5rem;
   padding-right: 2.5rem;
@@ -663,12 +643,12 @@ body{
   justify-content: flex-start;
 }
 .slide.content-slide h2 {
-  font-size: clamp(1.75rem, 3vw, 2.35rem);  /* was 1.85/3.2/2.6 */
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
   margin-bottom: .55rem;
   line-height: 1.08;
 }
 .slide.content-slide .lead {
-  font-size: 1rem;               /* was 1.05 */
+  font-size: 1rem;
   line-height: 1.5;
   margin-bottom: .85rem;
   max-width: 780px;
@@ -676,7 +656,7 @@ body{
 
 .tool-card {
   background: #fff;
-  border: 2px solid var(--border-light);  /* was 1px */
+  border: 2px solid var(--border-light);
   border-radius: 4px;
   padding: 1.5rem 1.6rem;
   display: flex;
@@ -695,7 +675,7 @@ body{
   position: absolute;
   top: 0; left: 0;
   width: 0;
-  height: 3px;                   /* was 2 */
+  height: 3px;
   background: var(--accent);
   transition: width .5s ease;
 }
@@ -711,16 +691,16 @@ body{
 .tool-head .tool-id {
   font-family: var(--serif);
   font-style: italic;
-  font-size: .85rem;             /* was .7 */
+  font-size: .85rem;
   font-weight: 600;
-  color: var(--accent-deep);     /* was --text-mid */
+  color: var(--accent-deep);
   letter-spacing: .12em;
   text-transform: uppercase;
   margin-bottom: .4rem;
 }
 .tool-head h4 {
   font-family: var(--serif);
-  font-size: 1.55rem;            /* was 1.35 */
+  font-size: 1.55rem;
   font-weight: 600;
   color: var(--black);
   letter-spacing: -.01em;
@@ -731,7 +711,7 @@ body{
 .tool-metric strong {
   display: block;
   font-family: var(--serif);
-  font-size: 1.55rem;            /* was 1.4 */
+  font-size: 1.55rem;
   font-weight: 700;
   color: var(--black);
   line-height: 1;
@@ -739,7 +719,7 @@ body{
 }
 .tool-metric strong em { color: var(--accent); font-style: normal; }
 .tool-metric span {
-  font-size: .7rem;              /* was .55 */
+  font-size: .7rem;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -748,7 +728,7 @@ body{
   display: block;
 }
 .tool-body {
-  font-size: .92rem;             /* was .78 */
+  font-size: .92rem;
   color: var(--text-mid);
   line-height: 1.55;
 }
@@ -759,10 +739,10 @@ body{
 }
 .tool-body .tb-row:last-child { margin-bottom: 0; }
 .tool-body .tb-key {
-  font-size: .68rem;             /* was .55 */
+  font-size: .68rem;
   letter-spacing: .15em;
   text-transform: uppercase;
-  color: var(--accent-deep);     /* was --text-light */
+  color: var(--accent-deep);
   font-weight: 800;
   flex-shrink: 0;
   width: 70px;
@@ -772,7 +752,7 @@ body{
 .tool-body .tb-val .b-headline {
   color: var(--black);
   font-weight: 600;
-  font-size: .96rem;             /* was .82 */
+  font-size: .96rem;
   margin-bottom: .3rem;
 }
 .tool-body ul { list-style: none; padding: 0; margin: 0; }
@@ -780,7 +760,7 @@ body{
   position: relative;
   padding-left: 1rem;
   margin-bottom: .3rem;
-  font-size: .9rem;              /* was .76 */
+  font-size: .9rem;
   color: var(--text-mid);
 }
 .tool-body li::before {
@@ -792,9 +772,9 @@ body{
 }
 .tool-foot {
   margin-top: auto;
-  border-left: 3px solid var(--accent);   /* was 2px */
+  border-left: 3px solid var(--accent);
   padding: .65rem .95rem;
-  font-size: .85rem;             /* was .72 */
+  font-size: .85rem;
   color: var(--black);
   font-style: italic;
   font-family: var(--serif);
@@ -815,17 +795,17 @@ body{
   display: grid;
   grid-template-columns: 70px 1fr 1.5fr 1.2fr;
   align-items: center;
-  padding: .5rem 1.4rem;         /* was .85 */
+  padding: .5rem 1.4rem;
   border-bottom: 2px solid var(--border-light);
   gap: 1.25rem;
 }
 .outcomes-table .ot-row:last-child { border-bottom: 0; }
 .outcomes-table .ot-row.head {
   background: var(--light2);
-  padding: .55rem 1.4rem;        /* was .75 */
+  padding: .55rem 1.4rem;
 }
 .outcomes-table .ot-row.head > * {
-  font-size: .62rem;             /* was .68 */
+  font-size: .62rem;
   letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--accent-deep);
@@ -834,13 +814,13 @@ body{
 .outcomes-table .ot-id {
   font-family: var(--serif);
   font-style: italic;
-  font-size: .92rem;             /* was 1 */
+  font-size: .92rem;
   color: var(--text-mid);
   font-weight: 600;
 }
 .outcomes-table .ot-metric {
   font-family: var(--serif);
-  font-size: 1.3rem;             /* was 1.5 */
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--black);
   line-height: 1;
@@ -852,7 +832,7 @@ body{
 }
 .outcomes-table .ot-metric small {
   font-family: var(--sans);
-  font-size: .68rem;             /* was .72 */
+  font-size: .68rem;
   font-weight: 700;
   color: var(--text-mid);
   text-transform: uppercase;
@@ -860,13 +840,13 @@ body{
   margin-left: .25rem;
 }
 .outcomes-table .ot-outcome {
-  font-size: .88rem;             /* was .95 */
+  font-size: .88rem;
   color: var(--black);
   font-weight: 600;
   line-height: 1.3;
 }
 .outcomes-table .ot-orig {
-  font-size: .82rem;             /* was .88 */
+  font-size: .82rem;
   color: var(--text-mid);
   line-height: 1.3;
 }
@@ -876,13 +856,13 @@ body{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin-top: 1.1rem;            /* was 1.75 */
+  margin-top: 1.1rem;
 }
 .philo-card {
   background: #fff;
   border: 2px solid var(--border-light);
   border-radius: 4px;
-  padding: 1.4rem 1.3rem;        /* was 1.85/1.6 */
+  padding: 1.4rem 1.3rem;
   position: relative;
   transition: .3s;
   display: flex;
@@ -896,25 +876,25 @@ body{
 .philo-card .p-tag {
   font-family: var(--serif);
   font-style: italic;
-  font-size: .85rem;             /* was .9 */
+  font-size: .85rem;
   font-weight: 700;
   letter-spacing: .12em;
   color: var(--accent);
-  margin-bottom: 1rem;           /* was 1.6 */
-  padding-bottom: .65rem;        /* was .85 */
+  margin-bottom: 1rem;
+  padding-bottom: .65rem;
   border-bottom: 2px solid var(--border-light);
 }
 .philo-card h5 {
   font-family: var(--serif);
-  font-size: 1.3rem;             /* was 1.45 */
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--black);
   line-height: 1.2;
-  margin-bottom: .65rem;          /* was .95 */
+  margin-bottom: .65rem;
   letter-spacing: -.005em;
 }
 .philo-card p {
-  font-size: .92rem;             /* was .95 */
+  font-size: .92rem;
   color: var(--text-mid);
   line-height: 1.5;
 }
@@ -924,14 +904,14 @@ body{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin-top: 1.4rem;            /* was 2.25 */
+  margin-top: 1.4rem;
 }
 .challenge-card {
   background: #fff;
   border: 2px solid var(--border-light);
   border-left: 5px solid var(--accent);
   border-radius: 0 4px 4px 0;
-  padding: 1.3rem 1.35rem;       /* was 1.75/1.6 */
+  padding: 1.3rem 1.35rem;
   transition: .3s;
 }
 .challenge-card:hover {
@@ -940,15 +920,15 @@ body{
 }
 .challenge-card .c-num {
   font-family: var(--serif);
-  font-size: 2.2rem;             /* was 2.8 */
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--accent);
   line-height: 1;
   font-style: italic;
-  margin-bottom: .7rem;          /* was 1.1 */
+  margin-bottom: .7rem;
 }
 .challenge-card p {
-  font-size: .95rem;             /* was 1 */
+  font-size: .95rem;
   color: var(--black);
   line-height: 1.4;
   font-weight: 600;
@@ -993,12 +973,12 @@ body{
   background: rgba(31,95,212,.12);
   border: 2px solid rgba(31,95,212,.3);
   border-radius: 99px;
-  font-size: .74rem;             /* was .78 */
+  font-size: .74rem;
   font-weight: 800;
   letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--accent-deep);
-  margin-bottom: 1.1rem;         /* was 1.5 */
+  margin-bottom: 1.1rem;
 }
 .booth-eyebrow .live-pulse {
   width: 9px;
@@ -1014,25 +994,25 @@ body{
 }
 .booth-headline {
   font-family: var(--serif);
-  font-size: clamp(1.95rem, 4vw, 3.4rem);   /* was 2.1/4.4/3.8 */
+  font-size: clamp(1.95rem, 4vw, 3.4rem);
   font-weight: 600;
   line-height: 1.05;
   color: var(--black);
   letter-spacing: -.018em;
-  margin-bottom: 1rem;           /* was 1.4 */
+  margin-bottom: 1rem;
 }
 .booth-headline i { color: var(--accent); font-style: italic; font-weight: 500; }
 .booth-subline {
-  font-size: .98rem;             /* was 1.05 */
+  font-size: .98rem;
   color: var(--text-mid);
   line-height: 1.55;
   max-width: 580px;
-  margin-bottom: 1.1rem;         /* was 1.5 */
+  margin-bottom: 1.1rem;
 }
 .booth-credlist {
   display: grid;
-  gap: .55rem;                   /* was .7 */
-  padding: .95rem 0;             /* was 1.25 */
+  gap: .55rem;
+  padding: .95rem 0;
   border-top: 2px solid var(--border-light);
   border-bottom: 2px solid var(--border-light);
 }
@@ -1040,7 +1020,7 @@ body{
   display: flex;
   align-items: center;
   gap: 1rem;
-  font-size: .92rem;             /* was .98 */
+  font-size: .92rem;
   color: var(--text-dark);
   font-weight: 500;
   line-height: 1.35;
@@ -1053,7 +1033,7 @@ body{
   flex-shrink: 0;
 }
 .booth-foot {
-  margin-top: 1.1rem;            /* was 1.6 */
+  margin-top: 1.1rem;
   display: flex;
   align-items: baseline;
   gap: 2rem;
@@ -1061,7 +1041,7 @@ body{
 }
 .booth-foot .bf-item { display: flex; flex-direction: column; }
 .booth-foot .bf-key {
-  font-size: .68rem;             /* was .72 */
+  font-size: .68rem;
   font-weight: 800;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -1070,7 +1050,7 @@ body{
 }
 .booth-foot .bf-val {
   font-family: var(--serif);
-  font-size: 1.1rem;             /* was 1.2 */
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--black);
 }
@@ -1082,10 +1062,10 @@ body{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 440px;                 /* was 480 */
+  height: 440px;
 }
 .booth-label {
-  font-size: .82rem;             /* was .65 */
+  font-size: .82rem;
   font-weight: 800;
   letter-spacing: .26em;
   text-transform: uppercase;
@@ -1103,15 +1083,15 @@ body{
 }
 .booth-num em { color: var(--accent); font-style: normal; }
 .booth-rule {
-  width: 100px;                  /* was 80 */
-  height: 3px;                   /* was 1.5 */
+  width: 100px;
+  height: 3px;
   background: var(--accent);
   margin: 1.5rem 0 1rem;
 }
 .booth-meet {
   font-family: var(--serif);
   font-style: italic;
-  font-size: 1.2rem;             /* was 1.05 */
+  font-size: 1.2rem;
   color: var(--text-mid);
   font-weight: 500;
 }
@@ -1177,7 +1157,7 @@ body{
   text-align: center;
 }
 .screen-hero .hero-eyebrow {
-  font-size: .85rem;             /* was .6 */
+  font-size: .85rem;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--accent-deep);
@@ -1192,8 +1172,8 @@ body{
 .screen-hero .hero-eyebrow::before,
 .screen-hero .hero-eyebrow::after {
   content: '';
-  width: 40px;                   /* was 32 */
-  height: 2.5px;                 /* was 1 */
+  width: 40px;
+  height: 2.5px;
   background: var(--accent);
   display: inline-block;
 }
@@ -1213,9 +1193,9 @@ body{
 .screen-hero .hero-label {
   font-family: var(--serif);
   font-style: italic;
-  font-size: clamp(1.3rem, 2.2vw, 1.9rem);  /* was 1.1/2/1.6 */
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
   color: var(--text-mid);
-  font-weight: 500;              /* was 400 */
+  font-weight: 500;
   letter-spacing: .01em;
   transform: translateY(40px);
   opacity: 0;
@@ -1226,7 +1206,7 @@ body{
   bottom: 2.5rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: .78rem;             /* was .58 */
+  font-size: .78rem;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -1263,7 +1243,7 @@ body{
   justify-content: center;
 }
 .screen-text .ss-num {
-  font-size: .85rem;             /* was .62 */
+  font-size: .85rem;
   letter-spacing: .2em;
   text-transform: uppercase;
   color: var(--accent-deep);
@@ -1278,13 +1258,13 @@ body{
 }
 .screen-text .ss-num::before {
   content: '';
-  width: 32px;                   /* was 24 */
-  height: 2.5px;                 /* was 1 */
+  width: 32px;
+  height: 2.5px;
   background: var(--accent);
 }
 .screen-text h3 {
   font-family: var(--serif);
-  font-size: clamp(2.2rem, 4.2vw, 3.4rem);  /* was 2/4/3.2 */
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: -.015em;
@@ -1296,7 +1276,7 @@ body{
 }
 .screen-text h3 i { color: var(--accent); font-style: italic; font-weight: 500; }
 .screen-text p {
-  font-size: 1.15rem;            /* was 1 */
+  font-size: 1.15rem;
   line-height: 1.65;
   color: var(--text-mid);
   max-width: 520px;
@@ -1326,7 +1306,7 @@ body{
   border-radius: 8px;
   box-shadow: 0 30px 70px rgba(15,42,79,.22);
   background: #fff;
-  border: 2px solid var(--border-light);  /* was 1px */
+  border: 2px solid var(--border-light);
 }
 
 .screen-step[data-anim="bottom-right"] .screen-image > img {
@@ -1348,6 +1328,767 @@ body{
 
 .screen-image.dual {
   display: flex; gap: 1.5rem; align-items: center; justify-content: center;
+}
+
+/* ===== Applicant form mockup (Step 1 Capture) ===== */
+.applicant-form-mock {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border: 3px solid var(--gus-navy);
+  border-radius: 18px;
+  padding: 2.2rem 2.4rem 2rem;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  font-family: var(--sans);
+}
+.applicant-form-mock .afm-title {
+  font-family: var(--sans);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  letter-spacing: -.01em;
+  margin-bottom: .55rem;
+}
+.applicant-form-mock .afm-rule {
+  height: 2px;
+  background: var(--light3);
+  margin-bottom: 1rem;
+}
+.applicant-form-mock .afm-sub {
+  font-size: .92rem;
+  color: var(--text-mid);
+  line-height: 1.45;
+  margin-bottom: 1.4rem;
+}
+.applicant-form-mock .afm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.4rem;
+}
+.applicant-form-mock .afm-field label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: .4rem;
+}
+.applicant-form-mock .afm-input {
+  border: 1.5px solid var(--light3);
+  border-radius: 8px;
+  padding: .7rem .85rem;
+  font-size: .95rem;
+  color: var(--text-dark);
+  background: #fff;
+}
+.applicant-form-mock .afm-upload {
+  border: 1.5px dashed var(--light3);
+  border-radius: 8px;
+  padding: .7rem .75rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.applicant-form-mock .afm-choose {
+  background: rgba(31,95,212,.12);
+  border: 1.5px solid rgba(31,95,212,.32);
+  border-radius: 7px;
+  padding: .5rem .7rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--accent-deep);
+  white-space: nowrap;
+}
+.applicant-form-mock .afm-filename {
+  font-size: .88rem;
+  color: var(--text-mid);
+}
+.applicant-form-mock .afm-cta {
+  margin-top: 1.4rem;
+  background: var(--accent-deep);
+  color: #fff;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: .95rem;
+  border-radius: 8px;
+  letter-spacing: .01em;
+}
+
+/* ===== SOP guide mockup (Step 2 Guide) ===== */
+.sop-guide-mock {
+  width: 100%;
+  max-width: 980px;
+  height: 100%;
+  max-height: 100%;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  font-family: var(--sans);
+}
+.sop-guide-mock .sop-left {
+  padding: 1.3rem 1.4rem;
+  border-right: 2px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sop-guide-mock .sop-right {
+  padding: 1.3rem 1.4rem;
+  overflow-y: auto;
+  min-height: 0;
+}
+.sop-guide-mock .sop-left-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  margin-bottom: .7rem;
+}
+.sop-guide-mock .sop-right-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--gus-navy);
+  margin-bottom: .7rem;
+}
+.sop-guide-mock .sop-draft {
+  border: 1.5px solid var(--light3);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  font-size: .72rem;
+  color: var(--text-dark);
+  line-height: 1.5;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.sop-guide-mock .sop-draft p { margin-bottom: .6rem; }
+.sop-guide-mock .sop-doc-head { font-weight: 700; letter-spacing: .04em; }
+.sop-guide-mock .sop-doc-sub { font-weight: 700; }
+.sop-guide-mock .sop-fade {
+  color: var(--text-light);
+  -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent);
+          mask-image: linear-gradient(180deg, #000 30%, transparent);
+}
+.sop-guide-mock .sop-btns {
+  margin-top: .9rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.sop-guide-mock .sop-btn {
+  text-align: center;
+  font-weight: 800;
+  font-size: .82rem;
+  padding: .6rem;
+  border-radius: 7px;
+  color: #fff;
+}
+.sop-guide-mock .sop-btn.green { background: #1f9d55; }
+.sop-guide-mock .sop-btn.red { background: #d62839; }
+.sop-guide-mock .sop-btn.navy { background: var(--gus-navy); }
+.sop-guide-mock .sop-right p {
+  font-size: .74rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin-bottom: .55rem;
+}
+.sop-guide-mock .sop-right p b { color: var(--black); }
+.sop-guide-mock .sop-greet { color: var(--text-dark); }
+.sop-guide-mock .sop-bold { font-weight: 700; color: var(--black) !important; }
+.sop-guide-mock .sop-warn { color: #d62839 !important; font-weight: 600; }
+.sop-guide-mock .sop-section {
+  color: #d62839 !important;
+  font-weight: 800;
+  font-size: .82rem !important;
+  margin-top: .3rem;
+}
+
+/* ===== Interview prep mockup (Step 3 Prepare) ===== */
+.prep-mock {
+  width: 100%;
+  max-width: 920px;
+  background: var(--light);
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  overflow: hidden;
+  font-family: var(--sans);
+}
+.prep-mock .prep-header {
+  background: var(--gus-navy);
+  padding: 1.1rem 1.6rem .9rem;
+}
+.prep-mock .prep-title {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: .01em;
+}
+.prep-mock .prep-rule {
+  height: 2px;
+  width: 160px;
+  background: rgba(255,255,255,.5);
+  margin: .5rem 0;
+}
+.prep-mock .prep-sub {
+  font-size: .82rem;
+  color: rgba(255,255,255,.85);
+}
+.prep-mock .prep-tabs {
+  background: var(--gus-navy);
+  border-top: 1px solid rgba(255,255,255,.12);
+  padding: .7rem 1.6rem;
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.prep-mock .prep-tab {
+  font-size: .8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.65);
+  white-space: nowrap;
+}
+.prep-mock .prep-tab.active { color: #fff; }
+.prep-mock .prep-body { padding: 1.4rem 1.6rem; }
+.prep-mock .prep-callout {
+  background: #fff;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: .85rem 1.1rem;
+  font-size: .85rem;
+  color: var(--text-dark);
+  margin-bottom: 1.2rem;
+}
+.prep-mock .prep-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.prep-mock .prep-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  box-shadow: 0 4px 14px rgba(15,42,79,.06);
+}
+.prep-mock .prep-icon { font-size: 1.5rem; margin-bottom: .6rem; }
+.prep-mock .prep-card h5 {
+  font-size: .98rem;
+  font-weight: 700;
+  color: var(--gus-navy);
+  margin-bottom: .4rem;
+}
+.prep-mock .prep-card p {
+  font-size: .78rem;
+  color: var(--text-mid);
+  line-height: 1.4;
+}
+.prep-mock .prep-foot {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1.5px solid var(--light3);
+  display: flex;
+  justify-content: flex-end;
+}
+.prep-mock .prep-next {
+  background: var(--gus-navy);
+  color: #fff;
+  font-weight: 800;
+  font-size: .85rem;
+  padding: .75rem 1.4rem;
+  border-radius: 8px;
+}
+
+/* ===== Identity verify mockup (Step 4 Verify) ===== */
+.verify-mock {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem;
+  align-items: start;
+  font-family: var(--sans);
+}
+.verify-mock .verify-card {
+  background: #fff;
+  border: 2px solid var(--gus-navy);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 24px 60px rgba(15,42,79,.2);
+}
+.verify-mock .verify-cam {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(90deg,#e9ebef 0 6%,#dfe2e7 6% 7%,#e9ebef 7% 14%,#dfe2e7 14% 15%,#e9ebef 15% 100%);
+  margin-bottom: .8rem;
+}
+.verify-mock .verify-frame.rect {
+  position: absolute;
+  inset: 18% 14%;
+  border: 2px dashed #2e9e4f;
+  border-radius: 4px;
+}
+.verify-mock .verify-frame.oval {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52%;
+  height: 78%;
+  border: 3px dashed #f0a818;
+  border-radius: 50%;
+}
+.verify-mock .verify-avatar {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42%;
+  height: 72%;
+}
+.verify-mock .verify-avatar svg { width: 100%; height: 100%; }
+.verify-mock .verify-hint {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20,24,30,.78);
+  color: #fff;
+  font-size: .68rem;
+  padding: .3rem .6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.verify-mock .verify-btn {
+  background: var(--accent-deep);
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+  font-size: .85rem;
+  padding: .7rem;
+  border-radius: 7px;
+}
+.verify-mock .verify-step {
+  font-size: .98rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  margin: .85rem 0 .5rem;
+}
+.verify-mock .verify-step.center { text-align: center; margin-bottom: .6rem; }
+.verify-mock .verify-list {
+  padding-left: 1.1rem;
+  margin-bottom: .8rem;
+}
+.verify-mock .verify-list li {
+  font-size: .8rem;
+  color: var(--text-mid);
+  line-height: 1.4;
+  margin-bottom: .25rem;
+}
+.verify-mock .verify-badges {
+  display: flex;
+  gap: .6rem;
+  justify-content: flex-end;
+}
+.verify-mock .verify-badges.center { justify-content: center; margin-bottom: .8rem; }
+.verify-mock .verify-badge {
+  background: #e3f5e9;
+  color: #1f7a3d;
+  font-size: .76rem;
+  font-weight: 700;
+  padding: .4rem .7rem;
+  border-radius: 6px;
+}
+
+/* ===== Assessment room mockup (Step 5 Assess) ===== */
+.assess-mock {
+  width: 100%;
+  max-width: 980px;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  padding: 1.3rem 1.5rem;
+  font-family: var(--sans);
+}
+.assess-mock .assess-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.assess-mock .assess-logo {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.05rem;
+}
+.assess-mock .assess-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  letter-spacing: -.01em;
+}
+.assess-mock .assess-rule {
+  height: 2px;
+  background: var(--light3);
+  margin: .8rem 0 1.1rem;
+}
+.assess-mock .assess-body {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.assess-mock .assess-cam {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 300px;
+  background: linear-gradient(90deg,#e9ebef 0 6%,#dfe2e7 6% 7%,#e9ebef 7% 14%,#dfe2e7 14% 15%,#e9ebef 15% 100%);
+}
+.assess-mock .assess-avatar {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 70%;
+}
+.assess-mock .assess-avatar svg { width: 100%; height: 100%; }
+.assess-mock .assess-chat {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+.assess-mock .assess-status {
+  border: 1.5px solid var(--light3);
+  border-radius: 8px;
+  padding: .7rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .88rem;
+  color: #c0392b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+}
+.assess-mock .assess-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #1f9d55;
+}
+.assess-mock .assess-stream {
+  border: 1.5px solid var(--light3);
+  border-radius: 8px;
+  padding: .9rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  flex: 1;
+  overflow: hidden;
+}
+.assess-mock .assess-msg {
+  font-size: .8rem;
+  line-height: 1.4;
+  padding: .7rem .9rem;
+  border-radius: 8px;
+}
+.assess-mock .assess-msg.ai {
+  background: var(--accent-deep);
+  color: #fff;
+}
+.assess-mock .assess-msg.sys {
+  background: #e8f1fd;
+  color: var(--text-mid);
+  font-style: italic;
+  text-align: center;
+}
+.assess-mock .assess-connect {
+  background: #9aa3ad;
+  color: #fff;
+  text-align: center;
+  font-weight: 800;
+  font-size: .88rem;
+  padding: .85rem;
+  border-radius: 8px;
+}
+
+/* ===== Evaluator mockup (Evaluator Step 2 Convert) ===== */
+.eval-mock {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  padding: 1.4rem 1.6rem;
+  overflow-y: auto;
+  font-family: var(--sans);
+}
+.eval-mock .eval-head { display: flex; align-items: center; gap: .9rem; margin-bottom: .9rem; }
+.eval-mock .eval-title { font-size: 1.4rem; font-weight: 800; color: var(--black); }
+.eval-mock .eval-mode {
+  background: #f25c2a; color: #fff; font-size: .7rem; font-weight: 800;
+  padding: .35rem .7rem; border-radius: 99px; text-transform: none;
+}
+.eval-mock .eval-callout {
+  background: #eaf3fb; border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0; padding: .7rem .9rem;
+  font-size: .78rem; color: var(--text-dark); margin-bottom: 1rem;
+}
+.eval-mock .eval-row { display: flex; align-items: center; gap: 1rem; margin-bottom: .7rem; }
+.eval-mock .eval-lbl { font-size: .85rem; font-weight: 700; color: var(--text-dark); width: 90px; flex-shrink: 0; }
+.eval-mock .eval-select {
+  flex: 1; border: 1.5px solid var(--light3); border-radius: 7px;
+  padding: .55rem .8rem; font-size: .82rem; color: var(--text-dark); background: #f8f9fb;
+}
+.eval-mock .eval-field { margin-bottom: .8rem; }
+.eval-mock .eval-fl { display: block; font-size: .92rem; font-weight: 800; color: var(--black); margin-bottom: .4rem; }
+.eval-mock .eval-file { font-size: .82rem; color: var(--text-dark); display: flex; align-items: center; gap: .55rem; }
+.eval-mock .eval-choose {
+  border: 1.5px solid var(--light3); border-radius: 5px; padding: .3rem .6rem;
+  font-size: .76rem; color: var(--text-dark); background: #f3f4f6; white-space: nowrap;
+}
+.eval-mock .eval-upload {
+  background: #2eaa52; color: #fff; font-weight: 700; font-size: .82rem;
+  padding: .55rem .9rem; border-radius: 6px; display: inline-block; margin: .4rem 0;
+}
+.eval-mock .eval-proc { font-size: .82rem; color: var(--text-mid); margin-bottom: .7rem; }
+.eval-mock .eval-toggles { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: 1rem; }
+.eval-mock .eval-tog {
+  text-align: center; font-size: .8rem; font-weight: 700; padding: .65rem;
+  border-radius: 6px; background: #e3e5e9; color: var(--text-mid);
+}
+.eval-mock .eval-tog.active { background: #2eaa52; color: #fff; }
+.eval-mock .eval-rt { font-size: 1.05rem; font-weight: 800; color: var(--black); margin-bottom: .6rem; }
+.eval-mock .eval-result {
+  background: #eef5fc; border: 1.5px solid #dce8f4; border-radius: 8px; padding: 1rem 1.1rem;
+}
+.eval-mock .eval-result p { font-size: .76rem; color: var(--text-mid); line-height: 1.5; margin-bottom: .55rem; }
+.eval-mock .eval-result p b { color: var(--black); }
+.eval-mock .eval-result .eval-h { font-weight: 800; color: var(--black); font-size: .8rem; margin-top: .3rem; }
+
+/* ===== Grade conversion mockup (Evaluator Step 3 Assess) ===== */
+.grade-mock {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  padding: 1.4rem 1.6rem;
+  overflow-y: auto;
+  font-family: var(--sans);
+}
+.grade-mock .grade-proc { font-size: .82rem; color: var(--text-mid); margin-bottom: .7rem; }
+.grade-mock .grade-toggles { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: 1rem; }
+.grade-mock .grade-tog {
+  text-align: center; font-size: .8rem; font-weight: 700; padding: .65rem;
+  border-radius: 6px; background: #e3e5e9; color: var(--text-mid);
+}
+.grade-mock .grade-tog.active { background: #2eaa52; color: #fff; }
+.grade-mock .grade-rt { font-size: 1.05rem; font-weight: 800; color: var(--black); margin-bottom: .6rem; }
+.grade-mock .grade-result {
+  background: #eef5fc; border: 1.5px solid #dce8f4; border-radius: 8px; padding: 1rem 1.1rem;
+}
+.grade-mock .grade-result p { font-size: .74rem; color: var(--text-mid); line-height: 1.5; margin-bottom: .55rem; }
+.grade-mock .grade-result p b { color: var(--black); }
+.grade-mock .grade-h { font-weight: 800; color: var(--black); font-size: .8rem !important; margin-top: .4rem; }
+.grade-mock .grade-mark { font-weight: 700; color: var(--text-dark); }
+.grade-mock .grade-mono {
+  font-family: var(--mono);
+  font-size: .68rem !important;
+  color: var(--text-dark) !important;
+  line-height: 1.7 !important;
+}
+
+/* ===== Decide / rubric mockup (Evaluator Step 4 Decide) ===== */
+.decide-mock {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  padding: 1.4rem 1.6rem;
+  overflow-y: auto;
+  font-family: var(--sans);
+}
+.decide-mock .decide-rt { font-size: 1.05rem; font-weight: 800; color: var(--black); margin-bottom: .6rem; }
+.decide-mock .decide-result {
+  background: #eef5fc; border: 1.5px solid #dce8f4; border-radius: 8px; padding: 1rem 1.1rem;
+}
+.decide-mock .decide-result p { font-size: .74rem; color: var(--text-mid); line-height: 1.5; margin-bottom: .55rem; }
+.decide-mock .decide-result p b { color: var(--black); }
+.decide-mock .decide-result p i { color: #c0392b; font-style: italic; }
+.decide-mock .decide-h { font-weight: 800; color: var(--black); font-size: .82rem !important; margin-top: .5rem; }
+
+/* ===== CreditMap upload mockup (CreditMap Step 1 Upload) ===== */
+.cmap-mock {
+  width: 100%;
+  max-width: 940px;
+  height: 100%;
+  background: #fff;
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(15,42,79,.22);
+  padding: 1.4rem 1.6rem;
+  overflow-y: auto;
+  font-family: var(--sans);
+}
+.cmap-mock .cmap-head { display: flex; align-items: center; justify-content: center; gap: .9rem; margin-bottom: 1.1rem; }
+.cmap-mock .cmap-logo { font-weight: 700; color: var(--accent); font-size: .95rem; }
+.cmap-mock .cmap-title { font-size: 1.3rem; font-weight: 800; color: var(--gus-navy); }
+.cmap-mock .cmap-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: 1rem; }
+.cmap-mock .cmap-step {
+  text-align: center; font-size: .82rem; font-weight: 700; padding: .7rem;
+  border-radius: 6px; background: #e3e5e9; color: var(--text-mid);
+}
+.cmap-mock .cmap-step.active { background: #2eaa52; color: #fff; }
+.cmap-mock .cmap-intro { font-size: .82rem; color: var(--text-mid); line-height: 1.45; margin-bottom: 1.1rem; }
+.cmap-mock .cmap-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.1rem; }
+.cmap-mock .cmap-inst {
+  border: 1.5px solid var(--light3); border-radius: 10px; padding: 1.1rem 1.2rem; background: #fafbfc;
+}
+.cmap-mock .cmap-inst-title { font-size: 1.05rem; font-weight: 800; padding-bottom: .6rem; margin-bottom: .8rem; border-bottom: 1.5px solid var(--light3); }
+.cmap-mock .cmap-inst-title.a { color: var(--accent); }
+.cmap-mock .cmap-inst-title.b { color: #8e44ad; }
+.cmap-mock .cmap-fl { display: block; font-size: .8rem; font-weight: 800; color: var(--black); margin-bottom: .4rem; }
+.cmap-mock .cmap-input {
+  border: 1.5px solid var(--light3); border-radius: 7px; padding: .55rem .75rem;
+  font-size: .82rem; color: var(--text-dark); background: #fff; margin-bottom: .9rem;
+}
+.cmap-mock .cmap-file {
+  border: 1.5px solid var(--light3); border-radius: 7px; padding: .55rem .7rem;
+  font-size: .72rem; color: var(--text-dark); background: #f3f4f6;
+  display: flex; align-items: center; gap: .5rem;
+}
+.cmap-mock .cmap-choose {
+  border: 1.5px solid var(--light3); border-radius: 5px; padding: .25rem .55rem;
+  font-size: .72rem; color: var(--text-dark); background: #fff; white-space: nowrap;
+}
+.cmap-mock .cmap-custom {
+  border: 1.5px solid var(--light3); border-radius: 10px; padding: 1.1rem 1.2rem; background: #fafbfc; margin-bottom: 1rem;
+}
+.cmap-mock .cmap-textarea {
+  border: 1.5px solid var(--light3); border-radius: 7px; padding: .6rem .75rem;
+  font-size: .8rem; color: var(--text-dark); background: #fff; min-height: 58px;
+}
+.cmap-mock .cmap-process {
+  background: var(--accent); color: #fff; text-align: center; font-weight: 800;
+  font-size: .9rem; padding: .85rem; border-radius: 8px; margin-bottom: .8rem;
+}
+.cmap-mock .cmap-analyzing { text-align: center; font-size: .8rem; font-style: italic; color: var(--text-mid); }
+.cmap-mock .cmap-process.green { background: #2eaa52; }
+
+/* CreditMap course tables (Step 2 Extract) */
+.cmap-mock .cmap-grp { font-size: 1.05rem; font-weight: 800; margin: .4rem 0 .7rem; }
+.cmap-mock .cmap-grp.a { color: var(--accent); }
+.cmap-mock .cmap-grp.b { color: #8e44ad; }
+.cmap-mock .cmap-table {
+  border: 1.5px solid var(--light3); border-radius: 8px; overflow: hidden; margin-bottom: 1.1rem;
+}
+.cmap-mock .cmap-trow {
+  display: grid;
+  grid-template-columns: 78px 1.6fr .55fr .7fr 2.6fr;
+  gap: .7rem; padding: .6rem .8rem; border-bottom: 1px solid var(--light3); align-items: center;
+}
+.cmap-mock .cmap-trow:last-child { border-bottom: 0; }
+.cmap-mock .cmap-trow.head { background: #f3f4f6; }
+.cmap-mock .cmap-trow.head span { font-size: .68rem; font-weight: 800; color: var(--text-dark); text-transform: none; }
+.cmap-mock .cmap-trow span { font-size: .7rem; color: var(--text-mid); line-height: 1.4; }
+.cmap-mock .cmap-trow:not(.head) { background: #fdfdf6; }
+.cmap-mock .cmap-code {
+  display: inline-block; font-style: normal; font-size: .64rem; font-weight: 700;
+  padding: .25rem .45rem; border-radius: 99px; white-space: nowrap;
+}
+.cmap-mock .cmap-code.a { color: var(--accent); background: #e8f1fd; border: 1px solid #c4dcf7; }
+.cmap-mock .cmap-code.b { color: #8e44ad; background: #f5ecfa; border: 1px solid #e3cef0; }
+
+/* CreditMap report (Step 3 Review) */
+.cmap-mock .cmap-report {
+  border: 1.5px solid var(--light3); border-radius: 8px; padding: 1.6rem 1.8rem; background: #fff;
+}
+.cmap-mock .crep-logo {
+  text-align: center; font-weight: 700; color: var(--accent); font-size: 1rem; margin-bottom: 1rem;
+}
+.cmap-mock .crep-logo span { font-size: .6rem; color: #f25c2a; }
+.cmap-mock .crep-title {
+  font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--black);
+  text-align: center; line-height: 1.15; margin-bottom: .5rem;
+}
+.cmap-mock .crep-italic {
+  font-family: var(--serif); font-style: italic; font-size: .8rem; color: var(--text-mid);
+  text-align: center; margin-bottom: .5rem;
+}
+.cmap-mock .crep-meta { font-size: .76rem; color: var(--text-dark); text-align: center; margin-bottom: .25rem; }
+.cmap-mock .crep-meta b { font-weight: 700; }
+.cmap-mock .crep-section {
+  font-family: var(--serif); font-size: 1.2rem; font-weight: 700; color: var(--black);
+  text-align: center; margin: 1.4rem 0 .8rem; padding-bottom: .5rem; border-bottom: 1.5px solid var(--light3);
+}
+.cmap-mock .cmap-report p { font-size: .76rem; color: var(--text-mid); line-height: 1.5; margin-bottom: .55rem; }
+.cmap-mock .cmap-report p b { color: var(--black); }
+.cmap-mock .crep-sub { font-weight: 600; color: var(--text-dark); padding-bottom: .35rem; border-bottom: 1px solid var(--light3); }
+.cmap-mock .crep-list { padding-left: 1.1rem; margin-top: .5rem; }
+.cmap-mock .crep-list li { font-size: .74rem; color: var(--text-mid); line-height: 1.5; margin-bottom: .5rem; }
+.cmap-mock .crep-list li b { color: var(--black); }
+
+/* CreditMap final docs triple (Step 4 Map) */
+.screen-image.triple .cmap-doc {
+  background: #fff;
+  border: 1.5px solid var(--light3);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  width: auto;
+  max-width: 32%;
+  height: 85%;
+  max-height: 85%;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(15,42,79,.18);
+  font-family: var(--sans);
+  flex: 0 1 auto;
+}
+.cmap-doc .cdoc-h {
+  font-family: var(--serif); font-size: .95rem; font-weight: 700; color: var(--black);
+  text-align: center; margin: .6rem 0 .6rem; padding-bottom: .4rem; border-bottom: 1.5px solid var(--light3);
+}
+.cmap-doc .cdoc-h:first-child { margin-top: 0; }
+.cmap-doc .cdoc-p { font-size: .62rem; color: var(--text-mid); line-height: 1.45; margin-bottom: .55rem; }
+.cmap-doc .cdoc-p b { color: var(--black); }
+.cmap-doc .cdoc-sub { font-size: .68rem; font-weight: 700; color: var(--text-dark); margin: .5rem 0 .4rem; }
+.cmap-doc .cdoc-table { border: 1px solid var(--light3); border-radius: 5px; overflow: hidden; }
+.cmap-doc .cdoc-row {
+  display: grid; grid-template-columns: .8fr .8fr 1fr 1.8fr; gap: .4rem;
+  padding: .4rem .5rem; border-bottom: 1px solid var(--light3); align-items: start;
+}
+.cmap-doc .cdoc-row:last-child { border-bottom: 0; }
+.cmap-doc .cdoc-row.head { background: #f3f4f6; }
+.cmap-doc .cdoc-row.head span { font-size: .56rem; font-weight: 800; color: var(--text-dark); }
+.cmap-doc .cdoc-row span { font-size: .56rem; color: var(--text-mid); line-height: 1.35; }
+.cmap-doc .cdoc-row .m-partial { color: #c0392b; font-weight: 800; }
+.cmap-doc .cdoc-row .m-surplus { color: var(--accent); font-weight: 800; }
+.cmap-doc .cdoc-row .m-deficit { color: #c0392b; font-weight: 800; }
+.cmap-doc .cdoc-list { list-style: none; padding: 0; margin: 0 0 .6rem; }
+.cmap-doc .cdoc-list li {
+  font-size: .62rem; color: var(--text-mid); line-height: 1.4; padding-left: .7rem;
+  position: relative; margin-bottom: .25rem;
+}
+.cmap-doc .cdoc-list li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+.cmap-doc .cdoc-list.cols { columns: 2; column-gap: .8rem; }
+.cmap-doc .cdoc-sign { font-size: .6rem; color: var(--text-mid); margin-bottom: .5rem; }
+.cmap-doc .cdoc-export {
+  background: #3d6b80; color: #fff; text-align: center; font-weight: 700;
+  font-size: .72rem; padding: .55rem; border-radius: 6px; margin-top: .6rem;
 }
 .screen-image.dual > img {
   width: auto; max-width: 47%; height: auto; max-height: 90%;
@@ -1408,7 +2149,7 @@ body{
 .screen-outro p {
   font-family: var(--serif);
   font-style: italic;
-  font-size: clamp(1.3rem, 2.2vw, 1.75rem);  /* was 1.1/2/1.5 */
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
   color: var(--text-mid);
   max-width: 760px;
   margin: 0;
@@ -1425,7 +2166,7 @@ body{
   position: absolute;
   top: 1.75rem;
   right: 2rem;
-  font-size: .75rem;             /* was .55 */
+  font-size: .75rem;
   letter-spacing: .2em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -1437,7 +2178,7 @@ body{
 }
 .stage-counter .sc-current {
   font-family: var(--serif);
-  font-size: 1.3rem;             /* was 1 */
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--accent);
   font-style: italic;
@@ -1449,8 +2190,8 @@ body{
   font-style: italic;
 }
 .stage-counter .sc-bar {
-  width: 100px;                  /* was 80 */
-  height: 3px;                   /* was 2 */
+  width: 100px;
+  height: 3px;
   background: var(--border-light);
   position: relative;
   overflow: hidden;
@@ -1471,10 +2212,10 @@ body{
   .screen { padding: 4rem 1.5rem 2rem; }
 }
 
-/* ===================== PERSISTENT GUS BAR — heavily darkened ===================== */
+/* ===================== PERSISTENT GUS BAR ===================== */
 .gus-bar {
   background: #fff;
-  border-top: 3px solid var(--border-mid);  /* was 1px / --border-light */
+  border-top: 3px solid var(--border-mid);
   display: grid;
   grid-template-rows: auto 1fr auto;
   position: relative;
@@ -1486,26 +2227,26 @@ body{
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: .6rem 3rem;           /* was .85 */
+  padding: .6rem 3rem;
   border-bottom: 2px solid var(--border-light);
   background: var(--light);
   flex-wrap: wrap;
 }
 .gus-bar .ecb-label {
-  font-size:.78rem;              /* was .52 */
+  font-size:.78rem;
   letter-spacing:.18em;
   text-transform:uppercase;
   color:var(--text-mid);
   font-weight:800;
 }
 .gus-bar .ecb-divider {
-  width:2px;                     /* was 1 */
-  height:18px;                   /* was 14 */
+  width:2px;
+  height:18px;
   background:var(--border-mid);
 }
 .gus-bar .ecb-mark {
-  font-size:1rem;                /* was .78 */
-  font-weight:700;               /* was 600 */
+  font-size:1rem;
+  font-weight:700;
   color:var(--black);
 }
 .gus-bar .ecb-mark b { color: var(--accent); font-weight: 700; }
@@ -1517,7 +2258,7 @@ body{
   padding: 0 3rem;
 }
 .gus-bar .eco-s {
-  padding: .65rem .5rem;          /* was .9 */
+  padding: .65rem .5rem;
   text-align: center;
   border-right: 2px solid var(--border-light);
   position: relative;
@@ -1526,13 +2267,13 @@ body{
 .gus-bar .eco-s strong {
   display: block;
   font-family: var(--serif);
-  font-size: 1.5rem;             /* was 1.7 */
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--black);
   line-height: 1;
 }
 .gus-bar .eco-s span {
-  font-size: .68rem;             /* was .7 */
+  font-size: .68rem;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -1562,10 +2303,10 @@ body{
   gap: 3rem;
   animation: scrollT 50s linear infinite;
   width: max-content;
-  padding: .55rem 0;             /* was .75 */
+  padding: .55rem 0;
 }
 .ticker span {
-  font-size: .78rem;             /* was .6 */
+  font-size: .78rem;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
@@ -1604,6 +2345,7 @@ body{
   .gus-bar .eco-s:nth-child(3) { border-right: 0; }
   .topbar { padding: 0 1.5rem; }
   .slide { padding: 90px 1.75rem 2rem; }
+  .topbar .brand img.brand-logo { height: 30px; }
 }
 
 /* ===================== SLIDE 2: ABOUT ===================== */
@@ -1619,14 +2361,14 @@ body{
   font-size: 22rem;
   line-height: 1;
   letter-spacing: -.04em;
-  color: rgba(31,95,212,.07);    /* was .045 — slightly more visible */
+  color: rgba(31,95,212,.07);
 }
 
 .about-light-slide .sec-label { margin-bottom: 1.5rem; }
 
 .about-headline {
   font-family: var(--serif);
-  font-weight: 600;              /* was 500 */
+  font-weight: 600;
   font-size: clamp(2.4rem, 4.8vw, 4.4rem);
   line-height: 1.04;
   letter-spacing: -.018em;
@@ -1637,26 +2379,26 @@ body{
 .about-headline i { font-style: italic; font-weight: 500; color: var(--accent); }
 
 .about-lead {
-  font-size: 1.1rem;             /* was .9-1 */
+  font-size: 1.1rem;
   line-height: 1.65;
   color: var(--text-mid);
   max-width: 62ch;
   margin-bottom: 1.8rem;
   font-weight: 400;
 }
-.about-lead strong { color: var(--black); font-weight: 600; }  /* was --text-dark / 500 */
+.about-lead strong { color: var(--black); font-weight: 600; }
 
 .about-foot-mark {
   position: absolute;
   bottom: 1.5rem;
-  right: 2.5rem;                 /* was 8rem — pull off the parallax circle's arc on the right */
+  right: 2.5rem;
   font-family: var(--sans);
   font-size: .78rem;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--text-mid);
   font-weight: 700;
-  z-index: 6;                    /* was 3 — sit above parallax layers cleanly */
+  z-index: 6;
 }
 .about-foot-mark b { color: var(--accent); font-weight: 700; }
 
@@ -1681,20 +2423,20 @@ body{
   min-height: 380px;
   padding: 2.5rem 2.3rem 3.6rem;
   background: var(--white);
-  border: 2px solid var(--border-light);  /* was 1px */
+  border: 2px solid var(--border-light);
   box-shadow: 0 12px 48px -16px rgba(15,42,79,.22), 0 2px 8px -4px rgba(15,42,79,.1);
   overflow: hidden;
 }
 .cycle-display .cycle-frame {
   position: absolute;
   top: 0; left: 0;
-  width: 5px;                    /* was 4 */
+  width: 5px;
   height: 100%;
   background: var(--accent);
 }
 .cycle-display .cycle-eyebrow {
   font-family: var(--sans);
-  font-size: .82rem;             /* was .62 */
+  font-size: .82rem;
   letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--accent-deep);
@@ -1723,7 +2465,7 @@ body{
   font-family: var(--serif);
   font-style: italic;
   font-weight: 600;
-  font-size: 2.8rem;             /* was 2.6 */
+  font-size: 2.8rem;
   line-height: 1;
   color: var(--accent);
   letter-spacing: -.01em;
@@ -1731,8 +2473,8 @@ body{
 }
 .cycle-slide .cs-headline {
   font-family: var(--serif);
-  font-size: 1.75rem;            /* was 1.55 */
-  font-weight: 700;              /* was 600 */
+  font-size: 1.75rem;
+  font-weight: 700;
   line-height: 1.18;
   color: var(--black);
   margin-bottom: .95rem;
@@ -1740,7 +2482,7 @@ body{
 }
 .cycle-slide .cs-headline i { font-style: italic; font-weight: 500; color: var(--accent); }
 .cycle-slide .cs-body {
-  font-size: 1rem;               /* was .82 */
+  font-size: 1rem;
   line-height: 1.55;
   color: var(--text-mid);
   font-weight: 400;
@@ -1755,15 +2497,15 @@ body{
   z-index: 3;
 }
 .cycle-display .cd-dot {
-  width: 28px;                   /* was 22 */
-  height: 3px;                   /* was 2 */
-  background: rgba(5,8,13,.25);  /* was .18 */
+  width: 28px;
+  height: 3px;
+  background: rgba(5,8,13,.25);
   border: 0; padding: 0; cursor: pointer;
   transition: background .35s, width .35s;
 }
 .cycle-display .cd-dot.is-active {
   background: var(--accent);
-  width: 44px;                   /* was 36 */
+  width: 44px;
 }
 .cycle-display .cd-dot:hover { background: var(--accent); }
 
@@ -1812,11 +2554,11 @@ body{
   position: absolute;
   top: 24px; right: 24px;
   font-family: var(--sans);
-  font-size: .72rem;             /* was .58 */
+  font-size: .72rem;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--text-mid);        /* darker */
-  font-weight: 800;              /* was 500 */
+  color: var(--text-mid);
+  font-weight: 800;
   white-space: nowrap;
   opacity: 0; transform: translateX(8px);
   transition: opacity .8s ease, transform .8s ease;
@@ -1896,7 +2638,7 @@ body{
 
   <!-- ============ TOP BAR ============ -->
   <div class="topbar">
-    <div class="brand">In<b>Uni</b> Global</div>
+    <div class="brand"><img class="brand-logo" src="data:image/png;base64,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" alt="InUni"></div>
     <div class="progress" id="progress">
       <button data-go="0" class="active"><div class="dot"></div></button>
       <button data-go="1"><div class="dot"></div></button>
@@ -2315,7 +3057,52 @@ body{
                 <p>Applicants upload their CV and SOP alongside core details — one structured intake for every market. Every file lands in the same shape, ready for review.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1zRmuWK4FYqBEHdCqjfGsMu6SmRKhyZRN&sz=w1600" alt="Capture — Applicant Profile">
+                <div class="applicant-form-mock">
+                  <h4 class="afm-title">Applicant Details</h4>
+                  <div class="afm-rule"></div>
+                  <p class="afm-sub">Please provide your information and upload your documents to prepare your assessment.</p>
+                  <div class="afm-grid">
+                    <div class="afm-field">
+                      <label>Full Name</label>
+                      <div class="afm-input">Marina Sunehag</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Email Address</label>
+                      <div class="afm-input">ss@gmail.com</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Student ID</label>
+                      <div class="afm-input">C1008</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Date of Birth</label>
+                      <div class="afm-input">07/05/2026</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Target University</label>
+                      <div class="afm-input">CCCU</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Target Program</label>
+                      <div class="afm-input">MBA</div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Upload CV (PDF/Word)</label>
+                      <div class="afm-upload">
+                        <span class="afm-choose">Choose File</span>
+                        <span class="afm-filename">Marina Sunehag CV....</span>
+                      </div>
+                    </div>
+                    <div class="afm-field">
+                      <label>Upload SOP (Word preferred)</label>
+                      <div class="afm-upload">
+                        <span class="afm-choose">Choose File</span>
+                        <span class="afm-filename">essay.docx</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="afm-cta">Next: Review Documents</div>
+                </div>
               </div>
             </div>
 
@@ -2326,7 +3113,37 @@ body{
                 <p>Feedback highlights what each university is looking to see — applicants address it in their own voice, with AI-content detection on submission. Structural feedback only; the work belongs to the applicant.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1hPoTT2jPTUejVxFCjbtV0CQ03yejpeNJ&sz=w1600" alt="Guide — Authentic Essays">
+                <div class="sop-guide-mock">
+                  <div class="sop-left">
+                    <h4 class="sop-left-title">Your Statement of Purpose (Draft)</h4>
+                    <div class="sop-draft">
+                      <p class="sop-doc-head">STATEMENT OF PURPOSE</p>
+                      <p>Study Permit Application – Canada</p>
+                      <p>My name is Marina Sunehag, a citizen of Sweden, currently residing in the United Kingdom. I am writing this Statement of Purpose in support of my application for a Canadian Study Permit to pursue the Master of Business Administration (MBA) program at University Canada West (UCW), commencing in September 2026.</p>
+                      <p class="sop-doc-sub">Academic Background and Motivation</p>
+                      <p>I have successfully completed a Bachelor of Science (BSc) in Political Science in the United Kingdom in 2024. My undergraduate studies provided me with a strong foundation in analytical thinking, policy analysis, governance, economics, and global affairs.</p>
+                      <p class="sop-fade">While my academic background is rooted in political science, I recognized that to translate my…</p>
+                    </div>
+                    <div class="sop-btns">
+                      <div class="sop-btn green">Export Final SOP to Word (.doc)</div>
+                      <div class="sop-btn red">Export Final SOP to PDF</div>
+                      <div class="sop-btn navy">Submit for Review</div>
+                    </div>
+                  </div>
+                  <div class="sop-right">
+                    <h4 class="sop-right-title">Statement of Purpose Revision Guide</h4>
+                    <p class="sop-greet">Dear Student,</p>
+                    <p>During the initial evaluation of your uploaded essay, some gaps were identified when comparing it with the key elements expected in a Statement of Purpose.</p>
+                    <p>Please review the feedback below and apply the suggested changes on the left-hand side. Ensure your statement clearly explains your academic background, motivation, and career goals, while remaining consistent with your CV.</p>
+                    <p class="sop-bold">Once editing is complete, click submit to proceed to the next stage.</p>
+                    <p class="sop-warn">Please note that all essays will be subject to AI content detection. Any submission exceeding 30% AI-generated content may not be accepted.</p>
+                    <p class="sop-section">Required Revisions:</p>
+                    <p><b>1. Accurate University and Course Selection</b> — your draft mentions University Canada West and Canada; this statement is for Canterbury Christ Church University (CCCU) in the UK. Update all references to name, country, and location.</p>
+                    <p><b>2. Motivation for choosing CCCU</b> — elaborate on what specifically draws you to CCCU: graduate employment, community, or the Canterbury campus close to London.</p>
+                    <p><b>3. Addressing the Timeline Gap</b> — explain your activities between completing your BSc in 2024 and your 2026 start date for a consistent narrative.</p>
+                    <p><b>4. Linking Past Studies to an MBA</b> — bridge the transition from Political Science to an MBA by expanding on transferable analytical and policy skills.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2337,7 +3154,48 @@ body{
                 <p>Interactive briefings on the city, programmes, and visa rules — applicants build a personal blueprint before the interview. By the time they sit down, they know what they're walking into.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1TriKJnJD_IWJX4WpL9jMzpK7bDFoTfGX&sz=w1600" alt="Prepare — Interview Readiness">
+                <div class="prep-mock">
+                  <div class="prep-header">
+                    <h4 class="prep-title">CCCU Interview Preparation</h4>
+                    <div class="prep-rule"></div>
+                    <p class="prep-sub">Click any card to explore. Pin the facts that matter most to build your personal blueprint.</p>
+                  </div>
+                  <div class="prep-tabs">
+                    <span class="prep-tab active">📍 Location &amp; City</span>
+                    <span class="prep-tab">🏛️ Institutional Strengths</span>
+                    <span class="prep-tab">🛂 Visa &amp; Financial Rules</span>
+                    <span class="prep-tab">🎓 All Programmes</span>
+                    <span class="prep-tab">🎤 Interview Q&amp;A Strategy</span>
+                  </div>
+                  <div class="prep-body">
+                    <div class="prep-callout">Understand Canterbury, CCCU's campus network, and why location matters for your interview answers.</div>
+                    <div class="prep-cards">
+                      <div class="prep-card">
+                        <div class="prep-icon">🏰</div>
+                        <h5>Canterbury — The City</h5>
+                        <p>Historic cathedral city in Kent, SE England</p>
+                      </div>
+                      <div class="prep-card">
+                        <div class="prep-icon">🚄</div>
+                        <h5>London Connectivity</h5>
+                        <p>~1 hour to London St Pancras by high-speed rail</p>
+                      </div>
+                      <div class="prep-card">
+                        <div class="prep-icon">🏷️</div>
+                        <h5>Cost of Living Advantage</h5>
+                        <p>Significantly lower than London</p>
+                      </div>
+                      <div class="prep-card">
+                        <div class="prep-icon">🏥</div>
+                        <h5>Medway Campus</h5>
+                        <p>Chatham Maritime — Healthcare &amp; Clinical Simulation</p>
+                      </div>
+                    </div>
+                    <div class="prep-foot">
+                      <div class="prep-next">Next Phase →</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2347,9 +3205,36 @@ body{
                 <h3><i>Identity</i> confirmed.</h3>
                 <p>Live passport and face capture confirm the right person is sitting the interview — no proxies, no surprises at enrolment. The decision and the candidate are linked from the start.</p>
               </div>
-              <div class="screen-image dual">
-                <img src="https://drive.google.com/thumbnail?id=1O1j5RHYSrsBOQ-My3GLUUtNeSaZZjVZS&sz=w1000" alt="Verify A — Identity capture">
-                <img src="https://drive.google.com/thumbnail?id=1pD70uQnsnkdny6_AYpKc9HGKYcoma6rC&sz=w1000" alt="Verify B — Identity confirmation">
+              <div class="screen-image">
+                <div class="verify-mock">
+                  <div class="verify-card">
+                    <div class="verify-cam">
+                      <div class="verify-frame rect"></div>
+                      <div class="verify-hint">Position passport page within frame</div>
+                    </div>
+                    <div class="verify-btn">Capture Passport</div>
+                    <h5 class="verify-step">Step 1: Capture Your Passport Page</h5>
+                    <ol class="verify-list">
+                      <li>Ensure the entire photo page fills the rectangle.</li>
+                      <li>Check for glare.</li>
+                    </ol>
+                    <div class="verify-badges">
+                      <span class="verify-badge">Ready to capture passport</span>
+                      <span class="verify-badge">Lighting: Good ✓</span>
+                    </div>
+                  </div>
+                  <div class="verify-card">
+                    <div class="verify-cam">
+                      <div class="verify-avatar">
+                        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="38" r="20" fill="rgba(15,42,79,.18)"/><path d="M20 92 Q50 60 80 92 Z" fill="rgba(15,42,79,.18)"/></svg>
+                      </div>
+                      <div class="verify-frame oval"></div>
+                    </div>
+                    <h5 class="verify-step center">Step 2: Capture Your Face</h5>
+                    <div class="verify-badges center"><span class="verify-badge">Face Detected ✓</span></div>
+                    <div class="verify-btn">Capture Face</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2360,7 +3245,30 @@ body{
                 <p>An AI-led conversation runs the same structured assessment for every applicant — reviewers receive a consistent, pre-assessed outcome. Variation is removed before judgment is applied.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1bHdtX0kruPeY-P8HgQw-puYqhXR0RUyD&sz=w1600" alt="Assess — Structured Interviews">
+                <div class="assess-mock">
+                  <div class="assess-header">
+                    <span class="assess-logo">◆ inuni</span>
+                    <span class="assess-title">Assessment Room</span>
+                  </div>
+                  <div class="assess-rule"></div>
+                  <div class="assess-body">
+                    <div class="assess-cam">
+                      <div class="assess-avatar">
+                        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="40" r="22" fill="rgba(15,42,79,.16)"/><path d="M16 96 Q50 62 84 96 Z" fill="rgba(15,42,79,.16)"/></svg>
+                      </div>
+                    </div>
+                    <div class="assess-chat">
+                      <div class="assess-status"><span class="assess-dot"></span>Listening... (Your turn to speak)</div>
+                      <div class="assess-stream">
+                        <div class="assess-msg ai">Room scan complete. Thank you. Please click 'Connect to Interviewer' below when you are ready to begin.</div>
+                        <div class="assess-msg sys">Room scan complete.</div>
+                        <div class="assess-msg sys">Connecting... Please wait for the setup to complete.</div>
+                        <div class="assess-msg ai">AI: Good morning, Marina. Thank you for joining me today for this interview. To begin, could you please tell me a bit about yourself and your background?</div>
+                      </div>
+                      <div class="assess-connect">Connecting...</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2417,7 +3325,34 @@ body{
                 <p>Foreign transcripts mapped course-by-course; degree benchmarked against the destination system. GPA and equivalence calculated.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1HSGafXTNQEF188MEplnEbqHm3Lv0BvJ_&sz=w1600" alt="Convert — Equivalency established">
+                <div class="eval-mock">
+                  <div class="eval-head">
+                    <h4 class="eval-title">Upload Application Documents</h4>
+                    <span class="eval-mode">Advanced Mode</span>
+                  </div>
+                  <div class="eval-callout"><b>Advanced Mode:</b> You have access to detailed evaluation data. Use the toggles below to switch between evaluation views.</div>
+                  <div class="eval-row"><span class="eval-lbl">University:</span><div class="eval-select">Rensselaer Polytechnic Institute</div></div>
+                  <div class="eval-row"><span class="eval-lbl">Program:</span><div class="eval-select">M.S. in Aeronautical Engineering</div></div>
+                  <div class="eval-field"><span class="eval-fl">Resume</span><div class="eval-file"><span class="eval-choose">Choose File</span> 📄 Marina Sunehag CV.pdf</div></div>
+                  <div class="eval-field"><span class="eval-fl">Personal Statement</span><div class="eval-file"><span class="eval-choose">Choose File</span> 📄 essay.docx</div></div>
+                  <div class="eval-field"><span class="eval-fl">Academic Transcript</span><div class="eval-file"><span class="eval-choose">Choose File</span> 📄 HEAR_1636684_1.pdf</div></div>
+                  <div class="eval-field"><span class="eval-fl">Degree Certificate</span><div class="eval-file"><span class="eval-choose">Choose File</span> no file selected</div></div>
+                  <div class="eval-upload">Upload &amp; Evaluate</div>
+                  <p class="eval-proc">Processing complete</p>
+                  <div class="eval-toggles">
+                    <span class="eval-tog active">Final Evaluation</span>
+                    <span class="eval-tog">Grade Conversion</span>
+                    <span class="eval-tog">Rubric Analysis</span>
+                  </div>
+                  <h5 class="eval-rt">Evaluation Result:</h5>
+                  <div class="eval-result">
+                    <p class="eval-h">Overall Assessment</p>
+                    <p>The applicant presents a highly unique professional background characterized by extensive leadership, business development, and international education experience, accompanied by a solid academic record in non-technical disciplines. However, the academic profile is fundamentally mismatched for the M.S. in Aeronautical Engineering program, indicating the programmatic fit is fundamentally unaligned.</p>
+                    <p class="eval-h">Key Strengths</p>
+                    <p><b>Strong Academic Performance:</b> Demonstrated capability for academic success in previous graduate-level coursework, reflected by a solid numeric grade point average in legal and commercial studies.</p>
+                    <p><b>Extensive Professional Experience:</b> A rich professional background in global leadership, international student recruitment, and business development.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2428,7 +3363,25 @@ body{
                 <p>Every applicant scored against the programme's rubric — same criteria, same weights, written justifications throughout.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=14bDHVd7ICHuXbBSgpasKxACTMDlyxZ0e&sz=w1600" alt="Assess — Rubric applied">
+                <div class="grade-mock">
+                  <p class="grade-proc">Processing complete</p>
+                  <div class="grade-toggles">
+                    <span class="grade-tog">Final Evaluation</span>
+                    <span class="grade-tog active">Grade Conversion</span>
+                    <span class="grade-tog">Rubric Analysis</span>
+                  </div>
+                  <h5 class="grade-rt">Evaluation Result:</h5>
+                  <div class="grade-result">
+                    <p class="grade-h">Grading Scale Used:</p>
+                    <p class="grade-mono">* 70.00 - 100.00 = A (4.0)<br>* 65.00 - 69.99 = A- (3.7)<br>* 60.00 - 64.99 = B+ (3.3)<br>* 50.00 - 59.99 = B (3.0)<br>* 0.00 - 49.99 = F (0.0)</p>
+                    <p class="grade-mark">### MAPPED COURSES START ###</p>
+                    <p class="grade-mono">1. Corporate Finance|58|B|3.0|Credits: 15<br>2. Fundamentals of Mergers and Acquisitions|57|B|3.0|Credits: 15<br>3. Transnational Corporate Restructuring|52|B|3.0|Credits: 15<br>4. Transnational Business Instruments|64|B+|3.3|Credits: 15<br>5. Financing of International Trade|66|A-|3.7|Credits: 15<br>6. International Financial Regulation|71|A|4.0|Credits: 15<br>7. Financial Risk and Regulation|65|A-|3.7|Credits: 15<br>8. Financial Products|65|A-|3.7|Credits: 15<br>9. Capital Markets|70|A|4.0|Credits: 15<br>10. Project Finance|66|A-|3.7|Credits: 15<br>11. International Commercial Arbitration|65|A-|3.7|Credits: 15<br>12. Private Equity|62|B+|3.3|Credits: 15</p>
+                    <p class="grade-mark">### MAPPED COURSES END ###</p>
+                    <p class="grade-h">Degree Equivalence Assessment:</p>
+                    <p><b>Equivalence:</b> Master's degree (specifically, Master of Laws)</p>
+                    <p><b>Reasoning:</b> The student completed a Master of Laws (LL.M.) program at King's College London, a recognized institution in the UK. The program entails 180 UK credits — the standard requirement for a full-time 1-year Master's degree — translating directly to a standard graduate-level Master's degree in the United States.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2439,7 +3392,26 @@ body{
                 <p>Strengths, gaps, and fit summarised in plain language. Reviewers receive a pre-assessed outcome with reasoning attached.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1dJ9drSCSVZ_C73FqCDIlbCEwdKr9jN_M&sz=w1600" alt="Decide — Evaluation delivered">
+                <div class="decide-mock">
+                  <h5 class="decide-rt">Evaluation Result:</h5>
+                  <div class="decide-result">
+                    <p class="decide-h">Document Review Summary</p>
+                    <p><b>Resume:</b> Provided. Details extensive experience in international student recruitment, business development, and higher education leadership, alongside degrees in Law, Business, and Political Science.</p>
+                    <p><b>Personal Statement (Research Intent):</b> Provided. <i>Critical Note:</i> The statement is explicitly written for an MBA program at University Canada West for a Canadian Study Permit — not the M.S. in Aeronautical Engineering at RPI.</p>
+                    <p><b>Academic Transcript:</b> Official HEAR from King's College London for a Master of Laws (LLM) in International Financial &amp; Commercial Law.</p>
+                    <p><b>Optional Documents:</b> GRE, English Proficiency, and Letters of Recommendation not provided. Evaluation proceeds on available required documents.</p>
+                    <p class="decide-h">Grade Conversion Summary</p>
+                    <p><b>System-Calculated GPA: 3.5</b></p>
+                    <p><b>Degree Equivalence:</b> Master of Laws (LLM) from King's College London, 180 UK credits — equivalent to a standard graduate-level Master's degree in the United States.</p>
+                    <p class="decide-h">Detailed Rubric Evaluation (MANE — Aeronautical Engineering)</p>
+                    <p><b>Program Background Requirements: Not Met.</b> The M.S. strictly requires Engineering, Physics, or Mathematics. The applicant's background is exclusively Political Science, Business, and Law.</p>
+                    <p><b>Expressed interest from faculty (Score: 0)</b> — No faculty or DGAC expressed interest; documents don't mention RPI or any aeronautical engineering faculty.</p>
+                    <p><b>Unique Perspective (Score: 2)</b> — Highly unique profile as an international education executive, but zero accompanying relevance to Aeronautical Engineering.</p>
+                    <p><b>Potential for academic success (Score: 1 — GPA &gt; 3.3, ≤ 3.5)</b> — Solid 3.5 GPA, but achieved in a non-technical field (Law); does not demonstrate STEM potential.</p>
+                    <p><b>Recommendations (Score: 0)</b> — Not specified/submitted.</p>
+                    <p><b>GRE (Verbal, Quantitative, Analytical) (Score: 0)</b></p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2484,7 +3456,40 @@ body{
                 <p>Sending and receiving institutions named, syllabi, learning outcomes and study plans uploaded as PDFs. Custom extraction rules added where needed.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1TdB24Pxj5nNLp1vCfHPOTn1csVUeGl4C&sz=w1600" alt="Upload — Documents in">
+                <div class="cmap-mock">
+                  <div class="cmap-head">
+                    <span class="cmap-logo">◆ inuni</span>
+                    <span class="cmap-title">CreditMap: Articulation &amp; Transfer Equivalency Engine</span>
+                  </div>
+                  <div class="cmap-steps">
+                    <span class="cmap-step active">1. Upload &amp; Setup</span>
+                    <span class="cmap-step">2. Review Courses</span>
+                    <span class="cmap-step">3. AI Mapping &amp; Gaps</span>
+                  </div>
+                  <p class="cmap-intro">Upload institutional documentation. It will automatically extract course details, credits, and learning outcomes to pre-fill the articulation mapping.</p>
+                  <div class="cmap-cols">
+                    <div class="cmap-inst">
+                      <h5 class="cmap-inst-title a">Institution A (Sending)</h5>
+                      <span class="cmap-fl">Institution Name:</span>
+                      <div class="cmap-input">UCW</div>
+                      <span class="cmap-fl">Upload Study Plan / Syllabus (PDF):</span>
+                      <div class="cmap-file"><span class="cmap-choose">Choose File</span> 📄 Academic-Calendar-2026-Mar-18-Final.pdf</div>
+                    </div>
+                    <div class="cmap-inst">
+                      <h5 class="cmap-inst-title b">Institution B (Receiving)</h5>
+                      <span class="cmap-fl">Institution Name:</span>
+                      <div class="cmap-input">University of Akron</div>
+                      <span class="cmap-fl">Upload Program Catalog / Syllabus (PDF):</span>
+                      <div class="cmap-file"><span class="cmap-choose">Choose File</span> 📄 Business_Management_BBA.pdf</div>
+                    </div>
+                  </div>
+                  <div class="cmap-custom">
+                    <span class="cmap-fl">Custom Extraction Instructions (Optional):</span>
+                    <div class="cmap-textarea">Map BA/BSs in business administration, business management</div>
+                  </div>
+                  <div class="cmap-process">Process Documents with AI 🪄</div>
+                  <p class="cmap-analyzing">Analyzing documents. This may take a minute...</p>
+                </div>
               </div>
             </div>
 
@@ -2495,7 +3500,47 @@ body{
                 <p>Course codes, credits, learning outcomes, and Bloom's levels pulled from each document automatically. The articulation evidence base is built before any mapping begins.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1vEm2uA1k_xmDL7vxhp6Z3j3jWynawWgQ&sz=w1600" alt="Extract — Courses parsed">
+                <div class="cmap-mock">
+                  <div class="cmap-head">
+                    <span class="cmap-logo">◆ inuni</span>
+                    <span class="cmap-title">CreditMap: Articulation &amp; Transfer Equivalency Engine</span>
+                  </div>
+                  <div class="cmap-steps">
+                    <span class="cmap-step">1. Upload &amp; Setup</span>
+                    <span class="cmap-step active">2. Review Courses</span>
+                    <span class="cmap-step">3. AI Mapping &amp; Gaps</span>
+                  </div>
+                  <p class="cmap-intro">Review the courses extracted. You can edit credits, outcomes, and Bloom's levels before running the mapping engine.</p>
+
+                  <h5 class="cmap-grp a">UCW Courses</h5>
+                  <div class="cmap-table">
+                    <div class="cmap-trow head"><span>Code</span><span>Course Name</span><span>Credits</span><span>Bloom's</span><span>Key Outcomes Extracted</span></div>
+                    <div class="cmap-trow">
+                      <span><i class="cmap-code a">UAC 030</i></span>
+                      <span>University Access Program</span><span>0</span><span>Level 3</span>
+                      <span>Demonstrate foundational academic English-language skills suitable for university-level coursework</span>
+                    </div>
+                    <div class="cmap-trow">
+                      <span><i class="cmap-code a">ENGL 080</i></span>
+                      <span>Academic Writing Fundamentals</span><span>0</span><span>Level 3</span>
+                      <span>Construct academically appropriate written texts; apply fundamental writing principles to structure coherent paragraphs</span>
+                    </div>
+                  </div>
+
+                  <h5 class="cmap-grp b">University of Akron Requirements</h5>
+                  <div class="cmap-table">
+                    <div class="cmap-trow head"><span>Code</span><span>Course Name</span><span>Credits</span><span>Bloom's</span><span>Key Outcomes Extracted</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">ENGL 111</i></span><span>English Composition I</span><span>3</span><span>Level 3</span><span>Apply rhetorical strategies effectively; construct clear and coherent essays</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">ENGL 112</i></span><span>English Composition II</span><span>3</span><span>Level 4</span><span>Analyze complex texts for research; synthesize scholarly sources to support arguments</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">COMM 105</i></span><span>Introduction to Public Speaking</span><span>3</span><span>Level 3</span><span>Deliver effective presentations; apply appropriate vocal and physical delivery techniques</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">MATH 145</i></span><span>College Algebra / Algebra for Calculus</span><span>3</span><span>Level 3</span><span>Solve complex algebraic equations; apply functions to model real-world scenarios</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">MATH 210</i></span><span>Calculus with Business Applications</span><span>3</span><span>Level 3</span><span>Apply differentiation to business functions; solve optimization problems</span></div>
+                    <div class="cmap-trow"><span><i class="cmap-code b">ECON 200</i></span><span>Principles of Microeconomics</span><span>3</span><span>Level 2</span><span>Understand supply, demand, and market equilibrium; explain market structures</span></div>
+                  </div>
+
+                  <div class="cmap-process green">Run AI Articulation Mapping ⇄</div>
+                  <p class="cmap-analyzing">Analyzing CLO-to-CLO overlap and determining gaps...</p>
+                </div>
               </div>
             </div>
 
@@ -2506,7 +3551,44 @@ body{
                 <p>Every extracted course shown side-by-side — credits, Bloom's level, key outcomes editable before the engine runs. Human oversight on the inputs, not just the results.</p>
               </div>
               <div class="screen-image">
-                <img src="https://drive.google.com/thumbnail?id=1d70X3rc4nVco9Y9tphr8y8t_iepbawef&sz=w1600" alt="Review — Outcomes verified">
+                <div class="cmap-mock">
+                  <div class="cmap-head">
+                    <span class="cmap-logo">◆ inuni</span>
+                    <span class="cmap-title" style="font-size:1.15rem">CreditMap: Articulation &amp; Transfer Equivalency Engine</span>
+                  </div>
+                  <div class="cmap-steps">
+                    <span class="cmap-step">1. Upload &amp; Setup</span>
+                    <span class="cmap-step">2. Review Courses</span>
+                    <span class="cmap-step active">3. AI Mapping &amp; Gaps</span>
+                  </div>
+                  <p class="cmap-intro" style="margin-bottom:.8rem">Articulation Results</p>
+
+                  <div class="cmap-report">
+                    <div class="crep-logo">◆ inuni <span>BRAIN</span></div>
+                    <h4 class="crep-title">Articulation &amp; Transfer Credit Equivalency Report</h4>
+                    <p class="crep-italic">AI-Assisted Evaluation</p>
+                    <p class="crep-meta"><b>Sending Institution:</b> UCW</p>
+                    <p class="crep-meta"><b>Receiving Institution:</b> University of Akron</p>
+                    <p class="crep-meta"><b>Report Date:</b> 1 May 2026</p>
+                    <p class="crep-meta" style="margin-top:.6rem"><b>Prepared by:</b> INUNI Brain | CreditMap Engine</p>
+                    <p class="crep-italic">Confidentiality: Internal academic governance use only</p>
+
+                    <h5 class="crep-section">1. Executive Summary</h5>
+                    <p><b>Purpose:</b> Establish program-to-program articulation and support transfer credit evaluation between UCW and the University of Akron.</p>
+                    <p><b>Overall Recommendation:</b> Revise / Do Not Approve as a Full Pathway</p>
+                    <p><b>Headline Results:</b> 0 Direct Matches | 1 Partial Match | 45 Deficits (Receiving gaps) | 1 Surplus (Sending gaps)</p>
+                    <p class="crep-sub">Key Conditions / Risks:</p>
+                    <ul class="crep-list">
+                      <li><b>Severe Credit Volume Discrepancy:</b> UCW provided only two 0-credit access/foundational courses; Akron requires a standard 3–4 credit collegiate curriculum, making direct articulation impossible without further courses.</li>
+                      <li><b>Massive Curricular Deficit:</b> 45 of 46 required Akron courses lack any mapped equivalent from the UCW submission.</li>
+                      <li><b>Developmental Nature of Sending Courses:</b> UAC 030 and ENGL 080 focus on fundamental language and quantitative skills, so cognitive gaps exist even where topics superficially align.</li>
+                    </ul>
+
+                    <h5 class="crep-section">2. Scope, Sources, and Policy Metadata</h5>
+                    <p><b>Included Programs/Courses:</b> All extracted courses from the provided documentation for UCW and University of Akron.</p>
+                    <p class="crep-sub">Credit System &amp; Metadata:</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2517,9 +3599,65 @@ body{
                 <p>CLO-to-CLO overlap measured against set % thresholds with Bloom's and credit-volume checks. Each pairing returned as direct match, partial match, deficit, or surplus — with rationale and conditions attached.</p>
               </div>
               <div class="screen-image triple">
-                <img src="https://drive.google.com/thumbnail?id=1zhlFPlmUglHEwhs_w-ZNcLGXsVA4vS75&sz=w1000" alt="Map — Equivalency resolved A">
-                <img src="https://drive.google.com/thumbnail?id=1kPkH1MUVTONmJ5fzdVxb4UvRnvjVOAKb&sz=w1000" alt="Map — Equivalency resolved B">
-                <img src="https://drive.google.com/thumbnail?id=15_SPXR8ZvHp4ue91gJUK9NikmcUeYFTK&sz=w1000" alt="Map — Equivalency resolved C">
+                <div class="cmap-doc">
+                  <h5 class="cdoc-h">3. Method and Decision Rules</h5>
+                  <p class="cdoc-p"><b>Method:</b> Learning outcome and course content alignment using strict 75%/40% Course Learning Outcome (CLO) overlap thresholds, Bloom's Taxonomy cognitive validation, and normalized credit volume verification.</p>
+                  <h5 class="cdoc-h">4. Course-by-Course Equivalency Matrix</h5>
+                  <div class="cdoc-table">
+                    <div class="cdoc-row head"><span>Sending</span><span>Receiving</span><span>Match</span><span>Rationale</span></div>
+                    <div class="cdoc-row"><span>ENGL 080</span><span>ENGL 111</span><span class="m-partial">PARTIAL MATCH (BRIDGE REQUIRED)</span><span>Overlap ~50%. Covers sentence/paragraph coherence but fails 75% threshold; lacks rhetorical strategies.</span></div>
+                    <div class="cdoc-row"><span>UAC 030</span><span>None</span><span class="m-surplus">SURPLUS (SENDING GAP)</span><span>Foundational access program; below 40% overlap for any collegiate-level requirement.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>ENGL 112</span><span class="m-deficit">DEFICIT</span><span>No sending equivalent meets analysis/synthesis. Must complete at Receiving.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>COMM 105</span><span class="m-deficit">DEFICIT</span><span>No equivalent for public speaking/presentations.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>MATH 145</span><span class="m-deficit">DEFICIT</span><span>No equivalent for college algebra.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>MATH 210</span><span class="m-deficit">DEFICIT</span><span>No equivalent for business calculus.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>ECON 200</span><span class="m-deficit">DEFICIT</span><span>No equivalent for microeconomics.</span></div>
+                    <div class="cdoc-row"><span>None</span><span>ECON 201</span><span class="m-deficit">DEFICIT</span><span>No equivalent for macroeconomics.</span></div>
+                  </div>
+                </div>
+
+                <div class="cmap-doc">
+                  <h5 class="cdoc-h">6. Appendix: Extracted Course Manifest</h5>
+                  <p class="cdoc-p">The following data was extracted during Step 1 and serves as the evidence base for this articulation report.</p>
+                  <p class="cdoc-sub">UCW Courses (Sending)</p>
+                  <ul class="cdoc-list">
+                    <li>UAC 030: University Access Program (0 cr)</li>
+                    <li>ENGL 080: Academic Writing Fundamentals (0 cr)</li>
+                  </ul>
+                  <p class="cdoc-sub">University of Akron Requirements (Receiving)</p>
+                  <ul class="cdoc-list cols">
+                    <li>ENGL 111: English Composition I</li><li>ENGL 112: English Composition II</li>
+                    <li>COMM 105: Public Speaking</li><li>MATH 145: College Algebra</li>
+                    <li>MATH 210: Calculus w/ Business</li><li>ECON 200: Microeconomics</li>
+                    <li>ECON 201: Macroeconomics</li><li>ACCT 201: Accounting Principles I</li>
+                    <li>ACCT 250: Spreadsheet Modeling</li><li>ENTRE 201: Intro to Entrepreneurship</li>
+                    <li>BLAW 220: Legal &amp; Social Environment</li><li>MKTG 205: Marketing Principles</li>
+                    <li>MATH 139: Finite Math</li><li>STAT 270: Introductory Statistics</li>
+                    <li>BUSN 100: College of Business Seminar</li><li>MGMT 301: Management Principles</li>
+                    <li>MGMT 305: Business Analytics</li><li>MGMT 480: Strategic Management</li>
+                    <li>FIN 301: Principles of Finance</li><li>INTB 205: International Business</li>
+                    <li>SCM 433: Supply Chain Logistics</li><li>SCM 476: Supply Chain Sourcing</li>
+                  </ul>
+                </div>
+
+                <div class="cmap-doc">
+                  <ul class="cdoc-list">
+                    <li>ACCT 450: Advanced Applied Analytics &amp; Decision Analysis (3 cr)</li>
+                    <li>FPL 200: Foundations of Financial Literacy (3 cr)</li>
+                    <li>ISM 315: Applications Development for Business (3 cr)</li>
+                    <li>HRM 442: HR Selection &amp; Staffing (3 cr)</li>
+                    <li>SALES 275: Professional Selling (3 cr)</li>
+                    <li>MKTG 355: Consumer Behavior (3 cr)</li>
+                    <li>SALES 480: Sales Management (3 cr)</li>
+                    <li>SOCIO 100: Introduction to Sociology (3 cr)</li>
+                  </ul>
+                  <h5 class="cdoc-h">7. Governance and Approvals</h5>
+                  <p class="cdoc-p"><b>Authority:</b> Final decisions rest with the Receiving Institution Registrar/Faculty.</p>
+                  <p class="cdoc-sign">Faculty/Program Lead: _______________ Date: _______</p>
+                  <p class="cdoc-sign">Registrar/Transfer Authority: _______________ Date: _______</p>
+                  <p class="cdoc-p" style="margin-top:.8rem">Next review date: Upon curriculum change.</p>
+                  <div class="cdoc-export">Export Report</div>
+                </div>
               </div>
             </div>
 
