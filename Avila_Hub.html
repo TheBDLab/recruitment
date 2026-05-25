@@ -7192,7 +7192,7 @@
                         <div class="cz-result" id="czResult"></div>
 
                         <div class="cz-disclaimer">
-                                    By accessing this portal, you confirm that the information provided is accurate and belongs to you. The information displayed is confidential and intended solely for the applicant. Unauthorised access or misuse of personal data is prohibited and may be reported. We process your data in accordance with the U.S. Family Educational Rights and Privacy Act (FERPA) and applicable data protection laws.
+                                    By accessing this portal, you confirm that the information provided is accurate and belongs to you. The information displayed is confidential and intended solely for the applicant. Unauthorised access or misuse of personal data is prohibited and may be reported. We handle your personal data securely and in line with our data privacy commitments and applicable data protection laws.
                                   </div>
                     </div>
 
@@ -7221,10 +7221,10 @@
                                 </div>
                             </div>
                             <div class="item">
-                                <span class="ic">🇺🇸</span>
+                                <span class="ic">🔐</span>
                                 <div>
-                                    <b>FERPA compliant</b>
-                                    Your education records are handled in line with the U.S. Family Educational Rights and Privacy Act (FERPA).
+                                    <b>Data privacy protected</b>
+                                    Your personal information is kept confidential, handled securely, and used only to support your application.
                                 </div>
                             </div>
                         </div>
@@ -8281,8 +8281,8 @@
     ];
     // Standalone intro video shown beside the roadmap subtitle
     const INTRO_VIDEO = {
-        title: "Your Avila Applicant Hub: A Quick Guide",
-        desc: "You've Applied — Here's What's Next.",
+        title: "Watch: a 2-minute overview",
+        desc: "How the Avila Applicant Hub works, start to finish.",
         url: "",
         poster: ""
     };
@@ -8977,14 +8977,8 @@
                     if (VIDEOS[i])
                         Object.assign(VIDEOS[i], v);
                 });
-            // Intro title/desc are locked to the source values below; only restore url/poster from storage.
-            if (d.intro) {
-                const {url, poster} = d.intro;
-                if (url !== undefined)
-                    INTRO_VIDEO.url = url;
-                if (poster !== undefined)
-                    INTRO_VIDEO.poster = poster;
-            }
+            if (d.intro)
+                Object.assign(INTRO_VIDEO, d.intro);
         };
         if (window.__AVILA_VIDEOS__) {
             try {
