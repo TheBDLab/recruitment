@@ -856,15 +856,14 @@ body.editing [data-edit]:focus{outline:2px solid var(--gold);background:rgba(253
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="sec-tag">2026 Intake Calendar &amp; Residency Sites</span>
-      <h2>One date to protect: your Complete Application Deadline.</h2>
-      <p>This is the date your full application (all documents except financials, which can follow) must be in. Miss it and your start slips to the next intake. The table also shows which approved residency locations run each intake.</p>
+      <h2>Know your intake dates and residency sites.</h2>
+      <p>Here are the upcoming intakes, each program's start date, and which approved residency locations run that intake. Talk to your counsellor early so your full application is ready in good time for your chosen start.</p>
     </div>
     <div class="dl-wrap reveal">
       <table class="dl" id="dlTable">
         <thead>
           <tr>
             <th>Intake</th>
-            <th>Complete Application Deadline</th>
             <th>Program Start</th>
             <th>Residency Sites for this intake</th>
           </tr>
@@ -873,7 +872,6 @@ body.editing [data-edit]:focus{outline:2px solid var(--gold);background:rgba(253
       </table>
     </div>
     <div class="dl-legend reveal">
-      <span><i class="dot-s" style="background:var(--rust)"></i> Complete Application Deadline — the one date everything hinges on</span>
       <span><i class="dot-s" style="background:var(--gold-deep)"></i> Program start date</span>
       <span><i class="dot-s" style="background:var(--teal)"></i> Residency sites = approved locations running that intake</span>
     </div>
@@ -1361,7 +1359,7 @@ const VIDEOS = [
   {title:"Life as a low-residency student", desc:"What residencies, CPT, and the 8-week format really look like.", url:"", poster:""}
 ];
 // Standalone intro video shown beside the roadmap subtitle
-const INTRO_VIDEO = {title:"Watch: a 2-minute overview", desc:"How the Avila Applicant Hub works, start to finish.", url:"", poster:""};
+const INTRO_VIDEO = {title:"Your Avila Applicant Hub: A Quick Guide", desc:"You've Applied — Here's What's Next.", url:"", poster:""};
 
 /* ---------- LIVE SESSIONS / WEBINARS ----------
    Editable in the editor panel. Each: {title, desc, date, time, host, url(register), tag} */
@@ -1532,7 +1530,6 @@ function renderDeadlines(){
   DEADLINES.forEach(row=>{
     const tr=el('tr');
     tr.appendChild(el('td','intake',row.intake));
-    tr.appendChild(el('td','crit',row.deadline));
     tr.appendChild(el('td','start',row.start));
     const sitesCls = row.sites==='All sites' ? 'sites-all' : 'sites-kc';
     tr.appendChild(el('td','sites',`<span class="site-badge ${sitesCls}">${row.sites}</span>`));
@@ -1779,7 +1776,8 @@ function loadVideos(){
     if(!d) return;
     if(Array.isArray(d)){ d.forEach((v,i)=>{ if(VIDEOS[i]) Object.assign(VIDEOS[i],v); }); return; } // legacy
     if(d.guides) d.guides.forEach((v,i)=>{ if(VIDEOS[i]) Object.assign(VIDEOS[i],v); });
-    if(d.intro) Object.assign(INTRO_VIDEO, d.intro);
+    // Intro title/desc are locked to the source values below; only restore url/poster from storage.
+    if(d.intro){ const {url,poster}=d.intro; if(url!==undefined) INTRO_VIDEO.url=url; if(poster!==undefined) INTRO_VIDEO.poster=poster; }
   };
   if(window.__AVILA_VIDEOS__){ try{ apply(window.__AVILA_VIDEOS__); }catch(e){} return; }
   try{ const raw=localStorage.getItem(VIDEO_STORE_KEY); if(raw) apply(JSON.parse(raw)); }catch(e){}
