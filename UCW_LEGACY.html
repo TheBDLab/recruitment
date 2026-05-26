@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UCW Global Counsellor Legacy Programme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* UCW light theme — names kept for compatibility, values repointed */
+  --navy-900:#ffffff;   /* page background (was darkest) */
+  --navy-800:#fafbfd;   /* subtle section bg */
+  --navy-700:#ffffff;   /* card bg */
+  --navy-600:#f4f6fa;   /* raised surface */
+  --ink:#ffffff;        /* base background */
+  --cream:#13224b;      /* primary heading text (UCW navy) */
+  --cream-dim:#3a4a73;
+  /* UCW brand */
+  --ucw-red:#e31b23;
+  --ucw-red-deep:#b8141b;
+  --ucw-red-light:#ff4d52;
+  --navy:#13224b;
+  --gold:#e31b23;        /* primary accent remapped to UCW red */
+  --gold-deep:#b8141b;
+  --coral:#e31b23;
+  --coral-deep:#b8141b;
+  --rose:#e31b23;
+  --sky:#2f6fb0;
+  --sage:#1f9d76;
+  --text:#28324d;        /* body text */
+  --text-dim:#586087;
+  --text-faint:#8a90a8;
+  --line:rgba(19,34,75,0.10);
+  --line-bright:rgba(19,34,75,0.18);
+  --display:"Fraunces",serif;
+  --body:"Outfit",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:#ffffff;
+  color:var(--text);
+  line-height:1.65;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--ucw-red);color:#fff}
+
+/* ---------- Atmosphere ---------- */
+.grain{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.015;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Nav ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.4rem clamp(1.2rem,5vw,4rem);
+  transition:all .4s ease;
+  background:transparent;
+}
+nav.scrolled{
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 6px 24px rgba(19,34,75,.06);
+  padding-top:1rem;padding-bottom:1rem;
+}
+.brand{display:flex;align-items:center;gap:.7rem;font-family:var(--display);font-weight:600;font-size:1.15rem;letter-spacing:.01em;text-decoration:none;color:var(--cream)}
+.brand .mark{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--ucw-red),var(--ucw-red-deep));
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:1rem;
+  font-family:var(--body);box-shadow:0 4px 10px rgba(227,27,35,.3);
+}
+.nav-links{display:flex;gap:2.2rem;align-items:center}
+.nav-links a{color:var(--text-dim);text-decoration:none;font-size:.92rem;font-weight:500;transition:color .25s;position:relative}
+.nav-links a:hover{color:var(--ucw-red)}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1.5px;background:var(--ucw-red);transition:width .3s}
+.nav-links a:hover::after{width:100%}
+.nav-cta{
+  background:linear-gradient(180deg,var(--ucw-red-light),var(--ucw-red));color:#fff;padding:.62rem 1.4rem;border-radius:100px;
+  font-weight:600;font-size:.9rem;text-decoration:none;transition:all .18s ease;
+  box-shadow:0 4px 0 var(--ucw-red-deep),0 8px 16px rgba(227,27,35,.28);
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ucw-red-deep),0 12px 22px rgba(227,27,35,.36)}
+.nav-cta:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ucw-red-deep),0 3px 8px rgba(227,27,35,.3)}
+.nav-cta::after{display:none}
+.menu-toggle{display:none;background:none;border:none;color:var(--navy);cursor:pointer;flex-direction:column;gap:5px}
+.menu-toggle span{width:24px;height:2px;background:var(--navy);transition:.3s}
+@media(max-width:860px){
+  .nav-links{
+    position:fixed;inset:0;background:var(--navy-900);flex-direction:column;justify-content:center;
+    gap:2.4rem;transform:translateX(100%);transition:transform .4s ease;font-size:1.3rem;
+  }
+  .nav-links.open{transform:translateX(0)}
+  .nav-links a{font-size:1.3rem}
+  .menu-toggle{display:flex;z-index:101}
+  .menu-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .menu-toggle.open span:nth-child(2){opacity:0}
+  .menu-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:8rem clamp(1.2rem,5vw,4rem) 4rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 80% 15%,rgba(227,27,35,.10),transparent 55%),
+    radial-gradient(ellipse 70% 60% at 10% 85%,rgba(47,111,176,.07),transparent 55%),
+    linear-gradient(180deg,#ffffff,#fef6f6 60%,#ffffff);
+  overflow:hidden;z-index:2;
+}
+.hero-glow{
+  position:absolute;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(227,27,35,.10),transparent 70%);
+  top:-10%;right:-5%;filter:blur(40px);animation:float 14s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,30px)}}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:3}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-size:.8rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ucw-red);margin-bottom:2rem;
+  opacity:0;animation:rise .8s .1s forwards;
+}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--ucw-red);box-shadow:0 0 12px rgba(227,27,35,.5)}
+h1.hero-title{
+  font-family:var(--display);
+  font-size:clamp(2.6rem,7vw,5.6rem);
+  line-height:1.02;font-weight:600;letter-spacing:-.02em;
+  color:var(--navy);margin-bottom:1.8rem;max-width:14ch;
+}
+h1.hero-title em{font-style:italic;color:var(--ucw-red);font-weight:500}
+.hero-title .l{display:block;opacity:0;animation:rise .9s forwards}
+.hero-title .l:nth-child(1){animation-delay:.2s}
+.hero-title .l:nth-child(2){animation-delay:.35s}
+.hero-title .l:nth-child(3){animation-delay:.5s}
+.hero-lead{
+  font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);max-width:60ch;line-height:1.7;
+  margin-bottom:2.6rem;opacity:0;animation:rise .9s .7s forwards;
+}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;animation:rise .9s .85s forwards}
+.btn-primary{
+  background:linear-gradient(180deg,var(--ucw-red-light),var(--ucw-red));
+  color:#fff;padding:.95rem 2.1rem;border-radius:100px;font-weight:700;font-size:1rem;
+  text-decoration:none;transition:all .18s ease;
+  box-shadow:0 5px 0 var(--ucw-red-deep),0 12px 24px rgba(227,27,35,.3);
+  border:none;cursor:pointer;display:inline-block;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ucw-red-deep),0 16px 30px rgba(227,27,35,.4)}
+.btn-primary:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ucw-red-deep),0 5px 12px rgba(227,27,35,.3)}
+.btn-ghost{
+  border:2px solid var(--navy);color:var(--navy);padding:.88rem 2rem;border-radius:100px;
+  font-weight:600;font-size:1rem;text-decoration:none;transition:all .18s ease;background:#fff;
+  box-shadow:0 4px 0 rgba(19,34,75,.18),0 8px 18px rgba(19,34,75,.08);display:inline-block;cursor:pointer;
+}
+.btn-ghost:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(19,34,75,.18),0 12px 22px rgba(19,34,75,.12)}
+.btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(19,34,75,.18),0 3px 8px rgba(19,34,75,.1)}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin-top:5rem;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  opacity:0;animation:rise 1s 1s forwards;box-shadow:0 18px 50px rgba(19,34,75,.08);
+}
+.hero-stats .s{background:#ffffff;padding:1.6rem 1.4rem}
+.hero-stats .s .num{font-family:var(--display);font-size:clamp(1.8rem,3.5vw,2.6rem);color:var(--navy);font-weight:600;line-height:1}
+.hero-stats .s .num span{color:var(--ucw-red)}
+.hero-stats .s .lbl{font-size:.82rem;color:var(--text-faint);margin-top:.5rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+@media(max-width:680px){.hero-stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- Director Welcome Video ---------- */
+.welcome{position:relative;z-index:2;background:linear-gradient(180deg,transparent,#f4f6fa,transparent)}
+.welcome-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(2rem,5vw,4rem);align-items:center;margin-top:1rem}
+@media(max-width:880px){.welcome-grid{grid-template-columns:1fr;gap:2.4rem}}
+.welcome-copy .section-tag{margin-bottom:1.4rem}
+.welcome-copy h2{font-family:var(--display);font-size:clamp(1.9rem,4vw,3rem);font-weight:500;line-height:1.1;color:var(--cream);margin-bottom:1.2rem;letter-spacing:-.015em}
+.welcome-copy h2 em{font-style:italic;color:var(--gold)}
+.welcome-copy p{color:var(--text-dim);font-size:1.05rem;line-height:1.75;margin-bottom:1.4rem;max-width:52ch}
+.welcome-sig{margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid var(--line)}
+.welcome-sig .name{font-family:var(--display);font-size:1.3rem;color:var(--cream);font-weight:500}
+.welcome-sig .role{color:var(--gold);font-size:.92rem;font-weight:600;letter-spacing:.02em;margin-top:.2rem}
+.welcome-sig .org{color:var(--text-faint);font-size:.88rem;margin-top:.15rem}
+
+.video-frame{
+  position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line-bright);
+  background:#000;aspect-ratio:16/9;box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.video-frame .embed-slot,.video-frame video,.video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* Poster placeholder (shown until a real video is added) */
+.video-poster{
+  position:absolute;inset:0;cursor:pointer;display:grid;place-items:center;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 35%,rgba(245,197,66,.16),transparent 60%),
+    linear-gradient(150deg,var(--navy-700),var(--navy-900));
+  transition:filter .3s;
+}
+.video-poster:hover{filter:brightness(1.08)}
+.video-poster .pinner{text-align:center;padding:1.5rem;position:relative;z-index:2}
+.video-poster .playbtn{
+  width:78px;height:78px;border-radius:50%;margin:0 auto 1.3rem;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--gold),var(--gold-deep));box-shadow:0 10px 36px rgba(245,197,66,.4);
+  transition:transform .3s;
+}
+.video-poster:hover .playbtn{transform:scale(1.08)}
+.video-poster .playbtn svg{width:30px;height:30px;margin-left:5px;fill:var(--ink)}
+.video-poster .ptitle{font-family:var(--display);color:var(--cream);font-size:1.25rem;font-weight:500;margin-bottom:.4rem}
+.video-poster .psub{color:var(--text-dim);font-size:.9rem}
+.video-poster::after{
+  content:"";position:absolute;inset:0;opacity:.04;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.video-badge{
+  position:absolute;top:1rem;left:1rem;z-index:3;display:inline-flex;align-items:center;gap:.5rem;
+  background:#ffffff;backdrop-filter:blur(8px);border:1px solid var(--line-bright);
+  padding:.45rem .9rem;border-radius:100px;font-size:.78rem;font-weight:600;color:var(--cream);letter-spacing:.03em;
+}
+.video-badge .rec{width:8px;height:8px;border-radius:50%;background:var(--coral);box-shadow:0 0 8px var(--coral)}
+
+/* ---------- Entrepreneurship Vision ---------- */
+.vision{position:relative;z-index:2;overflow:hidden}
+.vision::before{content:"";position:absolute;top:-20%;right:-10%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(245,197,66,.1),transparent 65%);pointer-events:none}
+.vision-lead{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(2rem,5vw,4rem);align-items:center;margin-bottom:3.5rem}
+@media(max-width:880px){.vision-lead{grid-template-columns:1fr;gap:2rem}}
+.vision-callout{
+  background:linear-gradient(150deg,rgba(245,197,66,.1),rgba(240,107,92,.06));
+  border:1px solid var(--line-bright);border-radius:22px;padding:2.2rem;position:relative;
+}
+.vision-callout .vc-tag{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.vision-callout .vc-quote{font-family:var(--display);font-size:1.5rem;font-style:italic;line-height:1.35;color:var(--cream);font-weight:400}
+.vision-callout .vc-note{margin-top:1.2rem;font-size:.84rem;color:var(--text-faint);line-height:1.5}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:1rem}
+@media(max-width:880px){.pillars{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.pillars{grid-template-columns:1fr}}
+.pillar{background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:1.6rem;transition:all .4s}
+.pillar:hover{transform:translateY(-4px);border-color:var(--line-bright)}
+.pillar .pic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;margin-bottom:1rem;background:rgba(245,197,66,.13);color:var(--gold)}
+.pillar h4{font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--cream);margin-bottom:.5rem}
+.pillar p{color:var(--text-dim);font-size:.9rem;line-height:1.55}
+
+/* ---------- Proof Points band ---------- */
+.proof{background:linear-gradient(180deg,transparent,#f4f6fa,transparent);position:relative;z-index:2}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:3rem}
+@media(max-width:780px){.proof-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.proof-grid{grid-template-columns:1fr}}
+.proof-cell{background:#ffffff;padding:2rem 1.6rem;text-align:center;backdrop-filter:blur(8px);transition:background .4s}
+.proof-cell:hover{background:#f4f6fa}
+.proof-cell .pnum{font-family:var(--display);font-size:clamp(2rem,4vw,2.8rem);font-weight:500;color:var(--cream);line-height:1}
+.proof-cell .pnum span{color:var(--gold)}
+.proof-cell .plbl{font-size:.86rem;color:var(--text-dim);margin-top:.6rem;line-height:1.4}
+.proof-foot{text-align:center;margin-top:1.6rem;font-size:.8rem;color:var(--text-faint)}
+
+/* ---------- Canada / Vancouver ---------- */
+.canada-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:3.4rem}
+@media(max-width:860px){.canada-grid{grid-template-columns:1fr}}
+.canada-card{background:#ffffff;border:1px solid var(--line);border-radius:18px;padding:2rem;transition:all .4s}
+.canada-card:hover{transform:translateY(-4px);border-color:var(--line-bright)}
+.canada-card h3{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--cream);margin-bottom:.7rem;display:flex;align-items:center;gap:.7rem}
+.canada-card h3 .ci{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:1.1rem;background:rgba(90,169,230,.14);color:var(--sky);flex-shrink:0}
+.canada-card p{color:var(--text-dim);font-size:.96rem;line-height:1.65}
+.eco-chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2.4rem}
+.eco-chip{
+  background:#ffffff;border:1px solid var(--line-bright);border-radius:100px;
+  padding:.5rem 1.1rem;font-size:.86rem;color:var(--text-dim);transition:all .3s;
+}
+.eco-chip:hover{border-color:var(--gold);color:var(--cream)}
+.eco-chip strong{color:var(--gold);font-weight:600}
+.eco-label{text-align:center;font-size:.8rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em;margin-top:2.8rem;margin-bottom:.4rem}
+
+/* ---------- Sections ---------- */
+section{position:relative;z-index:2}
+.wrap{max-width:1140px;margin:0 auto;padding:clamp(4.5rem,9vw,8rem) clamp(1.2rem,5vw,4rem)}
+.section-tag{
+  font-size:.78rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);
+  display:flex;align-items:center;gap:.8rem;margin-bottom:1.4rem;
+}
+.section-tag::before{content:"";width:32px;height:1.5px;background:var(--coral)}
+h2.section-title{
+  font-family:var(--display);font-size:clamp(2rem,4.5vw,3.4rem);line-height:1.08;font-weight:500;
+  letter-spacing:-.015em;color:var(--cream);margin-bottom:1.4rem;max-width:18ch;
+}
+h2.section-title em{font-style:italic;color:var(--gold)}
+.section-intro{font-size:1.08rem;color:var(--text-dim);max-width:64ch;line-height:1.75}
+
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- Why / Objectives ---------- */
+.obj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3.4rem}
+@media(max-width:860px){.obj-grid{grid-template-columns:1fr}}
+.obj-card{
+  background:linear-gradient(160deg,#eef1f7,#ffffff);
+  border:1px solid var(--line);border-radius:20px;padding:2.2rem;position:relative;overflow:hidden;
+  transition:transform .4s,border-color .4s;
+}
+.obj-card:hover{transform:translateY(-6px);border-color:var(--line-bright)}
+.obj-card .icon{
+  width:54px;height:54px;border-radius:14px;display:grid;place-items:center;margin-bottom:1.4rem;
+  font-size:1.5rem;
+}
+.obj-card:nth-child(1) .icon{background:rgba(245,197,66,.14);color:var(--gold)}
+.obj-card:nth-child(2) .icon{background:rgba(232,82,122,.14);color:var(--rose)}
+.obj-card:nth-child(3) .icon{background:rgba(240,107,92,.14);color:var(--coral)}
+.obj-card h3{font-family:var(--display);font-size:1.4rem;font-weight:500;color:var(--cream);margin-bottom:.8rem}
+.obj-card p{color:var(--text-dim);font-size:.98rem}
+.obj-card .bar{position:absolute;top:0;left:0;width:100%;height:3px}
+.obj-card:nth-child(1) .bar{background:linear-gradient(90deg,var(--gold),transparent)}
+.obj-card:nth-child(2) .bar{background:linear-gradient(90deg,var(--rose),transparent)}
+.obj-card:nth-child(3) .bar{background:linear-gradient(90deg,var(--coral),transparent)}
+
+/* ---------- Glance band ---------- */
+.glance{background:linear-gradient(180deg,transparent,#f4f6fa,transparent)}
+.glance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:3rem}
+@media(max-width:780px){.glance-grid{grid-template-columns:1fr}}
+.glance-cell{padding:2.6rem 2.2rem;border-right:1px solid var(--line);background:#ffffff}
+.glance-cell:last-child{border-right:none}
+@media(max-width:780px){.glance-cell{border-right:none;border-bottom:1px solid var(--line)}.glance-cell:last-child{border-bottom:none}}
+.glance-cell .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);font-weight:600;margin-bottom:1rem}
+.glance-cell .v{font-family:var(--display);font-size:1.7rem;color:var(--cream);font-weight:500;margin-bottom:.7rem;line-height:1.1}
+.glance-cell .d{color:var(--text-dim);font-size:.95rem}
+
+/* ---------- Curriculum ---------- */
+.mod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem;margin-top:3.4rem}
+@media(max-width:780px){.mod-grid{grid-template-columns:1fr}}
+.mod{
+  background:#ffffff;border:1px solid var(--line);border-radius:18px;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:border-color .4s,background .4s,transform .4s,box-shadow .4s;
+}
+.mod:hover{border-color:var(--line-bright);background:#f4f6fa}
+.mod.open{border-color:var(--line-bright);background:#f4f6fa;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.mod .mod-head{padding:2rem 2rem 1.7rem;position:relative}
+.mod .topline{height:2px;width:48px;border-radius:2px;margin-bottom:1.4rem;transition:width .45s cubic-bezier(.16,1,.3,1)}
+.mod.open .topline{width:100%}
+.mod:nth-child(1) .topline{background:var(--gold)}
+.mod:nth-child(2) .topline{background:var(--rose)}
+.mod:nth-child(3) .topline{background:var(--coral)}
+.mod:nth-child(4) .topline{background:var(--sky)}
+.mod:nth-child(5) .topline{background:var(--sage)}
+.mod:nth-child(6) .topline{background:var(--gold-deep)}
+.mod .no{font-family:var(--display);font-size:.95rem;color:var(--text-faint);font-weight:600;letter-spacing:.1em}
+.mod h3{font-family:var(--display);font-size:1.35rem;font-weight:500;color:var(--cream);margin:.4rem 0 .8rem;padding-right:2.5rem}
+.mod .mod-head>p{color:var(--text-dim);font-size:.96rem}
+.mod .big{position:absolute;right:1.4rem;bottom:-.6rem;font-family:var(--display);font-size:5rem;font-weight:600;color:rgba(255,255,255,.025);line-height:1;transition:color .4s;pointer-events:none}
+.mod.open .big{color:rgba(245,197,66,.04)}
+/* toggle */
+.mod .toggle{
+  position:absolute;top:2rem;right:1.7rem;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--line-bright);display:grid;place-items:center;transition:all .4s;z-index:2;
+}
+.mod:hover .toggle{border-color:var(--gold)}
+.mod .toggle::before,.mod .toggle::after{content:"";position:absolute;background:var(--text-dim);transition:all .4s;border-radius:2px}
+.mod .toggle::before{width:13px;height:2px}
+.mod .toggle::after{width:2px;height:13px}
+.mod:hover .toggle::before,.mod:hover .toggle::after{background:var(--gold)}
+.mod.open .toggle{transform:rotate(135deg);border-color:var(--gold)}
+.mod.open .toggle::before,.mod.open .toggle::after{background:var(--gold)}
+/* expandable body */
+.mod .mod-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.16,1,.3,1)}
+.mod.open .mod-body{grid-template-rows:1fr}
+.mod .mod-body-inner{overflow:hidden}
+.mod .mod-detail{padding:0 2rem 2rem;opacity:0;transform:translateY(8px);transition:opacity .4s .1s,transform .4s .1s}
+.mod.open .mod-detail{opacity:1;transform:none}
+.mod .detail-divider{height:1px;background:var(--line);margin-bottom:1.4rem}
+.mod .detail-label{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem}
+.mod .learn-list{list-style:none;margin-bottom:1.5rem}
+.mod .learn-list li{color:var(--text-dim);font-size:.92rem;padding-left:1.5rem;position:relative;margin-bottom:.55rem;line-height:1.5}
+.mod .learn-list li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.mod .takeaway{background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem}
+.mod .takeaway .tk-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);margin-bottom:.4rem}
+.mod .takeaway p{color:var(--cream);font-size:.94rem;font-style:italic;line-height:1.55;margin:0}
+.mod-hint{text-align:center;margin-top:1.8rem;color:var(--text-faint);font-size:.86rem;letter-spacing:.02em}
+
+/* ---------- Journey / steps ---------- */
+.journey{display:grid;grid-template-columns:1fr;gap:0;margin-top:3.4rem;position:relative}
+.step{display:grid;grid-template-columns:auto 1fr;gap:2rem;padding:2rem 0;border-bottom:1px solid var(--line);align-items:start}
+.step:last-child{border-bottom:none}
+.step .badge{
+  width:50px;height:50px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);
+  display:grid;place-items:center;font-family:var(--display);font-size:1.2rem;font-weight:600;flex-shrink:0;
+}
+.step h3{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--cream);margin-bottom:.5rem}
+.step p{color:var(--text-dim);font-size:.98rem;max-width:62ch}
+.step .tag{display:inline-block;font-size:.78rem;color:var(--coral);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+
+/* ---------- Faculty ---------- */
+.fac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3.4rem}
+@media(max-width:860px){.fac-grid{grid-template-columns:1fr}}
+.fac{background:#ffffff;border:1px solid var(--line);border-radius:18px;padding:2rem;transition:all .4s}
+.fac:hover{transform:translateY(-4px);border-color:var(--line-bright)}
+.fac .avatar{
+  width:64px;height:64px;border-radius:16px;margin-bottom:1.3rem;display:grid;place-items:center;font-size:1.6rem;
+  background:linear-gradient(135deg,rgba(245,197,66,.15),rgba(240,107,92,.15));border:1px solid var(--line-bright);
+}
+.fac h3{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--cream);margin-bottom:.7rem}
+.fac p{color:var(--text-dim);font-size:.95rem}
+
+/* ---------- Assessments ---------- */
+.assess-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3.4rem}
+@media(max-width:860px){.assess-grid{grid-template-columns:1fr}}
+.assess{border:1px solid var(--line);border-radius:18px;padding:2rem;background:#ffffff;transition:all .4s}
+.assess:hover{transform:translateY(-4px)}
+.assess:nth-child(1){border-top:3px solid var(--gold)}
+.assess:nth-child(2){border-top:3px solid var(--rose)}
+.assess:nth-child(3){border-top:3px solid var(--coral)}
+.assess h3{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--cream);margin-bottom:.9rem}
+.assess>p{color:var(--text-dim);font-size:.95rem;margin-bottom:1.2rem}
+.assess ul{list-style:none}
+.assess li{color:var(--text-dim);font-size:.92rem;padding-left:1.4rem;position:relative;margin-bottom:.6rem}
+.assess li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+/* ---------- Privileges ---------- */
+.priv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem;margin-top:3.4rem}
+@media(max-width:780px){.priv-grid{grid-template-columns:1fr}}
+.priv{display:flex;gap:1.4rem;padding:2rem;border:1px solid var(--line);border-radius:18px;background:#ffffff;transition:all .4s}
+.priv:hover{border-color:var(--line-bright);transform:translateY(-3px)}
+.priv .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;flex-shrink:0;background:rgba(245,197,66,.13);color:var(--gold)}
+.priv h3{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--cream);margin-bottom:.5rem}
+.priv p{color:var(--text-dim);font-size:.94rem}
+
+/* ---------- Quote band ---------- */
+.quote-band{text-align:center;padding:clamp(4rem,8vw,6rem) clamp(1.2rem,5vw,4rem);background:radial-gradient(ellipse at center,#eef1f7,transparent 70%)}
+.quote-band blockquote{font-family:var(--display);font-style:italic;font-size:clamp(1.6rem,4vw,2.8rem);line-height:1.3;color:var(--cream);max-width:20ch;margin:0 auto;font-weight:400}
+.quote-band blockquote span{color:var(--gold)}
+.quote-band cite{display:block;margin-top:1.8rem;font-style:normal;color:var(--text-faint);font-size:.9rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* ---------- CTA ---------- */
+.cta{
+  margin:0 clamp(1.2rem,5vw,4rem) clamp(4rem,8vw,7rem);
+  background:linear-gradient(135deg,var(--navy-700),var(--navy-600));
+  border:1px solid var(--line-bright);border-radius:28px;padding:clamp(3rem,6vw,5.5rem) clamp(2rem,5vw,5rem);
+  text-align:center;position:relative;overflow:hidden;
+  max-width:1140px;margin-left:auto;margin-right:auto;
+}
+.cta::before{content:"";position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(245,197,66,.12),transparent 60%)}
+.cta-inner{position:relative;z-index:2}
+.cta h2{font-family:var(--display);font-size:clamp(2rem,5vw,3.4rem);font-weight:500;color:var(--cream);margin-bottom:1.2rem;line-height:1.1}
+.cta h2 em{font-style:italic;color:var(--gold)}
+.cta p{color:var(--text-dim);max-width:54ch;margin:0 auto 2.4rem;font-size:1.08rem}
+.cta .btn-primary{font-size:1.05rem;padding:1.05rem 2.4rem}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);padding:3rem clamp(1.2rem,5vw,4rem);text-align:center}
+footer .brand{justify-content:center;margin-bottom:1rem}
+footer p{color:var(--text-faint);font-size:.88rem;max-width:60ch;margin:0 auto}
+footer .legal{margin-top:1.5rem;font-size:.8rem;color:var(--text-faint);opacity:.6}
+
+/* utility */
+.mt-sm{margin-top:1rem}
+
+/* step link */
+.step-link{display:inline-block;margin-top:1rem;color:var(--gold);text-decoration:none;font-weight:600;font-size:.92rem;transition:gap .25s,color .25s}
+.step-link:hover{color:var(--cream)}
+
+/* ---------- Application Journey ---------- */
+.apply-section{
+  margin:0 clamp(1.2rem,5vw,4rem) clamp(4rem,8vw,7rem);
+  max-width:1140px;margin-left:auto;margin-right:auto;
+}
+.apply-shell{
+  background:linear-gradient(135deg,var(--navy-700),var(--navy-600));
+  border:1px solid var(--line-bright);border-radius:28px;
+  padding:clamp(2rem,5vw,4rem) clamp(1.4rem,5vw,4.5rem);
+  position:relative;overflow:hidden;
+}
+.apply-shell::before{content:"";position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(245,197,66,.1),transparent 60%);pointer-events:none}
+.apply-head{text-align:center;position:relative;z-index:2;margin-bottom:2.6rem}
+.apply-head .section-tag{justify-content:center}
+.apply-head h2{font-family:var(--display);font-size:clamp(1.8rem,4.5vw,3rem);font-weight:500;color:var(--cream);line-height:1.1;margin-bottom:.8rem}
+.apply-head h2 em{font-style:italic;color:var(--gold)}
+.apply-head p{color:var(--text-dim);max-width:56ch;margin:0 auto;font-size:1.02rem}
+
+/* progress */
+.progress{display:flex;align-items:center;justify-content:center;gap:0;max-width:560px;margin:0 auto 2.6rem;position:relative;z-index:2}
+.progress .node{display:flex;flex-direction:column;align-items:center;gap:.5rem;flex:0 0 auto}
+.progress .circle{
+  width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+  border:1.5px solid var(--line-bright);color:var(--text-faint);font-weight:600;font-size:.95rem;
+  background:#ffffff;transition:all .4s;
+}
+.progress .node.active .circle{border-color:var(--gold);color:var(--ink);background:var(--gold);box-shadow:0 0 0 5px rgba(245,197,66,.15)}
+.progress .node.done .circle{border-color:var(--gold);color:var(--gold);background:rgba(245,197,66,.12)}
+.progress .node .plabel{font-size:.72rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;font-weight:600;white-space:nowrap}
+.progress .node.active .plabel{color:var(--gold)}
+.progress .bar{flex:1;height:2px;background:var(--line-bright);margin:0 .4rem;margin-bottom:1.7rem;position:relative;min-width:20px}
+.progress .bar::after{content:"";position:absolute;inset:0;background:var(--gold);width:0;transition:width .5s}
+.progress .bar.filled::after{width:100%}
+@media(max-width:640px){.progress .node .plabel{display:none}.progress .bar{margin-bottom:0}}
+
+/* form */
+.apply-form{position:relative;z-index:2;max-width:680px;margin:0 auto}
+.fstep{display:none;animation:fade .5s ease}
+.fstep.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.fstep h3{font-family:var(--display);font-size:1.5rem;font-weight:500;color:var(--cream);margin-bottom:.4rem}
+.fstep .sub{color:var(--text-dim);font-size:.96rem;margin-bottom:1.8rem}
+.field{margin-bottom:1.3rem}
+.field label{display:block;font-size:.85rem;font-weight:600;color:var(--cream);margin-bottom:.5rem;letter-spacing:.01em}
+.field label .req{color:var(--coral)}
+.field input,.field select,.field textarea{
+  width:100%;padding:.85rem 1rem;border-radius:12px;border:1px solid var(--line-bright);
+  background:#ffffff;color:var(--cream);font-family:var(--body);font-size:1rem;transition:border-color .25s,box-shadow .25s;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-faint)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,66,.12)}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a4a8c0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center}
+.field select option{background:var(--navy-800)}
+.field textarea{resize:vertical;min-height:96px;line-height:1.6}
+.field .hint{font-size:.8rem;color:var(--text-faint);margin-top:.4rem}
+.field .err{font-size:.8rem;color:var(--coral);margin-top:.4rem;display:none}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--coral)}
+.field.invalid .err{display:block}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+@media(max-width:560px){.row2{grid-template-columns:1fr}}
+
+/* the three questions */
+.qcard{background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1.4rem}
+.qcard .qn{display:flex;align-items:center;gap:.7rem;margin-bottom:.4rem}
+.qcard .qn span{width:26px;height:26px;border-radius:50%;background:rgba(245,197,66,.14);color:var(--gold);display:grid;place-items:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+.qcard .qn strong{font-family:var(--display);color:var(--cream);font-size:1.05rem;font-weight:500}
+.qcard p{color:var(--text-dim);font-size:.9rem;padding-left:2.4rem}
+
+/* upload */
+.dropzone{
+  border:2px dashed var(--line-bright);border-radius:16px;padding:2.4rem 1.4rem;text-align:center;
+  cursor:pointer;transition:all .3s;background:#ffffff;
+}
+.dropzone:hover,.dropzone.drag{border-color:var(--gold);background:rgba(245,197,66,.05)}
+.dropzone .up-ic{font-size:2.2rem;margin-bottom:.7rem}
+.dropzone .up-main{color:var(--cream);font-weight:600;margin-bottom:.3rem}
+.dropzone .up-main span{color:var(--gold);text-decoration:underline}
+.dropzone .up-sub{color:var(--text-faint);font-size:.84rem}
+.video-preview{display:none;margin-top:1.2rem;background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:1rem;align-items:center;gap:1rem}
+.video-preview.show{display:flex}
+.video-preview video{width:120px;height:72px;border-radius:8px;object-fit:cover;background:#000;flex-shrink:0}
+.video-preview .vmeta{flex:1;min-width:0}
+.video-preview .vname{color:var(--cream);font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.video-preview .vsize{color:var(--text-faint);font-size:.82rem;margin-top:.2rem}
+.video-preview .vremove{background:none;border:1px solid var(--line-bright);color:var(--text-dim);border-radius:8px;padding:.4rem .7rem;cursor:pointer;font-size:.82rem;transition:all .25s;flex-shrink:0}
+.video-preview .vremove:hover{border-color:var(--coral);color:var(--coral)}
+
+/* review */
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:.1rem;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:1.6rem}
+@media(max-width:560px){.review-grid{grid-template-columns:1fr}}
+.review-grid .rk{background:#ffffff;padding:.8rem 1rem;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);font-weight:600;border-bottom:1px solid var(--line)}
+.review-grid .rv{background:#eef1f7;padding:.8rem 1rem;color:var(--cream);font-size:.94rem;border-bottom:1px solid var(--line);word-break:break-word}
+.consent{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:1.6rem;cursor:pointer}
+.consent input{margin-top:.25rem;width:18px;height:18px;accent-color:var(--gold);flex-shrink:0}
+.consent label{color:var(--text-dim);font-size:.9rem;line-height:1.5;cursor:pointer}
+
+/* nav buttons */
+.form-nav{display:flex;justify-content:space-between;gap:1rem;margin-top:2rem}
+.form-nav .btn-back{background:none;border:1px solid var(--line-bright);color:var(--text-dim);padding:.85rem 1.6rem;border-radius:100px;font-weight:500;font-size:.98rem;cursor:pointer;transition:all .25s;font-family:var(--body)}
+.form-nav .btn-back:hover{border-color:var(--cream);color:var(--cream)}
+.form-nav .btn-back.hidden{visibility:hidden}
+.form-nav .btn-next{background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:var(--ink);border:none;padding:.85rem 2rem;border-radius:100px;font-weight:600;font-size:.98rem;cursor:pointer;transition:all .3s;box-shadow:0 8px 26px rgba(245,197,66,.22);font-family:var(--body)}
+.form-nav .btn-next:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(245,197,66,.36)}
+
+/* success */
+.apply-success{display:none;text-align:center;position:relative;z-index:2;padding:1rem 0}
+.apply-success.show{display:block;animation:fade .6s ease}
+.apply-success .check{width:88px;height:88px;border-radius:50%;background:rgba(245,197,66,.12);border:2px solid var(--gold);display:grid;place-items:center;margin:0 auto 1.6rem;font-size:2.6rem;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.apply-success h3{font-family:var(--display);font-size:2rem;font-weight:500;color:var(--cream);margin-bottom:.8rem}
+.apply-success p{color:var(--text-dim);max-width:50ch;margin:0 auto 2rem}
+.apply-success .ref{display:inline-block;background:#f4f6fa;border:1px solid var(--line);border-radius:10px;padding:.6rem 1.2rem;color:var(--ucw-red);font-weight:600;letter-spacing:.05em;margin-bottom:2rem}
+
+/* ===== Light-theme depth: soft shadows on cards ===== */
+.obj-card,.glance-grid,.mod,.fac,.assess,.priv,.canada-card,.pillar,.proof-cell,.video-frame,.vision-callout,.qcard,.review-grid{
+  box-shadow:0 10px 30px rgba(19,34,75,.06);
+}
+.obj-card:hover,.mod:hover,.fac:hover,.assess:hover,.priv:hover,.canada-card:hover,.pillar:hover{
+  box-shadow:0 18px 44px rgba(19,34,75,.12);
+}
+.mod.open{box-shadow:0 24px 60px rgba(19,34,75,.16)!important}
+.apply-shell{box-shadow:0 30px 80px rgba(19,34,75,.12)}
+
+/* 3D pumped form buttons */
+.form-nav .btn-next{
+  background:linear-gradient(180deg,var(--ucw-red-light),var(--ucw-red));color:#fff;border:none;
+  padding:.85rem 2rem;border-radius:100px;font-weight:700;font-size:.98rem;cursor:pointer;
+  transition:all .18s ease;font-family:var(--body);
+  box-shadow:0 5px 0 var(--ucw-red-deep),0 10px 20px rgba(227,27,35,.28);
+}
+.form-nav .btn-next:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ucw-red-deep),0 14px 26px rgba(227,27,35,.38)}
+.form-nav .btn-next:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ucw-red-deep),0 4px 10px rgba(227,27,35,.3)}
+.form-nav .btn-back{
+  background:#fff;border:2px solid var(--line-bright);color:var(--text-dim);padding:.8rem 1.6rem;border-radius:100px;
+  font-weight:600;font-size:.98rem;cursor:pointer;transition:all .18s ease;font-family:var(--body);
+  box-shadow:0 3px 0 rgba(19,34,75,.12);
+}
+.form-nav .btn-back:hover{transform:translateY(-1px);border-color:var(--navy);color:var(--navy);box-shadow:0 5px 0 rgba(19,34,75,.12)}
+
+/* Form inputs: light fields */
+.field input,.field select,.field textarea{
+  background:#fff!important;border:1.5px solid var(--line-bright)!important;color:var(--navy)!important;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ucw-red)!important;box-shadow:0 0 0 3px rgba(227,27,35,.12)!important}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-faint)!important}
+.field select option{background:#fff!important;color:var(--navy)!important}
+
+/* Progress circles active = red */
+.progress .node.active .circle{border-color:var(--ucw-red)!important;color:#fff!important;background:var(--ucw-red)!important;box-shadow:0 0 0 5px rgba(227,27,35,.15)!important}
+.progress .node.done .circle{border-color:var(--ucw-red)!important;color:var(--ucw-red)!important;background:rgba(227,27,35,.1)!important}
+.progress .node.active .plabel{color:var(--ucw-red)!important}
+.progress .bar.filled::after{background:var(--ucw-red)!important}
+
+/* Dropzone + previews light */
+.dropzone{background:#fafbfd!important}
+.dropzone:hover,.dropzone.drag{border-color:var(--ucw-red)!important;background:rgba(227,27,35,.04)!important}
+.video-preview{background:#fafbfd!important}
+.review-grid .rk{background:#f4f6fa!important;color:var(--text-faint)!important}
+.review-grid .rv{background:#fff!important;color:var(--navy)!important}
+
+/* Apply shell light gradient */
+.apply-shell{background:linear-gradient(135deg,#fff,#fef6f6)!important}
+.apply-shell::before{background:radial-gradient(circle,rgba(227,27,35,.08),transparent 60%)!important}
+.apply-head h2,.apply-success h3{color:var(--navy)!important}
+.apply-success .check{background:rgba(227,27,35,.1)!important;border-color:var(--ucw-red)!important;color:var(--ucw-red)!important}
+
+/* CTA band light with red glow */
+.cta{background:linear-gradient(135deg,#fff,#fef4f4)!important;border:1px solid var(--line-bright)!important;box-shadow:0 30px 80px rgba(19,34,75,.1)!important}
+.cta::before{background:radial-gradient(circle,rgba(227,27,35,.1),transparent 60%)!important}
+.cta h2{color:var(--navy)!important}
+
+/* Footer light */
+footer{background:#fafbfd}
+
+/* Vision callout warm tint */
+.vision-callout{background:linear-gradient(150deg,rgba(227,27,35,.08),rgba(227,27,35,.03))!important}
+.vision-callout .vc-quote{color:var(--navy)!important}
+
+/* Welcome video poster */
+.video-poster{background:radial-gradient(ellipse 70% 60% at 50% 35%,rgba(227,27,35,.12),transparent 60%),linear-gradient(150deg,#fef6f6,#f4f6fa)!important}
+.video-poster .ptitle{color:var(--navy)!important}
+.video-badge{background:rgba(255,255,255,.85)!important;color:var(--navy)!important}
+.playbtn{background:linear-gradient(180deg,var(--ucw-red-light),var(--ucw-red))!important;box-shadow:0 6px 0 var(--ucw-red-deep),0 12px 24px rgba(227,27,35,.35)!important}
+.video-poster .playbtn svg{fill:#fff!important}
+
+/* Quote band */
+.quote-band{background:radial-gradient(ellipse at center,rgba(227,27,35,.05),transparent 70%)!important}
+.quote-band blockquote{color:var(--navy)!important}
+.quote-band blockquote span{color:var(--ucw-red)!important}
+
+/* Icon tiles -> red family */
+.obj-card .icon,.priv .ic,.pillar .pic{background:rgba(227,27,35,.1)!important;color:var(--ucw-red)!important}
+.fac .avatar{background:linear-gradient(135deg,rgba(227,27,35,.12),rgba(227,27,35,.05))!important}
+.canada-card h3 .ci{background:rgba(47,111,176,.12)!important;color:var(--sky)!important}
+
+/* Consent checkbox accent */
+.consent input,.field input[type=checkbox]{accent-color:var(--ucw-red)!important}
+
+/* Takeaway box light */
+.mod .takeaway{background:#fafbfd!important}
+.mod .takeaway p{color:var(--navy)!important}
+
+/* Eco chips */
+.eco-chip{background:#fff!important}
+.eco-chip:hover{border-color:var(--ucw-red)!important;color:var(--navy)!important}
+.eco-chip strong{color:var(--ucw-red)!important}
+
+/* Section tags + labels red */
+.section-tag{color:var(--ucw-red)!important}
+.section-tag::before{background:var(--ucw-red)!important}
+.mod .detail-label,.vc-tag{color:var(--ucw-red)!important}
+.mod .takeaway .tk-label{color:var(--ucw-red)!important}
+
+/* ===== Entry Welcome Modal ===== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:1.4rem;background:rgba(19,34,75,.55);backdrop-filter:blur(6px);
+  opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease;
+}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal{
+  position:relative;max-width:540px;width:100%;background:#fff;border-radius:24px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(19,34,75,.35);
+  transform:translateY(24px) scale(.96);transition:transform .45s cubic-bezier(.16,1,.3,1);
+}
+.modal-overlay.show .modal{transform:none}
+.modal-top{
+  background:linear-gradient(135deg,var(--ucw-red),var(--ucw-red-deep));
+  padding:2rem 2.2rem 1.6rem;color:#fff;position:relative;overflow:hidden;
+}
+.modal-top::before{content:"";position:absolute;top:-50%;right:-10%;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.1)}
+.modal-top .m-rocket{font-size:2.2rem;margin-bottom:.6rem;display:block;position:relative;z-index:2}
+.modal-top h3{font-family:var(--display);font-size:1.55rem;font-weight:600;line-height:1.25;position:relative;z-index:2}
+.modal-body{padding:1.8rem 2.2rem 2.2rem}
+.modal-body p{color:var(--text);font-size:1rem;line-height:1.65;margin-bottom:1rem}
+.modal-body p strong{color:var(--navy)}
+.modal-deadline{
+  display:inline-flex;align-items:center;gap:.5rem;background:rgba(227,27,35,.08);
+  border:1px solid rgba(227,27,35,.2);border-radius:100px;padding:.45rem 1rem;
+  font-size:.88rem;font-weight:700;color:var(--ucw-red);margin-bottom:1.6rem;letter-spacing:.01em;
+}
+.modal-actions{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+.modal-close{
+  position:absolute;top:1rem;right:1rem;z-index:5;width:34px;height:34px;border-radius:50%;
+  border:none;background:rgba(255,255,255,.2);color:#fff;font-size:1.2rem;cursor:pointer;
+  display:grid;place-items:center;transition:all .25s;line-height:1;
+}
+.modal-close:hover{background:rgba(255,255,255,.35);transform:rotate(90deg)}
+.modal .btn-secondary{
+  background:#fff;border:2px solid var(--line-bright);color:var(--text-dim);padding:.8rem 1.4rem;
+  border-radius:100px;font-weight:600;font-size:.95rem;cursor:pointer;transition:all .18s ease;font-family:var(--body);
+}
+.modal .btn-secondary:hover{border-color:var(--navy);color:var(--navy)}
+@media(max-width:480px){.modal-actions{flex-direction:column}.modal-actions .btn-primary,.modal .btn-secondary{width:100%;text-align:center}}
+
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- ENTRY WELCOME MODAL -->
+<div class="modal-overlay" id="welcomeModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-top">
+      <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+      <span class="m-rocket">🚀</span>
+      <h3 id="modalTitle">The next generation of UCW Brand Ambassadors starts here.</h3>
+    </div>
+    <div class="modal-body">
+      <p>Applications are officially <strong>OPEN</strong> for GUS Canada Brand Ambassadors, and we're excited to welcome a new cohort of ambitious creators, leaders, and changemakers this September!</p>
+      <p>✨ <strong>Think you've got what it takes?</strong> We want to hear from you.</p>
+      <div class="modal-deadline">Applications close 14 August 2026</div>
+      <div class="modal-actions">
+        <a href="#apply" class="btn-primary" id="modalApply">Start Your Application</a>
+        <button type="button" class="btn-secondary" id="modalLater">Maybe later</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav id="nav">
+  <a href="#top" class="brand">UCW Legacy</a>
+  <div class="nav-links" id="navLinks">
+    <a href="#vision">Why UCW</a>
+    <a href="#curriculum">Curriculum</a>
+    <a href="#canada">Why Canada</a>
+    <a href="#journey">The Journey</a>
+    <a href="#apply" class="nav-cta">Apply Now</a>
+  </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="dot"></span> An Invitation · Canada's Entrepreneurial University</span>
+    <h1 class="hero-title">
+      <span class="l">Become a UCW</span>
+      <span class="l"><em>Global Ambassador.</em></span>
+      <span class="l">Leave a legacy.</span>
+    </h1>
+    <p class="hero-lead">The Global Counsellor Legacy Programme transforms our most dedicated partners into recognised ambassadors for University Canada West — equipping you with the knowledge, skills, and prestige to guide students toward life-changing decisions with genuine confidence.</p>
+    <div class="hero-actions">
+      <a href="#apply" class="btn-primary">Start Your Application</a>
+      <a href="#curriculum" class="btn-ghost">Explore the Curriculum</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="s"><div class="num">4–6</div><div class="lbl">Weeks Online</div></div>
+      <div class="s"><div class="num">6</div><div class="lbl">Expert Modules</div></div>
+      <div class="s"><div class="num">By</div><div class="lbl">Invitation Only</div></div>
+      <div class="s"><div class="num">1</div><div class="lbl">Global Network</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- DIRECTOR WELCOME VIDEO -->
+<section class="welcome" id="welcome">
+  <div class="wrap">
+    <div class="welcome-grid">
+      <div class="welcome-copy reveal">
+        <span class="section-tag">A Personal Welcome</span>
+        <h2>A message from <em>Michelle Hicks</em></h2>
+        <p>Hear directly from our Global Director of International Student Recruitment on what the Legacy Programme means, why your partnership matters, and the difference you make in students' lives every day.</p>
+        <p>Take two minutes to meet the person behind the programme — and discover why UCW believes in investing in counsellors like you.</p>
+        <div class="welcome-sig">
+          <div class="name">Michelle Hicks</div>
+          <div class="role">Global Director, International Student Recruitment</div>
+          <div class="org">UCW, GUS Canada</div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <!-- ============================================================
+             VIDEO INTEGRATION POINT — Michelle Hicks welcome message
+             ------------------------------------------------------------
+             To add the real video, pick ONE of the three options below
+             and replace the placeholder block (.video-poster) inside
+             .video-frame. Everything is pre-styled to fill the frame.
+
+             OPTION A — YouTube / Vimeo (recommended, easiest):
+               Replace the <div class="video-poster">…</div> with:
+               <iframe class="embed-slot"
+                 src="https://www.youtube.com/embed/VIDEO_ID"
+                 title="Welcome from Michelle Hicks"
+                 allow="accelerometer;autoplay;encrypted-media;picture-in-picture"
+                 allowfullscreen></iframe>
+               (For Vimeo use: https://player.vimeo.com/video/VIDEO_ID)
+
+             OPTION B — Hosted MP4 file (your own server / CDN):
+               Replace .video-poster with:
+               <video class="embed-slot" controls poster="thumbnail.jpg">
+                 <source src="https://your-host.com/michelle-welcome.mp4" type="video/mp4">
+               </video>
+
+             OPTION C — Click-to-play with your file:
+               Keep the poster, set data-video on it (see the small script
+               near the bottom of this file, marked "WELCOME VIDEO PLAYER").
+             ============================================================ -->
+        <div class="video-frame">
+          <span class="video-badge"><span class="rec"></span> Welcome Message</span>
+          <div class="video-poster" id="welcomePoster" data-video="">
+            <div class="pinner">
+              <div class="playbtn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+              <div class="ptitle">Watch Michelle's welcome</div>
+              <div class="psub">Global Director, International Student Recruitment · 2 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">Why This Matters</span>
+      <h2 class="section-title">More than recruitment. <em>A true partnership.</em></h2>
+      <p class="section-intro">Exceptional partnerships require more than transactions. When you genuinely understand UCW — our programmes, our values, and the opportunities Canada offers — you become an advocate who guides students toward decisions that change their lives. This programme is our investment in you.</p>
+    </div>
+
+    <div class="obj-grid">
+      <div class="obj-card reveal"><div class="bar"></div>
+        <div class="icon">🎓</div>
+        <h3>Deepen UCW Knowledge</h3>
+        <p>Gain comprehensive understanding of UCW's academic portfolio, the relevance of our MBA, and the distinctive career pathways open to graduates in Canada's dynamic economy.</p>
+      </div>
+      <div class="obj-card reveal"><div class="bar"></div>
+        <div class="icon">📣</div>
+        <h3>Enhance Your Skills</h3>
+        <p>Advanced training in consultative sales, authentic storytelling, and digital marketing — the tools that drive meaningful student conversions and build your credibility.</p>
+      </div>
+      <div class="obj-card reveal"><div class="bar"></div>
+        <div class="icon">🌐</div>
+        <h3>Build Global Community</h3>
+        <p>Join an exclusive network of elite counsellors aligned with UCW's mission and committed to transforming students' lives through quality Canadian education.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENTREPRENEURSHIP VISION -->
+<section class="vision" id="vision">
+  <div class="wrap">
+    <div class="vision-lead">
+      <div class="reveal">
+        <span class="section-tag">What Sets UCW Apart</span>
+        <h2 class="section-title">Canada's <em>entrepreneurial</em> university.</h2>
+        <p class="section-intro">UCW puts entrepreneurship at the heart of business education. Its MBA offers a dedicated Specialization in Entrepreneurship — built around opportunity recognition, business-model development, and investor-ready pitching — alongside live industry projects and tech partnerships. For your students, that means learning to create opportunity, not just find a job.</p>
+      </div>
+      <div class="vision-callout reveal">
+        <div class="vc-tag">UCW's Vision</div>
+        <div class="vc-quote">"Entrepreneurship as a mode of learning — not just a topic on the syllabus."</div>
+        <div class="vc-note">UCW is building toward an incubator-based, practice-led model where education and enterprise are fully integrated — positioning graduates to think and act like founders in any role.</div>
+      </div>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar reveal"><div class="pic">🚀</div><h4>Venture-Driven</h4><p>Students learn to identify market opportunities, design solutions, and launch viable ventures using proven frameworks and customer-discovery methods.</p></div>
+      <div class="pillar reveal"><div class="pic">🛠️</div><h4>Practice-Led</h4><p>Real-world learning through Riipen industry projects, design thinking, consulting practice, and capstone experiences — taught by faculty with deep industry experience.</p></div>
+      <div class="pillar reveal"><div class="pic">🤝</div><h4>Industry-Embedded</h4><p>Partnerships with Salesforce, IBM, AWS, Tableau and the Digital Marketing Institute bring current tools and certifications directly into the curriculum.</p></div>
+      <div class="pillar reveal"><div class="pic">🌱</div><h4>Future-Focused</h4><p>Four MBA specializations — Entrepreneurship, AI & Machine Learning Leadership, Business Analytics, and Supply Chain Management — built for tomorrow's economy.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF POINTS -->
+<section class="proof" id="proof">
+  <div class="wrap" style="padding-top:2rem;padding-bottom:2rem">
+    <div class="reveal" style="text-align:center;max-width:60ch;margin:0 auto">
+      <span class="section-tag" style="justify-content:center">The Credibility</span>
+      <h2 class="section-title" style="margin:0 auto">Proof your students can <em>trust.</em></h2>
+    </div>
+    <div class="proof-grid reveal">
+      <div class="proof-cell"><div class="pnum">5<span>★</span></div><div class="plbl">QS Stars rating — 1st in BC, 3rd in Canada to earn it</div></div>
+      <div class="proof-cell"><div class="pnum">#1</div><div class="plbl">Most Scopus-indexed publications among Canadian private universities (2025)</div></div>
+      <div class="proof-cell"><div class="pnum">92<span>%</span></div><div class="plbl">of MBA students working or with a job lined up within a year of graduating</div></div>
+      <div class="proof-cell"><div class="pnum">7,000<span>+</span></div><div class="plbl">students from 100+ countries in the heart of Vancouver</div></div>
+      <div class="proof-cell"><div class="pnum">200<span>+</span></div><div class="plbl">employers offering practicum placements & real work experience</div></div>
+      <div class="proof-cell"><div class="pnum">ACBSP</div><div class="plbl">&amp; NCMA-accredited MBA — recognised, quality-assured education</div></div>
+    </div>
+    <p class="proof-foot">Figures from UCW's International Viewbook 2026. UCW is part of the GUS Canada network of institutions.</p>
+  </div>
+</section>
+
+<!-- GLANCE -->
+<section class="glance" id="glance">
+  <div class="wrap" style="padding-top:2rem">
+    <div class="reveal">
+      <span class="section-tag">At a Glance</span>
+      <h2 class="section-title">Designed for busy professionals.</h2>
+    </div>
+    <div class="glance-grid reveal">
+      <div class="glance-cell">
+        <div class="k">Duration & Format</div>
+        <div class="v">4–6 weeks, online</div>
+        <div class="d">Weekly live sessions combined with self-paced modules, built to fit demanding professional schedules.</div>
+      </div>
+      <div class="glance-cell">
+        <div class="k">Access</div>
+        <div class="v">By invitation only</div>
+        <div class="d">An exclusive programme reserved for UCW's most trusted and dedicated counsellor partners worldwide.</div>
+      </div>
+      <div class="glance-cell">
+        <div class="k">Recognition</div>
+        <div class="v">Official credential</div>
+        <div class="d">Graduate as a UCW Global Ambassador — Legacy Class of 2026 — with exclusive network membership.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">The Curriculum</span>
+      <h2 class="section-title">Six modules. <em>One transformation.</em></h2>
+      <p class="section-intro">Cutting-edge content delivered through live interactive sessions and practical assignments — each designed to sharpen your effectiveness while deepening your connection to UCW's mission.</p>
+      <p class="section-intro" style="margin-top:1rem;color:var(--gold)">Developed in collaboration with industry technology specialists, ensuring the curriculum reflects the skills and tools shaping tomorrow's workplace.</p>
+    </div>
+
+    <div class="mod-grid">
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 01</div>
+          <h3>AI in Business</h3>
+          <p>Discover why UCW's MBA is future-ready, integrating artificial intelligence, data analytics, and emerging technologies into curriculum design.</p>
+          <div class="big">01</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>How UCW embeds AI, analytics & tech via partners like Salesforce, IBM, AWS and Tableau</li>
+            <li>The four MBA specializations — AI & Machine Learning, Business Analytics, Supply Chain, Entrepreneurship</li>
+            <li>Turning "future-ready" features into clear student benefits</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"A future-ready curriculum reduces the risk that a degree feels outdated by graduation."</p></div>
+        </div></div></div>
+      </div>
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 02</div>
+          <h3>Digital Marketing Skills</h3>
+          <p>Build your counsellor brand online through strategic social media presence, content creation, and authentic digital engagement.</p>
+          <div class="big">02</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>Build a credible advisor profile that earns family trust</li>
+            <li>Plan a sustainable content rhythm — education-first, not hard-sell</li>
+            <li>Represent UCW correctly with approved messaging and assets</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"Families research counsellors online before they trust them — your profile is your first pitch."</p></div>
+        </div></div></div>
+      </div>
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 03</div>
+          <h3>Storytelling &amp; Personal Branding</h3>
+          <p>Inspire students through authentic narratives that connect their emotional motivations with real educational outcomes.</p>
+          <div class="big">03</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>A simple narrative framework: motivation, obstacle, transformation</li>
+            <li>Connect a student's personal "why" to UCW and Canada outcomes</li>
+            <li>Tell true stories ethically — with consent and student dignity</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"Students decide on a believable picture of their future self — not facts alone."</p></div>
+        </div></div></div>
+      </div>
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 04</div>
+          <h3>Sales Mastery</h3>
+          <p>Advanced pitch techniques and consultative selling approaches designed specifically for promoting UCW programmes.</p>
+          <div class="big">04</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>Run a needs-discovery conversation that surfaces real priorities</li>
+            <li>Match UCW programmes to students rather than pushing one option</li>
+            <li>Handle cost, location, and outcome objections with confidence</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"Ask before you pitch — the best recommendation follows real understanding."</p></div>
+        </div></div></div>
+      </div>
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 05</div>
+          <h3>Success Stories</h3>
+          <p>Deep dives with top-performing counsellors sharing proven strategies, challenges overcome, and conversion insights.</p>
+          <div class="big">05</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>Repeatable tactics drawn from real peer case studies</li>
+            <li>Common pitfalls that cause student drop-off — and how to avoid them</li>
+            <li>How to adapt a proven approach to your own market</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"Conversion is usually lost in follow-up, not first contact — discipline matters."</p></div>
+        </div></div></div>
+      </div>
+
+      <div class="mod reveal" tabindex="0">
+        <div class="mod-head">
+          <div class="toggle"></div>
+          <div class="topline"></div>
+          <div class="no">MODULE 06</div>
+          <h3>Canada Career Pathways</h3>
+          <p>Understand employability trends, post-study work opportunities, and immigration pathways available to UCW graduates.</p>
+          <div class="big">06</div>
+        </div>
+        <div class="mod-body"><div class="mod-body-inner"><div class="mod-detail">
+          <div class="detail-divider"></div>
+          <div class="detail-label">What you'll learn</div>
+          <ul class="learn-list">
+            <li>Canada's labour market and where UCW graduates compete well</li>
+            <li>The post-study work landscape, explained responsibly</li>
+            <li>What counsellors should — and shouldn't — promise students</li>
+          </ul>
+          <div class="takeaway"><div class="tk-label">Key takeaway</div><p>"Speak to opportunities and trends — never guarantee jobs or immigration outcomes."</p></div>
+        </div></div></div>
+      </div>
+
+    </div>
+    <p class="mod-hint">Tap any module to explore what's inside →</p>
+  </div>
+</section>
+
+<!-- WHY CANADA / VANCOUVER -->
+<section id="canada">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">Why Canada · Why Vancouver</span>
+      <h2 class="section-title">A launchpad for <em>ambition.</em></h2>
+      <p class="section-intro">When your students ask "Why Canada?", UCW gives you a compelling answer. Studying in Vancouver places them inside one of North America's fastest-growing tech and startup hubs — with real pathways to work, build, and stay.</p>
+    </div>
+
+    <div class="canada-grid">
+      <div class="canada-card reveal"><h3><span class="ci">🏙️</span> A Top Startup Ecosystem</h3><p>In 2025, Vancouver ranked among the top 15 startup ecosystems in North America and top 40 worldwide — home to Amazon, Salesforce, Samsung and a thriving founder community your students can plug into.</p></div>
+      <div class="canada-card reveal"><h3><span class="ci">💼</span> Work While You Study</h3><p>Eligible international students can work up to 24 hours a week, and UCW's practicum program connects MBA students with 200+ employers for real Canadian work experience before they graduate.</p></div>
+      <div class="canada-card reveal"><h3><span class="ci">📈</span> Strong Job Market</h3><p>British Columbia projects over 1,000,000 job openings through 2034. For students who qualify, post-study work permit pathways exist under IRCC criteria — a genuine route to launch a career.</p></div>
+      <div class="canada-card reveal"><h3><span class="ci">🌎</span> Safe & Welcoming</h3><p>Canada ranks among the world's safest and most welcoming countries, with Vancouver offering an unmatched quality of life — coastal beauty, diversity, and a truly global student community.</p></div>
+    </div>
+
+    <p class="eco-label">Plugged into Vancouver's innovation network</p>
+    <div class="eco-chips reveal">
+      <span class="eco-chip"><strong>e@UBC</strong> Entrepreneurship</span>
+      <span class="eco-chip"><strong>SFU</strong> VentureLabs</span>
+      <span class="eco-chip"><strong>Creative Destruction Lab</strong> Vancouver</span>
+      <span class="eco-chip"><strong>Innovate BC</strong></span>
+      <span class="eco-chip"><strong>New Ventures BC</strong></span>
+      <span class="eco-chip"><strong>Launch Academy</strong></span>
+      <span class="eco-chip"><strong>Spring Activator</strong></span>
+      <span class="eco-chip"><strong>Founder Institute</strong> Vancouver</span>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section id="journey">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">The Journey</span>
+      <h2 class="section-title">From application <em>to ambassador.</em></h2>
+      <p class="section-intro">Your path through the Legacy Programme is built on authenticity, growth, and recognition — every step designed to make you a more confident, credible advocate for UCW.</p>
+    </div>
+
+    <div class="journey">
+      <div class="step reveal">
+        <div class="badge">01</div>
+        <div>
+          <span class="tag">Apply</span>
+          <h3>Share your story</h3>
+          <p>Submit a brief video answering three essential questions: <em>Why UCW? Why Canada? Why Me?</em> This authentic introduction helps us identify counsellors who share our values and genuine passion for student success.</p>
+          <a href="#apply" class="step-link">Begin your application →</a>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="badge">02</div>
+        <div>
+          <span class="tag">Join the cohort</span>
+          <h3>Enter an elite circle</h3>
+          <p>Selected participants join a hand-picked cohort representing UCW's most trusted global partners — learning together over 4–6 weeks of live and self-paced study.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="badge">03</div>
+        <div>
+          <span class="tag">Learn & apply</span>
+          <h3>Master six modules</h3>
+          <p>Complete expert-led sessions and creative assignments — from a "Why Canada" social media pitch to documenting your most successful student conversations.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="badge">04</div>
+        <div>
+          <span class="tag">Graduate</span>
+          <h3>Earn your legacy</h3>
+          <p>Complete all modules and assessments to earn the prestigious designation: <em>UCW Global Ambassador, Legacy Class of 2026</em> — and lifelong membership in our global network.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FACULTY -->
+<section id="faculty">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">Expert Facilitators</span>
+      <h2 class="section-title">Learn from those <em>who know UCW best.</em></h2>
+      <p class="section-intro">A distinguished faculty bringing decades of combined experience in international education, career development, and strategic recruitment — offering both frameworks and immediately applicable tactics.</p>
+    </div>
+
+    <div class="fac-grid">
+      <div class="fac reveal"><div class="avatar">🏛️</div><h3>UCW Leadership</h3><p>Academic directors, brand strategists, and institutional leaders share insider perspectives on UCW's vision, strategic direction, and distinctive positioning in Canada's higher education landscape.</p></div>
+      <div class="fac reveal"><div class="avatar">🧭</div><h3>Career Coaches</h3><p>Expert guidance on navigating Canada's labour market, understanding emerging industry opportunities, and advising students on post-graduation success across diverse sectors.</p></div>
+      <div class="fac reveal"><div class="avatar">📈</div><h3>GUS Canada Business Development Experts</h3><p>Practical recruitment mastery from the GUS Canada business development team — conversion techniques, objection handling, and relationship-building strategies that produce results.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ASSESSMENTS -->
+<section id="assessments">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">Engaging Assessments</span>
+      <h2 class="section-title">Learning that comes alive.</h2>
+      <p class="section-intro">Practical, creative assignments that reinforce key concepts while building your professional portfolio — balancing private reflection with confident public demonstration.</p>
+    </div>
+
+    <div class="assess-grid">
+      <div class="assess reveal">
+        <h3>Social Media Challenge</h3>
+        <p>Create and post a compelling "Why Canada" elevator pitch on your preferred platform, demonstrating authentic storytelling.</p>
+        <ul>
+          <li>Showcase Canada's unique educational advantages</li>
+          <li>Integrate personal insights and cultural perspective</li>
+          <li>Engage your professional network</li>
+        </ul>
+      </div>
+      <div class="assess reveal">
+        <h3>Signature Pitch</h3>
+        <p>Document and share your most successful student pitch for UCW, analysing what made it effective.</p>
+        <ul>
+          <li>Identify key persuasion elements</li>
+          <li>Demonstrate understanding of student psychology</li>
+          <li>Provide actionable insights for peers</li>
+        </ul>
+      </div>
+      <div class="assess reveal">
+        <h3>Weekly Reflections</h3>
+        <p>Complete brief micro-surveys and reflective journals that encourage continuous improvement.</p>
+        <ul>
+          <li>Track your personal learning journey</li>
+          <li>Identify real application opportunities</li>
+          <li>Contribute to the programme's evolution</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-band reveal">
+  <blockquote>"Our partnerships are not transactional — they are <span>transformational and enduring.</span>"</blockquote>
+  <cite>The UCW Legacy Philosophy</cite>
+</section>
+
+<!-- PRIVILEGES -->
+<section id="privileges">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-tag">Ambassador Privileges</span>
+      <h2 class="section-title">Recognition that <em>lasts a lifetime.</em></h2>
+      <p class="section-intro">Graduation is the beginning. Ambassador status is a permanent investment in your professional brand and your relationship with UCW.</p>
+    </div>
+
+    <div class="priv-grid">
+      <div class="priv reveal"><div class="ic">🏅</div><div><h3>Official Credential</h3><p>A prestigious certificate designating you as UCW Global Ambassador (Legacy Class of 2026), suitable for display and professional promotion.</p></div></div>
+      <div class="priv reveal"><div class="ic">⭐</div><div><h3>GUS Canada Social Media Recognition</h3><p>Featured placement across UCW and GUS Canada social media channels, showcasing your achievement to students, peers, and the wider education community.</p></div></div>
+      <div class="priv reveal"><div class="ic">🚪</div><div><h3>Priority Access</h3><p>First invitations to exclusive campaigns, advanced webinars, special agent challenges, and limited-opportunity programmes before general release.</p></div></div>
+      <div class="priv reveal"><div class="ic">✈️</div><div><h3>Entrepreneurship Mobility Credits</h3><p>Exclusive access to the programme where eligible members track performance milestones, earn rewards, and celebrate achievements across all GUS Canada institutions.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION JOURNEY -->
+<section class="apply-section reveal" id="apply">
+  <div class="apply-shell">
+    <div class="apply-head" id="applyHead">
+      <span class="section-tag">Begin Your Legacy</span>
+      <h2>Are you ready to <em>leave a legacy?</em></h2>
+      <p>Complete your application in four short steps. You'll share a few details about yourself and upload your "Why UCW? Why Canada? Why Me?" video to join the Legacy Class of 2026.</p>
+    </div>
+
+    <!-- progress -->
+    <div class="progress" id="progress">
+      <div class="node active" data-node="0"><div class="circle">1</div><div class="plabel">About You</div></div>
+      <div class="bar"></div>
+      <div class="node" data-node="1"><div class="circle">2</div><div class="plabel">Your Video</div></div>
+      <div class="bar"></div>
+      <div class="node" data-node="2"><div class="circle">3</div><div class="plabel">Review</div></div>
+    </div>
+
+    <!-- form -->
+    <div class="apply-form" id="applyForm">
+
+      <!-- STEP 1 -->
+      <div class="fstep active" data-step="0">
+        <h3>Tell us about you</h3>
+        <p class="sub">The essentials so we can get in touch.</p>
+        <div class="row2">
+          <div class="field"><label>Full name <span class="req">*</span></label><input type="text" name="name" placeholder="Jane Counsellor" required><div class="err">Please enter your name.</div></div>
+          <div class="field"><label>Email address <span class="req">*</span></label><input type="email" name="email" placeholder="you@agency.com" required><div class="err">Please enter a valid email.</div></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Phone (with country code)</label><input type="tel" name="phone" placeholder="+1 604 555 0123"><div class="err"></div></div>
+          <div class="field"><label>Country <span class="req">*</span></label><input type="text" name="country" placeholder="e.g. India" required><div class="err">Please enter your country.</div></div>
+        </div>
+        <div class="field"><label>Agency / company <span class="req">*</span></label><input type="text" name="agency" placeholder="Your organisation" required><div class="err">Please enter your agency or company.</div></div>
+        <div class="field"><label>Why you? <span class="req">*</span></label>
+          <textarea name="whyMe" placeholder="In a few sentences, what makes you a natural advocate for students — and for UCW?" required></textarea>
+          <div class="hint">A short, honest answer is perfect. You'll expand on this in your video.</div>
+          <div class="err">Please share a few words about why you.</div></div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="fstep" data-step="1">
+        <h3>Share your story on video</h3>
+        <p class="sub">Record a brief 60–90 second video answering these three questions:</p>
+
+        <div class="qcard"><div class="qn"><span>1</span><strong>Why UCW? Creating AI-Ready Entrepreneurs at UCW</strong></div><p>What makes UCW the place to build the next generation of AI-ready, entrepreneurial graduates?</p></div>
+        <div class="qcard"><div class="qn"><span>2</span><strong>Why Canada?</strong></div><p>What makes Canada a destination you believe in for students?</p></div>
+        <div class="qcard"><div class="qn"><span>3</span><strong>Why Me?</strong></div><p>What makes you the right person to be a UCW Global Ambassador?</p></div>
+
+        <div class="field">
+          <label>Upload your video <span class="req">*</span></label>
+          <div class="dropzone" id="dropzone">
+            <div class="up-ic">🎬</div>
+            <div class="up-main"><span>Click to upload</span> or drag &amp; drop</div>
+            <div class="up-sub">MP4, MOV or WebM · up to 200 MB</div>
+          </div>
+          <input type="file" id="videoInput" accept="video/*" hidden>
+          <div class="err" id="videoErr">Please upload your video to continue.</div>
+          <div class="video-preview" id="videoPreview">
+            <video id="previewPlayer" muted></video>
+            <div class="vmeta"><div class="vname" id="vName"></div><div class="vsize" id="vSize"></div></div>
+            <button type="button" class="vremove" id="vRemove">Remove</button>
+          </div>
+        </div>
+        <p class="hint" style="color:var(--text-faint);font-size:.84rem">Tip: a phone camera is perfectly fine — we care about authenticity, not production value.</p>
+        <label class="consent" style="margin-top:1.2rem"><input type="checkbox" id="socialConsent"><span>I'm happy for UCW to feature my video on its social media and marketing channels (optional).</span></label>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="fstep" data-step="2">
+        <h3>Review &amp; submit</h3>
+        <p class="sub">Please check everything looks right before submitting.</p>
+        <div class="review-grid" id="reviewGrid"></div>
+        <label class="consent"><input type="checkbox" id="consent"><span>I confirm the information above is accurate and consent to UCW's International Business Development team contacting me about the Legacy Programme.</span></label>
+        <div class="err" id="consentErr" style="display:none;color:var(--coral);font-size:.85rem;margin-top:-.8rem;margin-bottom:1rem">Please confirm to continue.</div>
+      </div>
+
+      <!-- nav -->
+      <div class="form-nav">
+        <button type="button" class="btn-back hidden" id="btnBack">← Back</button>
+        <button type="button" class="btn-next" id="btnNext">Continue →</button>
+      </div>
+    </div>
+
+    <!-- success -->
+    <div class="apply-success" id="applySuccess">
+      <div class="check">✓</div>
+      <h3>Your founder application has been received!</h3>
+      <p>The UCW team of experts is currently reviewing candidate profiles to ensure the next cohort of entrepreneurs, builders, and innovators is truly exceptional.</p>
+      <p>We'll be announcing results soon on social media and will keep all candidates updated throughout the process. Thanks for your patience while we carefully review every application!</p>
+      <div class="ref" id="refCode">REF: —</div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="#" class="btn-primary" id="emailApp">Email My Application</a>
+        <button type="button" class="btn-ghost" id="startOver" style="cursor:pointer;font-family:var(--body)">Submit Another</button>
+      </div>
+      <p style="font-size:.82rem;color:var(--text-faint);margin-top:1.6rem;max-width:46ch">Please keep your reference number. Your video isn't sent automatically — attach the file you selected to the email that opens.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="#top" class="brand">UCW Legacy</a>
+  <p>For enquiries regarding nominations, applications, or programme details, please contact UCW's International Business Development team. Together, let's build partnerships that transform lives and create lasting educational legacies.</p>
+  <div class="legal">University Canada West · Global Counsellor Legacy Programme · Legacy Class of 2026</div>
+</footer>
+
+<script>
+// Nav scroll state
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>40)});
+
+// Mobile menu
+const toggle=document.getElementById('menuToggle'),links=document.getElementById('navLinks');
+toggle.addEventListener('click',()=>{toggle.classList.toggle('open');links.classList.toggle('open')});
+links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{toggle.classList.remove('open');links.classList.remove('open')}));
+
+// Reveal on scroll
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('in'),i*60);io.unobserve(e.target)}})
+},{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ===== Entry Welcome Modal ===== */
+(function(){
+  const overlay=document.getElementById('welcomeModal');
+  if(!overlay)return;
+  let dismissed=false;
+  function open(){ if(!dismissed) overlay.classList.add('show'); }
+  function close(){ overlay.classList.remove('show'); dismissed=true; }
+  // Show shortly after load so it feels like a greeting, not a block
+  setTimeout(open,900);
+  document.getElementById('modalClose').addEventListener('click',close);
+  document.getElementById('modalLater').addEventListener('click',close);
+  document.getElementById('modalApply').addEventListener('click',close); // close, then anchor scrolls to #apply
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) close(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&overlay.classList.contains('show')) close(); });
+})();
+
+/* ---------- Expandable module cards ---------- */
+(function(){
+  const mods=[...document.querySelectorAll('.mod')];
+  function toggle(card){
+    const isOpen=card.classList.contains('open');
+    mods.forEach(m=>m.classList.remove('open')); // accordion: close others
+    if(!isOpen)card.classList.add('open');
+  }
+  mods.forEach(card=>{
+    card.addEventListener('click',()=>toggle(card));
+    card.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(card);}
+    });
+  });
+})();
+
+/* ============================================================
+   WELCOME VIDEO PLAYER (Option C helper)
+   ------------------------------------------------------------
+   If you set a URL on #welcomePoster's data-video attribute,
+   clicking the poster will swap in the player automatically.
+   - YouTube/Vimeo: paste the EMBED url (…/embed/ID or player.vimeo…/ID)
+   - MP4 file: paste the direct .mp4 URL
+   Leave data-video empty to keep the static placeholder.
+   ============================================================ */
+(function(){
+  const poster=document.getElementById('welcomePoster');
+  if(!poster)return;
+  poster.addEventListener('click',()=>{
+    const url=poster.getAttribute('data-video');
+    if(!url)return; // no video set yet — placeholder stays
+    const frame=poster.parentElement;
+    let el;
+    if(/\.(mp4|webm|ogg)(\?|$)/i.test(url)){
+      el=document.createElement('video');
+      el.className='embed-slot';el.controls=true;el.autoplay=true;
+      const s=document.createElement('source');s.src=url;el.appendChild(s);
+    }else{
+      el=document.createElement('iframe');
+      el.className='embed-slot';
+      el.src=url+(url.includes('?')?'&':'?')+'autoplay=1';
+      el.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
+      el.allowFullscreen=true;
+    }
+    poster.replaceWith(el);
+  });
+})();
+
+/* ============================================================
+   APPLICATION JOURNEY
+   ------------------------------------------------------------
+   NOTE FOR DEVELOPERS: this collects the application client-side
+   and produces an email handoff. To send to a real backend
+   (Formspree / Google Forms / your endpoint), replace the body
+   of submitToBackend() below with a fetch() POST. The form data
+   and video File object are already assembled for you.
+   ============================================================ */
+(function(){
+  const steps=[...document.querySelectorAll('.fstep')];
+  const nodes=[...document.querySelectorAll('.progress .node')];
+  const bars=[...document.querySelectorAll('.progress .bar')];
+  const btnNext=document.getElementById('btnNext');
+  const btnBack=document.getElementById('btnBack');
+  const form=document.getElementById('applyForm');
+  const head=document.getElementById('applyHead');
+  const progress=document.getElementById('progress');
+  const success=document.getElementById('applySuccess');
+  let cur=0, videoFile=null;
+
+  // ---- video upload ----
+  const dz=document.getElementById('dropzone');
+  const input=document.getElementById('videoInput');
+  const preview=document.getElementById('videoPreview');
+  const player=document.getElementById('previewPlayer');
+  const vName=document.getElementById('vName');
+  const vSize=document.getElementById('vSize');
+  const MAX=200*1024*1024;
+
+  dz.addEventListener('click',()=>input.click());
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
+  dz.addEventListener('drop',e=>{if(e.dataTransfer.files[0])handleVideo(e.dataTransfer.files[0])});
+  input.addEventListener('change',e=>{if(e.target.files[0])handleVideo(e.target.files[0])});
+  document.getElementById('vRemove').addEventListener('click',()=>{
+    videoFile=null;input.value='';preview.classList.remove('show');dz.style.display='block';
+  });
+
+  function handleVideo(file){
+    if(!file.type.startsWith('video/')){alert('Please choose a video file.');return;}
+    if(file.size>MAX){alert('That file is over 200 MB. Please upload a smaller video.');return;}
+    videoFile=file;
+    vName.textContent=file.name;
+    vSize.textContent=(file.size/1048576).toFixed(1)+' MB';
+    player.src=URL.createObjectURL(file);
+    preview.classList.add('show');dz.style.display='none';
+    document.getElementById('videoErr').style.display='none';
+  }
+
+  // ---- validation per step ----
+  function validateStep(i){
+    let ok=true;
+    if(i===2){ // video step
+      if(!videoFile){document.getElementById('videoErr').style.display='block';ok=false;}
+      return ok;
+    }
+    const fields=steps[i].querySelectorAll('input[required],select[required]');
+    fields.forEach(f=>{
+      const wrap=f.closest('.field');
+      let valid=f.value.trim()!=='';
+      if(f.type==='email'&&valid)valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value);
+      wrap.classList.toggle('invalid',!valid);
+      if(!valid)ok=false;
+    });
+    return ok;
+  }
+
+  // ---- navigation ----
+  function goTo(i){
+    steps[cur].classList.remove('active');
+    nodes[cur].classList.remove('active');
+    cur=i;
+    steps.forEach((s,idx)=>s.classList.toggle('active',idx===cur));
+    nodes.forEach((n,idx)=>{
+      n.classList.toggle('active',idx===cur);
+      n.classList.toggle('done',idx<cur);
+    });
+    bars.forEach((b,idx)=>b.classList.toggle('filled',idx<cur));
+    btnBack.classList.toggle('hidden',cur===0);
+    btnNext.textContent=cur===steps.length-1?'Submit Application ✓':'Continue →';
+    if(cur===steps.length-1)buildReview();
+    document.getElementById('apply').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  btnNext.addEventListener('click',()=>{
+    if(!validateStep(cur))return;
+    if(cur<steps.length-1){goTo(cur+1);}
+    else{ // final submit
+      if(!document.getElementById('consent').checked){
+        document.getElementById('consentErr').style.display='block';return;
+      }
+      submit();
+    }
+  });
+  btnBack.addEventListener('click',()=>{if(cur>0)goTo(cur-1)});
+
+  // ---- review ----
+  function collect(){
+    const d={};
+    form.querySelectorAll('input,select,textarea').forEach(f=>{if(f.name)d[f.name]=f.value.trim();});
+    d.video=videoFile?videoFile.name:'—';
+    d.socialConsent=document.getElementById('socialConsent').checked?'Yes — UCW may feature this video':'Not granted';
+    return d;
+  }
+  function buildReview(){
+    const d=collect();
+    const map=[
+      ['Name',d.name],['Email',d.email],['Phone',d.phone||'—'],['Country',d.country],
+      ['Agency',d.agency],['Why me',d.whyMe||'—'],['Video',d.video],['Social media use',d.socialConsent]
+    ];
+    document.getElementById('reviewGrid').innerHTML=
+      map.map(([k,v])=>`<div class="rk">${k}</div><div class="rv">${escapeHtml(v)}</div>`).join('');
+  }
+  function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  // ---- submit ----
+  function refCode(){return 'UCW-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-26';}
+  function submit(){
+    const d=collect();
+    const ref=refCode();
+    submitToBackend(d,videoFile,ref); // hook for real backend
+    // show success
+    head.style.display='none';progress.style.display='none';form.style.display='none';
+    success.classList.add('show');
+    document.getElementById('refCode').textContent='REF: '+ref;
+    // build email fallback
+    const body=
+`UCW Global Counsellor Legacy Programme — Application
+Reference: ${ref}
+
+Name: ${d.name}
+Email: ${d.email}
+Phone: ${d.phone||'-'}
+Country: ${d.country}
+Agency: ${d.agency}
+
+Why me: ${d.whyMe||'-'}
+
+Video file: ${d.video}
+Social media use: ${d.socialConsent}
+(Please attach this video file to this email before sending.)`;
+    document.getElementById('emailApp').href=
+      'mailto:ibd@ucanwest.ca?subject='+encodeURIComponent('Legacy Programme Application — '+d.name+' ('+ref+')')+
+      '&body='+encodeURIComponent(body);
+  }
+
+  // Replace this with a real fetch() POST to send applications to a server.
+  function submitToBackend(data,file,ref){
+    console.log('Application ready to submit:',{ref,data,videoAttached:!!file});
+    /* Example (Formspree):
+       const fd=new FormData();
+       Object.entries(data).forEach(([k,v])=>fd.append(k,v));
+       if(file)fd.append('video',file);
+       fd.append('ref',ref);
+       fetch('https://formspree.io/f/YOUR_ID',{method:'POST',body:fd});
+    */
+  }
+
+  document.getElementById('startOver').addEventListener('click',()=>{
+    form.reset?.();
+    form.querySelectorAll('input,select,textarea').forEach(f=>f.value='');
+    videoFile=null;input.value='';preview.classList.remove('show');dz.style.display='block';
+    document.getElementById('consent').checked=false;
+    document.getElementById('socialConsent').checked=false;
+    success.classList.remove('show');
+    head.style.display='';progress.style.display='';form.style.display='';
+    nodes.forEach(n=>n.classList.remove('done'));
+    goTo(0);
+  });
+})();
+</script>
+</body>
+</html>
