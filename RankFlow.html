@@ -798,7 +798,7 @@ function renderPodium(){
 function renderNations(){
   // Build nation counts from staticPlayers
   var regionMap={
-    'AnnyLynks':'&#127758; Unknown',
+    'AnnyLynks':'&#127474;&#127485; Mexico',
     'PedroLameira':'&#127463;&#127479; Brazil',
     'Bella':'&#127468;&#127469; Ghana',
     'Roge.Alex':'&#127474;&#127485; Mexico',
@@ -884,7 +884,7 @@ function updateStats(){
   // Use staticPlayers as the authoritative source for hero stats
   var staticGoals = staticPlayers.reduce(function(s,p){return s+p.unf+p.ucw;},0);
   var staticNations = (function(){
-    var regions=['Unknown','Brazil','Ghana','Mexico','LATAM/MENA/South Asia',
+    var regions=['Mexico','Brazil','Ghana','Mexico','LATAM/MENA/South Asia',
       'Canada','Nepal','Nepal','Turkiye','El Salvador','Brazil','Canada',
       'Peru','India','Brazil','Vietnam','Colombia','Canada','India','Colombia',
       'Vietnam','Canada','Colombia','Ecuador','Canada','Peru','Colombia',
@@ -900,38 +900,38 @@ function updateStats(){
 
 // ── STATIC PLAYER LEADERBOARD DATA ──
 var staticPlayers = [
-  {region:'Unknown',                flag:'&#127758;',          nick:'AnnyLynks',          unf:0, ucw:0},
-  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'PedroLameira',       unf:0, ucw:2},
-  {region:'Ghana',                  flag:'&#127468;&#127469;', nick:'Bella',              unf:0, ucw:0},
-  {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Roge.Alex',          unf:0, ucw:0},
-  {region:'LATAM/MENA/South Asia',  flag:'&#127758;',          nick:'CAD',                unf:0, ucw:0},
-  {region:'Canada (Caribbean)',     flag:'&#127464;&#127462;', nick:'dd',                 unf:0, ucw:0},
-  {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'BinodSoltee',        unf:0, ucw:0},
-  {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'Raj',                unf:0, ucw:0},
-  {region:'Türkiye',           flag:'&#127481;&#127479;', nick:'Egal',               unf:0, ucw:3},
-  {region:'El Salvador',            flag:'&#127480;&#127483;', nick:'GabyEI',             unf:0, ucw:0},
-  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Mie',                unf:1, ucw:0},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Couselormaple',      unf:0, ucw:0},
-  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'GS FC',              unf:1, ucw:1},
-  {region:'India',                  flag:'&#127470;&#127475;', nick:'HIMS.K',             unf:1, ucw:0},
-  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Go HB!',             unf:2, ucw:1},
-  {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'AC Vina',            unf:1, ucw:0},
-  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'AngieClosingQueen',  unf:0, ucw:1},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Immilander',         unf:4, ucw:2},
-  {region:'India',                  flag:'&#127470;&#127475;', nick:'Ajay',               unf:0, ucw:0},
-  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Maru',               unf:0, ucw:0},
-  {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'Leap Warrior',       unf:0, ucw:0},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'El trueno',          unf:0, ucw:0},
-  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'ValeG',              unf:1, ucw:0},
-  {region:'Ecuador',                flag:'&#127466;&#127464;', nick:'Encebollado',        unf:0, ucw:1},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Maestro',            unf:6, ucw:6},
-  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'SCCanada.',           unf:0, ucw:0},
-  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Danny',              unf:1, ucw:0},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'TGD',                unf:0, ucw:0},
-  {region:'Jamaica',                flag:'&#127471;&#127474;', nick:'JamRockaz',          unf:1, ucw:0},
-  {region:'India',                  flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:3, ucw:0},
-  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'Perusito',           unf:0, ucw:0},
-  {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Green',              unf:1, ucw:0}
+  {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'AnnyLynks',          unf:0,  ucw:0},
+  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'PedroLameira',       unf:0,  ucw:2},
+  {region:'Ghana',                  flag:'&#127468;&#127469;', nick:'Bella',              unf:0,  ucw:0},
+  {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Roge.Alex',          unf:0,  ucw:0},
+  {region:'LATAM/MENA/South Asia',  flag:'&#127758;',          nick:'CAD',                unf:0,  ucw:0},
+  {region:'Canada (Caribbean)',     flag:'&#127464;&#127462;', nick:'dd',                 unf:1,  ucw:0},
+  {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'BinodSoltee',        unf:0,  ucw:0},
+  {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'Raj',                unf:0,  ucw:0},
+  {region:'Türkiye',           flag:'&#127481;&#127479;', nick:'Egal',               unf:0,  ucw:3},
+  {region:'El Salvador',            flag:'&#127480;&#127483;', nick:'GabyEI',             unf:0,  ucw:0},
+  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Mie',                unf:1,  ucw:0},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Couselormaple',      unf:0,  ucw:0},
+  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'GS FC',              unf:1,  ucw:1},
+  {region:'India',                  flag:'&#127470;&#127475;', nick:'HIMS.K',             unf:1,  ucw:0},
+  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Go HB!',             unf:2,  ucw:1},
+  {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'AC Vina',            unf:1,  ucw:0},
+  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'AngieClosingQueen',  unf:0,  ucw:1},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Immilander',         unf:4,  ucw:2},
+  {region:'India',                  flag:'&#127470;&#127475;', nick:'Ajay',               unf:0,  ucw:0},
+  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Maru',               unf:0,  ucw:0},
+  {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'Leap Warrior',       unf:0,  ucw:0},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'El trueno',          unf:0,  ucw:0},
+  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'ValeG',              unf:1,  ucw:0},
+  {region:'Ecuador',                flag:'&#127466;&#127464;', nick:'Encebollado',        unf:0,  ucw:2},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Maestro',            unf:11, ucw:0},
+  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'SCCanada.',           unf:0,  ucw:0},
+  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Danny',              unf:1,  ucw:0},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'TGD',                unf:0,  ucw:0},
+  {region:'Jamaica',                flag:'&#127471;&#127474;', nick:'JamRockaz',          unf:1,  ucw:0},
+  {region:'India',                  flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:3,  ucw:0},
+  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'Perusito',           unf:0,  ucw:0},
+  {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Green',              unf:0,  ucw:1}
 ];
 
 function renderPlayerTables(){
