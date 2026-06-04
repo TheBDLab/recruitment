@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INUNI Global — Brand Foundation</title>
+<style>
+  :root{
+    --deep-navy:#173A65; --navy:#18407C; --royal:#18509F;
+    --bright:#1B75C2; --light:#1F90C8;
+    --ink:#16243a; --muted:#5d6b80; --line:#dfe4ec;
+    --paper:#ffffff; --bg:#eef1f6;
+    --serif:'Newsreader',Georgia,serif; --sans:'Archivo',-apple-system,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font-family:var(--sans);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;padding:40px 16px}
+  .page{background:var(--paper);max-width:880px;margin:0 auto;box-shadow:0 30px 80px rgba(23,58,101,.10),0 4px 14px rgba(23,58,101,.06);overflow:hidden}
+
+  /* ===== Masthead ===== */
+  .masthead{position:relative;background:linear-gradient(135deg,var(--deep-navy) 0%,var(--navy) 45%,var(--royal) 100%);color:#fff;padding:54px 60px 50px;overflow:hidden}
+  .masthead::before{content:"";position:absolute;top:50%;left:50%;width:680px;height:680px;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.05) 0deg,rgba(255,255,255,.05) 1.2deg,transparent 1.2deg,transparent 18deg);-webkit-mask-image:radial-gradient(circle,#000 18%,transparent 60%);mask-image:radial-gradient(circle,#000 18%,transparent 60%);opacity:.55;pointer-events:none}
+  .masthead::after{content:"";position:absolute;top:50%;left:50%;width:240px;height:240px;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:0 0 0 28px rgba(255,255,255,.05),0 0 0 70px rgba(255,255,255,.03);pointer-events:none}
+  .mh-row{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
+  .wordmark{font-family:var(--sans);font-weight:700;font-size:2.1rem;letter-spacing:.20em}
+  .wordmark .iu{display:inline-block;transform:rotate(45deg);width:30px;height:30px;background:linear-gradient(135deg,var(--light),var(--royal));border-radius:5px;vertical-align:middle;margin:0 10px 6px 0;position:relative}
+  .wordmark .iu::after{content:"iU";position:absolute;inset:0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;letter-spacing:0;color:#fff}
+  .sub-word{font-size:.72rem;letter-spacing:.42em;color:rgba(255,255,255,.7);margin-top:10px;font-weight:500}
+  .tagline{position:relative;z-index:2;font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.55rem;color:#fff;margin-top:38px;letter-spacing:.01em}
+  .tagline .q{color:var(--light)}
+  .mh-meta{text-align:right;font-size:.66rem;letter-spacing:.18em;color:rgba(255,255,255,.65);line-height:1.9;text-transform:uppercase}
+  .mh-logo{position:relative;z-index:2;display:flex;justify-content:center}
+  .mh-logo .card{background:#fff;border-radius:18px;padding:24px 30px;box-shadow:0 24px 60px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;min-width:280px;min-height:150px}
+  .mh-logo .card img{width:100%;max-width:330px;height:auto;display:block}
+  .mh-logo .card.ph::after{content:"Paste your INUNI logo URL into the image src — or tell Claude the uploaded filename";display:block;max-width:270px;text-align:center;font-family:var(--sans);font-size:.78rem;color:var(--muted);line-height:1.5}
+  .mh-logo .card.ph img{display:none}
+  .mh-stamp{position:relative;z-index:2;text-align:center;margin-top:24px;font-size:.64rem;letter-spacing:.2em;color:rgba(255,255,255,.6);text-transform:uppercase}
+
+  /* ===== Body ===== */
+  .body{padding:0 60px}
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  .eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--bright);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+  .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  h2{font-family:var(--serif);font-weight:400;font-size:1.5rem;color:var(--deep-navy);margin-bottom:14px;line-height:1.25}
+  p{color:var(--muted);font-size:.95rem;margin-bottom:12px}
+  p.lead{font-family:var(--serif);font-size:1.18rem;color:var(--ink);font-weight:300;line-height:1.5}
+  strong{color:var(--ink);font-weight:600}
+  .positioning{font-family:var(--serif);font-size:1.6rem;color:var(--deep-navy);font-weight:400;line-height:1.3;border-left:3px solid var(--bright);padding-left:22px;margin:6px 0}
+
+  /* the promise */
+  .promise .slogan{font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.95rem;color:var(--deep-navy);line-height:1.3;margin-bottom:10px}
+  .parse{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:22px}
+  .parse .pc{background:var(--paper);padding:20px 22px}
+  .parse .pc .word{font-family:var(--serif);font-size:1.22rem;color:var(--royal);font-weight:400;margin-bottom:9px}
+  .parse .pc p{font-size:.84rem;margin:0}
+
+  /* name split */
+  .namebox{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:6px}
+  .nb{background:var(--paper);padding:22px 24px}
+  .nb .big{font-family:var(--serif);font-size:2.2rem;color:var(--royal);font-weight:300;letter-spacing:.04em}
+  .nb p{font-size:.86rem;margin:8px 0 0}
+  .pal-note{font-size:.82rem;color:var(--muted);font-style:italic;margin-top:16px;text-align:center}
+
+  /* convergence diagram */
+  .converge-wrap{margin-top:24px;display:flex;justify-content:center}
+  .converge{width:100%;max-width:700px;height:auto}
+  .cv-label{font-family:var(--sans);font-weight:600;font-size:13px;fill:var(--ink)}
+  .cv-sub{font-family:var(--sans);font-weight:500;font-size:9.5px;fill:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+  .cv-stream{fill:none;stroke-linecap:round}
+  .cv-dot{animation:cv-flow 3.2s ease-in-out infinite}
+  @keyframes cv-flow{0%{opacity:0}15%{opacity:1}85%{opacity:1}100%{opacity:0}}
+  .cv-core-text{font-family:var(--serif);font-weight:400;font-size:22px;fill:#fff}
+  .cv-cap{text-align:center;font-size:.8rem;color:var(--muted);font-style:italic;margin-top:8px}
+
+  /* mission & vision */
+  .mv{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:6px}
+  .mv-card{border:1px solid var(--line);border-top:3px solid var(--royal);padding:24px 26px;background:linear-gradient(180deg,#f7f9fc,#fff)}
+  .mv-card .tag{font-size:.64rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--bright);margin-bottom:12px}
+  .mv-card .stmt{font-family:var(--serif);font-size:1.18rem;color:var(--deep-navy);font-weight:300;line-height:1.45}
+
+  /* principles */
+  .principles{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:8px;border:1px solid var(--line)}
+  .pr{background:var(--paper);padding:20px 22px}
+  .pr .num{font-family:var(--serif);font-size:.9rem;color:var(--light)}
+  .pr h4{font-size:.95rem;font-weight:700;color:var(--deep-navy);margin:4px 0 5px}
+  .pr p{font-size:.84rem;margin:0}
+
+  /* mark anatomy */
+  .mark-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .mk{display:flex;gap:12px;align-items:flex-start}
+  .mk .dot{flex-shrink:0;width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--royal)}
+  .mk h4{font-size:.9rem;color:var(--deep-navy);font-weight:700}
+  .mk p{font-size:.82rem;margin:2px 0 0}
+
+  /* belief band */
+  .belief{position:relative;margin:0 -60px;padding:46px 60px;background:linear-gradient(135deg,#eef4fb,#e3edf9);border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;overflow:hidden}
+  .belief::before{content:"";position:absolute;top:50%;left:50%;width:420px;height:420px;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(27,117,194,.06) 0deg,rgba(27,117,194,.06) 1.2deg,transparent 1.2deg,transparent 18deg);-webkit-mask-image:radial-gradient(circle,#000 12%,transparent 58%);mask-image:radial-gradient(circle,#000 12%,transparent 58%);pointer-events:none}
+  .belief .eb{position:relative;z-index:2;font-size:.64rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--bright);margin-bottom:14px}
+  .belief .q{position:relative;z-index:2;font-family:var(--serif);font-weight:300;font-style:italic;font-size:2rem;color:var(--deep-navy);line-height:1.25}
+
+  /* business architecture */
+  .brain{background:linear-gradient(135deg,var(--deep-navy),var(--royal));color:#fff;border-radius:12px;padding:22px 26px;margin:10px 0 8px;position:relative;overflow:hidden}
+  .brain .bt{font-size:.64rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--light);margin-bottom:6px}
+  .brain h4{font-family:var(--serif);font-weight:400;font-size:1.22rem;color:#fff;margin-bottom:8px}
+  .brain p{color:rgba(255,255,255,.85);font-size:.86rem;margin:0}
+  .unit{margin-top:26px}
+  .unit-h{display:flex;align-items:center;gap:12px;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--deep-navy);margin-bottom:14px}
+  .unit-h::after{content:"";flex:1;height:1px;background:var(--line)}
+  .lines{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .lcard{border:1px solid var(--line);border-radius:10px;padding:18px 20px;background:#fff}
+  .lcard .ln{font-size:1.02rem;font-weight:700;color:var(--royal);margin-bottom:3px}
+  .lcard .lr{font-size:.72rem;color:var(--muted);margin-bottom:10px;font-weight:500}
+  .lcard p{font-size:.84rem;margin:0 0 10px}
+  .tag{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin:0 5px 5px 0}
+  .t-comm{background:#e3edf9;color:#18509f}
+  .t-ret{background:#fdf0e0;color:#b5731f}
+  .t-succ{background:#e2f3ec;color:#1d8a5c}
+  .t-pkg{background:#ececf0;color:#555}
+  .rev{font-size:.8rem;color:var(--muted);line-height:1.5}
+  .rev b{color:var(--ink);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line);font-size:.74rem;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .tablewrap{overflow-x:auto;margin-top:12px}
+  .biztable{width:100%;border-collapse:collapse;font-size:.85rem;min-width:560px}
+  .biztable th{text-align:left;font-family:var(--sans);font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bright);padding:0 14px 10px;border-bottom:2px solid var(--royal)}
+  .biztable td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--muted);font-size:.84rem;line-height:1.5}
+  .biztable tr.unitrow td{background:#eef4fb;font-family:var(--sans);font-weight:700;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--deep-navy);padding:10px 14px}
+  .biztable td.line{font-weight:700;color:var(--royal);font-size:.92rem}
+  .biztable td.line .sub{display:block;font-weight:500;color:var(--muted);font-size:.68rem;letter-spacing:.04em;margin-top:3px}
+  .biztable td.earns .note{font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.45}
+
+  /* palette */
+  .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:18px}
+  .sw .chiprow{height:70px;border-radius:10px;display:flex;align-items:flex-end;padding:8px;box-shadow:0 4px 12px rgba(23,58,101,.12)}
+  .sw .hex{font-size:.66rem;font-weight:700;color:#fff;letter-spacing:.04em}
+  .sw .nm{font-size:.74rem;color:var(--muted);margin-top:8px;font-weight:500}
+
+  /* closing */
+  .closing{background:linear-gradient(135deg,var(--deep-navy),var(--royal));color:#fff;padding:38px 60px}
+  .closing .eyebrow{color:var(--light)}
+  .closing .eyebrow::after{background:linear-gradient(90deg,rgba(255,255,255,.25),transparent)}
+  .closing p{color:rgba(255,255,255,.85);font-size:1rem}
+  .closing .big{font-family:var(--serif);font-style:italic;font-size:1.4rem;color:#fff;margin-top:6px}
+
+  .foot{background:#0f2c50;color:rgba(255,255,255,.55);padding:16px 60px;display:flex;justify-content:space-between;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase}
+  .foot .gold{color:var(--light)}
+
+  @media(max-width:680px){
+    .body,.masthead,.foot,.closing{padding-left:30px;padding-right:30px}
+    .namebox,.mv,.principles,.mark-grid,.parse{grid-template-columns:1fr}
+    .palette{grid-template-columns:repeat(3,1fr)}
+    .mh-row{flex-direction:column;gap:16px}.mh-meta{text-align:left}
+    .foot{flex-direction:column;gap:6px}
+  }
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{background:#fff;padding:0}
+    .page{box-shadow:none;max-width:100%;margin:0}
+    section,.mv-card,.lcard,.brain,.belief,.pillar,.logo-showcase,.converge-wrap,.parse .pc,.pr,.mk,.sw{break-inside:avoid;page-break-inside:avoid}
+    .biztable tr{break-inside:avoid;page-break-inside:avoid}
+    h2,.eyebrow{break-after:avoid;page-break-after:avoid}
+    @page{margin:12mm}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="mh-logo">
+      <div class="card" id="logoCard">
+        <div id="wmFallback" style="text-align:center"><div style="font-family:var(--sans);font-weight:700;font-size:1.85rem;letter-spacing:.16em;color:var(--deep-navy)">INUNI <span style="color:var(--bright)">GLOBAL</span></div><div style="font-size:.6rem;letter-spacing:.26em;color:var(--muted);margin-top:8px;font-weight:600">WE BRING THE WORLD INTO ONE INTELLIGENCE</div></div>
+        <img id="inuniLogo" style="display:none" src="data:image/png;base64,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" alt="INUNI Global">
+      </div>
+    </div>
+    <div class="mh-stamp">Brand Foundation &middot; Brand Mark v2 &middot; 2026 &middot; Internal Approval</div>
+  </header>
+
+  <div class="body">
+
+    <!-- THE NEW MARK -->
+    <section class="logo-intro">
+      <style>
+        .logo-intro .logo-showcase{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;align-items:center;margin-top:26px}
+        .logo-art{display:flex;flex-direction:column;align-items:center;gap:20px;background:linear-gradient(135deg,#f4f8fc,#fff);border:1px solid var(--line);border-radius:18px;padding:34px 30px}
+        .logo-art img{max-width:280px;width:100%;height:auto}
+        .logo-art p{color:var(--muted)!important}
+        .logo-art .wm{font-family:var(--sans);font-weight:700;font-size:1.5rem;letter-spacing:.14em;color:var(--deep-navy)}
+        .logo-art .wm b{color:var(--bright)}
+        .logo-art .wm .g{color:var(--muted);font-weight:600;font-size:.62em;letter-spacing:.24em;margin-left:.25em}
+        .logo-decode .row{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+        .logo-decode .row:last-child{border-bottom:0}
+        .logo-decode .k{flex-shrink:0;width:104px;font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bright);padding-top:3px;line-height:1.4}
+        .logo-decode .v{font-size:.9rem;color:var(--muted);line-height:1.55}
+        .logo-decode .v b{color:var(--ink);font-weight:600}
+        @media(max-width:680px){.logo-intro .logo-showcase{grid-template-columns:1fr}.logo-decode .row{flex-direction:column;gap:4px}.logo-decode .k{width:auto}}
+      </style>
+
+      <div class="eyebrow">A New Identity &mdash; The Mark</div>
+      <h2>One mark that carries the whole idea.</h2>
+      <p class="lead">The new INUNI identity isn&rsquo;t decoration &mdash; it&rsquo;s the strategy in miniature. Read it closely and the entire proposition is already there: the world, drawn into one intelligence.</p>
+
+      <div class="logo-showcase">
+        <div class="logo-art">
+          <div id="markFallback" style="text-align:center">
+            <div class="wm">IN<b>U</b>NI<span class="g">GLOBAL</span></div>
+            <p style="font-size:.74rem;color:var(--muted);max-width:200px;margin:14px auto 0;line-height:1.5">Drop your INUNI logo file in and it will appear here automatically.</p>
+          </div>
+          <img id="markLogo" alt="INUNI Global logo" style="display:none;max-width:260px;width:100%;height:auto">
+          <p style="font-size:.66rem;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin:0">The INUNI Global Mark</p>
+        </div>
+
+        <div class="logo-decode">
+          <div class="row"><div class="k">The Name</div><div class="v">INUNI joins <b>IN</b> (entry, inclusion, the international) with <b>UNI</b> (university, unity, the one): read together, &ldquo;into one.&rdquo; It&rsquo;s also a palindrome, mirroring around its central U.</div></div>
+          <div class="row"><div class="k">The Core</div><div class="v">The faceted <b>iU diamond</b> holds intelligence (i) meeting university and unity (U) &mdash; the high-value heart where everything resolves.</div></div>
+          <div class="row"><div class="k">Convergence</div><div class="v">Streams drawn <b>inward</b> show institutions, students, partners and data crossing borders to arrive at one intelligent centre.</div></div>
+          <div class="row"><div class="k">Globe &amp; Rings</div><div class="v">An Atlantic-facing <b>globe</b> nods to the founding USA&ndash;UK partnerships; <b>orbital rings</b> signal continuous expansion and the intelligence surrounding the core.</div></div>
+          <div class="row"><div class="k">Palette</div><div class="v">Institutional <b>navy</b> for authority and credibility, brighter <b>blues</b> for technology-forward intelligence &mdash; established and innovative at once.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE PROMISE -->
+    <section class="promise">
+      <div class="eyebrow">The Promise &mdash; Our Slogan</div>
+      <p class="slogan">&ldquo;We bring the world into one intelligence.&rdquo;</p>
+      <p>Seven words carry the whole idea. Read them in three moves:</p>
+      <div class="parse">
+        <div class="pc"><div class="word">The world</div><p>International education as it stands &mdash; thousands of institutions, students, agents and records scattered across borders, with almost nothing connecting them.</p></div>
+        <div class="pc"><div class="word">&hellip; into one</div><p>INUNI is <em>into one</em>. We draw those scattered parts inward and make them a single, coordinated whole &mdash; unity is the pivot the entire brand turns on.</p></div>
+        <div class="pc"><div class="word">&hellip; intelligence</div><p>Not one list or one network, but one <em>intelligence</em> &mdash; AI and data that perceive and connect, directed by experienced people. A system that thinks, not merely stores.</p></div>
+      </div>
+      <p style="margin-top:16px">A directory you search; an intelligence works on your behalf. That distinction &mdash; machine reach fused with human judgment &mdash; is the promise the rest of this paper sets out to prove.</p>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section>
+      <div class="eyebrow">01 · Overview</div>
+      <h2>The central system that draws education&rsquo;s flows inward.</h2>
+      <p class="lead">INUNI Global exists to connect the world of education and to make the movement of talent across borders deliberate, trusted and seamless.</p>
+      <p>International education today is fragmented &mdash; scattered across thousands of institutions, agents, platforms and records, with little that ties them together. INUNI is conceived as the central system that draws those flows inward and coordinates them intelligently. It is not another listing or marketplace; it is the layer through which institutions, students and partners enter a single, connected ecosystem.</p>
+    </section>
+
+    <!-- THE NAME -->
+    <section>
+      <div class="eyebrow">02 · The Name &mdash; IN + UNI</div>
+      <div class="namebox">
+        <div class="nb">
+          <div class="big">IN</div>
+          <p>Entry, inclusion and the international &mdash; the act of bringing the world inward.</p>
+        </div>
+        <div class="nb">
+          <div class="big">UNI</div>
+          <p>The university, unity and the one &mdash; many separate parts becoming a single coordinated whole.</p>
+        </div>
+      </div>
+      <p style="margin-top:14px">Read together, INUNI is <strong>&ldquo;into one&rdquo;</strong>: the world&rsquo;s institutions, students and partners brought into one connected system. The word is also a palindrome, mirroring around its central <strong>U</strong> &mdash; a quiet reminder that everything in the brand pivots on unity, on the one.</p>
+    </section>
+
+    <!-- THE IDEA -->
+    <section>
+      <div class="eyebrow">03 · The Idea &mdash; Convergence</div>
+      <h2>Where others see borders, INUNI sees flows waiting to be brought together.</h2>
+      <p>The brand&rsquo;s entire expression &mdash; from the mark to the language &mdash; describes the world being drawn inward: institutions, students, partners and data moving across borders and arriving at one intelligent centre, where they connect and become coordinated. Convergence is both the <strong>promise</strong> (we bring the pieces together) and the <strong>method</strong> (an intelligence layer that turns scattered activity into a single, navigable system).</p>
+
+      <div class="converge-wrap">
+        <svg class="converge" viewBox="0 0 760 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The INUNI intelligence system: five ecosystem sources converge into the iU core, wrapped by an outer orbit of shared services">
+          <defs>
+            <linearGradient id="diamond" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1F90C8"/>
+              <stop offset="50%" stop-color="#18509F"/>
+              <stop offset="100%" stop-color="#173A65"/>
+            </linearGradient>
+            <radialGradient id="glow">
+              <stop offset="0%" stop-color="#1B75C2" stop-opacity=".30"/>
+              <stop offset="65%" stop-color="#1B75C2" stop-opacity=".06"/>
+              <stop offset="100%" stop-color="#1B75C2" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="coreShadow" x="-60%" y="-60%" width="220%" height="220%">
+              <feDropShadow dx="0" dy="9" stdDeviation="11" flood-color="#173A65" flood-opacity="0.32"/>
+            </filter>
+            <style>
+              .cv-svc{font-family:'Archivo',sans-serif;font-weight:600;font-size:10.5px;fill:#6b7a90;letter-spacing:.07em;text-transform:uppercase}
+              .cv-orbit{fill:none;stroke:#1B75C2;stroke-opacity:.22;stroke-width:1.3;stroke-dasharray:2 7;stroke-linecap:round}
+              .cv-snode{fill:#9aafc6}
+              .cv-corebig{font-family:'Newsreader',Georgia,serif;font-weight:400;font-size:30px;fill:#fff}
+            </style>
+          </defs>
+
+          <!-- soft glow behind the core -->
+          <circle cx="380" cy="300" r="116" fill="url(#glow)">
+            <animate attributeName="opacity" values="0.75;1;0.75" dur="4.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- outer shared-services orbit -->
+          <circle class="cv-orbit" cx="380" cy="300" r="212"/>
+          <!-- inner guide rings -->
+          <circle cx="380" cy="300" r="72" fill="none" stroke="#1B75C2" stroke-opacity=".16"/>
+          <circle cx="380" cy="300" r="96" fill="none" stroke="#1B75C2" stroke-opacity=".08"/>
+
+          <!-- OUTER LAYER · shared services on the orbit -->
+          <circle class="cv-snode" cx="380" cy="88"  r="3.4"/>
+          <circle class="cv-snode" cx="530" cy="150" r="3.4"/>
+          <circle class="cv-snode" cx="592" cy="300" r="3.4"/>
+          <circle class="cv-snode" cx="530" cy="450" r="3.4"/>
+          <circle class="cv-snode" cx="380" cy="512" r="3.4"/>
+          <circle class="cv-snode" cx="230" cy="450" r="3.4"/>
+          <circle class="cv-snode" cx="168" cy="300" r="3.4"/>
+          <circle class="cv-snode" cx="230" cy="150" r="3.4"/>
+
+          <text class="cv-svc" x="380" y="72"  text-anchor="middle">Academic &amp; Industry</text>
+          <text class="cv-svc" x="546" y="139" text-anchor="start">Career Services</text>
+          <text class="cv-svc" x="606" y="304" text-anchor="start">Finance &amp; Legal</text>
+          <text class="cv-svc" x="546" y="464" text-anchor="start">Infrastructure</text>
+          <text class="cv-svc" x="380" y="530" text-anchor="middle">Technology</text>
+          <text class="cv-svc" x="214" y="464" text-anchor="end">HR &amp; Payroll</text>
+          <text class="cv-svc" x="154" y="304" text-anchor="end">Recruitment</text>
+          <text class="cv-svc" x="214" y="139" text-anchor="end">Government</text>
+
+          <!-- INNER LAYER · ecosystem streams converging inward -->
+          <path class="cv-stream" d="M380 185 L380 252" stroke="#173A65" stroke-width="2.4"/>
+          <path class="cv-stream" d="M271 265 L334 285" stroke="#18407C" stroke-width="2.4"/>
+          <path class="cv-stream" d="M312 393 L352 339" stroke="#1B75C2" stroke-width="2.4"/>
+          <path class="cv-stream" d="M448 393 L408 339" stroke="#1F90C8" stroke-width="2.4"/>
+          <path class="cv-stream" d="M489 265 L426 285" stroke="#18509F" stroke-width="2.4"/>
+
+          <circle class="cv-dot" r="3.5" fill="#173A65" style="offset-path:path('M380 185 L380 252');animation-delay:0s"/>
+          <circle class="cv-dot" r="3.5" fill="#18407C" style="offset-path:path('M271 265 L334 285');animation-delay:.6s"/>
+          <circle class="cv-dot" r="3.5" fill="#1B75C2" style="offset-path:path('M312 393 L352 339');animation-delay:1.2s"/>
+          <circle class="cv-dot" r="3.5" fill="#1F90C8" style="offset-path:path('M448 393 L408 339');animation-delay:1.8s"/>
+          <circle class="cv-dot" r="3.5" fill="#18509F" style="offset-path:path('M489 265 L426 285');animation-delay:2.4s"/>
+
+          <circle cx="380" cy="185" r="5" fill="#173A65"/>
+          <circle cx="271" cy="265" r="5" fill="#18407C"/>
+          <circle cx="312" cy="393" r="5" fill="#1B75C2"/>
+          <circle cx="448" cy="393" r="5" fill="#1F90C8"/>
+          <circle cx="489" cy="265" r="5" fill="#18509F"/>
+
+          <text class="cv-label" x="380" y="156" text-anchor="middle">Institutions</text>
+          <text class="cv-sub"   x="380" y="170" text-anchor="middle">universities</text>
+          <text class="cv-label" x="247" y="252" text-anchor="end">Partners</text>
+          <text class="cv-sub"   x="247" y="266" text-anchor="end">agents &middot; data</text>
+          <text class="cv-label" x="297" y="411" text-anchor="end">Smart Technologies</text>
+          <text class="cv-sub"   x="297" y="425" text-anchor="end">AI &middot; analytics</text>
+          <text class="cv-label" x="463" y="411" text-anchor="start">Advisors &amp; Influencers</text>
+          <text class="cv-sub"   x="463" y="425" text-anchor="start">leaders &middot; voices</text>
+          <text class="cv-label" x="513" y="252" text-anchor="start">Students</text>
+          <text class="cv-sub"   x="513" y="266" text-anchor="start">the journey</text>
+
+          <!-- iU diamond core -->
+          <g transform="translate(380 300)" filter="url(#coreShadow)">
+            <rect x="-40" y="-40" width="80" height="80" rx="9" transform="rotate(45)" fill="url(#diamond)"/>
+            <line x1="0" y1="-56" x2="0" y2="56" stroke="#fff" stroke-opacity=".16"/>
+            <line x1="-56" y1="0" x2="56" y2="0" stroke="#fff" stroke-opacity=".16"/>
+            <text class="cv-corebig" x="0" y="10" text-anchor="middle">iU</text>
+          </g>
+        </svg>
+      </div>
+      <p class="cv-cap">The ecosystem converges into one intelligence at the core &mdash; which radiates a full suite of shared services back across the network.</p>
+
+      <style>
+        .pillars{display:flex;flex-wrap:wrap;gap:16px;margin-top:30px}
+        .pillar{flex:1 1 150px;min-width:140px;text-align:center;display:flex;flex-direction:column;align-items:center;position:relative}
+        .pillar:not(:last-child)::after{content:"";position:absolute;top:42px;right:-8px;width:1px;height:120px;background:var(--line)}
+        .pillar .ic{width:84px;height:84px;border-radius:50%;background:#fff;box-shadow:0 10px 26px rgba(23,58,101,.10);display:flex;align-items:center;justify-content:center;margin-bottom:18px;border:1px solid var(--line)}
+        .pillar h4{font-size:.78rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--deep-navy);line-height:1.4}
+        .pillar .ul{width:26px;height:3px;background:var(--bright);margin-top:12px;border-radius:2px}
+
+        .svc-hub{display:flex;justify-content:center;margin:26px 0 6px}
+        .svc-hub .core{display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(135deg,var(--deep-navy),var(--royal));color:#fff;border-radius:50%;width:160px;height:160px;justify-content:center;text-align:center;box-shadow:0 16px 40px rgba(23,58,101,.22)}
+        .svc-hub .core .t1{font-size:.58rem;font-weight:700;letter-spacing:.18em;color:var(--light)}
+        .svc-hub .core .t2{font-family:var(--serif);font-size:1.5rem;font-weight:400;letter-spacing:.04em}
+        .svc-hub .core .t3{font-size:.56rem;letter-spacing:.16em;color:rgba(255,255,255,.7);text-transform:uppercase}
+        .svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+        .svc{background:var(--paper);padding:20px 22px}
+        .svc h4{font-size:.92rem;font-weight:700;color:var(--royal);margin-bottom:7px;line-height:1.3}
+        .svc p{font-size:.82rem;margin:0;color:var(--muted);line-height:1.5}
+        .svc .chips{margin-top:9px;display:flex;flex-wrap:wrap;gap:5px}
+        .svc .chips span{font-size:.62rem;font-weight:600;letter-spacing:.03em;color:var(--deep-navy);background:#eef4fb;border-radius:20px;padding:3px 9px}
+        @media(max-width:680px){.svc-grid{grid-template-columns:1fr}.pillar:not(:last-child)::after{display:none}}
+      </style>
+    </section>
+
+    <!-- ===== PARTNERSHIP PILLARS ===== -->
+    <section>
+      <div class="eyebrow">The Network in Practice &mdash; Partnership Pillars</div>
+      <h2>What a partner university plugs into on day one.</h2>
+      <p>When an institution partners with INUNI Global, it gains immediate access to five capabilities that would otherwise take years to build alone &mdash; the convergence model made concrete.</p>
+      <div class="pillars">
+        <div class="pillar">
+          <div class="ic">
+            <svg viewBox="0 0 44 44" width="42" height="42" fill="none" stroke="#18509F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="22" cy="15" r="9"/><path d="M13 15h18M22 6c3.6 2.8 3.6 15.2 0 18M22 6c-3.6 2.8-3.6 15.2 0 18"/>
+              <circle cx="16" cy="33" r="2.8"/><circle cx="22" cy="32" r="3.1"/><circle cx="28" cy="33" r="2.8"/>
+              <path d="M12 40c0-2.6 1.8-4.4 4-4.4M20 40c0-2.8 2-4.7 4-4.7s4 1.9 4 4.7M32 40c0-2.6-1.8-4.4-4-4.4"/>
+            </svg>
+          </div>
+          <h4>GUS Academic<br>Network Access</h4><div class="ul"></div>
+        </div>
+        <div class="pillar">
+          <div class="ic">
+            <svg viewBox="0 0 44 44" width="42" height="42" fill="none" stroke="#18509F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 19v6l3.5 1 2 7.5h3.2L16 27l14 4.6V14L18.5 19 9 19z"/><path d="M33 17c2.4 1.6 2.4 8.4 0 10"/><path d="M36 14l3-1.5M37 22l3 1.5M36 18h3.5"/>
+            </svg>
+          </div>
+          <h4>Bespoke Marketing<br>Solutions</h4><div class="ul"></div>
+        </div>
+        <div class="pillar">
+          <div class="ic">
+            <svg viewBox="0 0 44 44" width="42" height="42" fill="none" stroke="#18509F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="11" y="9" width="22" height="28" rx="3"/><rect x="17" y="6" width="10" height="6" rx="2"/><path d="M16 23.5l4 4 8.5-9.5"/>
+            </svg>
+          </div>
+          <h4>Compliance<br>Frameworks</h4><div class="ul"></div>
+        </div>
+        <div class="pillar">
+          <div class="ic">
+            <svg viewBox="0 0 44 44" width="42" height="42" fill="none" stroke="#18509F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 7c5 0 9 4 9 9 0 6.5-9 17-9 17s-9-10.5-9-17c0-5 4-9 9-9z"/><circle cx="22" cy="16" r="3.6"/><ellipse cx="22" cy="35.5" rx="9" ry="2.6"/>
+            </svg>
+          </div>
+          <h4>In-Country<br>Expertise</h4><div class="ul"></div>
+        </div>
+        <div class="pillar">
+          <div class="ic">
+            <svg viewBox="0 0 44 44" width="42" height="42" fill="none" stroke="#18509F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 36h27"/><rect x="13" y="25" width="5" height="11"/><rect x="21" y="18" width="5" height="18"/><rect x="29" y="12" width="5" height="24"/>
+              <path d="M11 22l6-4 6 3 8-9.5"/><circle cx="11" cy="22" r="1.8" fill="#18509F" stroke="none"/><circle cx="31" cy="11.5" r="1.8" fill="#18509F" stroke="none"/>
+            </svg>
+          </div>
+          <h4>Regional Market<br>Intelligence</h4><div class="ul"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISSION & VISION -->
+    <section>
+      <div class="eyebrow">04 · Mission &amp; Vision</div>
+      <div class="mv">
+        <div class="mv-card">
+          <div class="tag">Mission</div>
+          <div class="stmt">Internationalisation has always made universities choose between reach and rigour. INUNI exists to end that trade-off. Our technology handles the scale of international growth; our experts handle the judgment it demands &mdash; so a university can grow across borders without compromising its standards.</div>
+        </div>
+        <div class="mv-card">
+          <div class="tag">Vision</div>
+          <div class="stmt">A world where every university is global by default and every learner moves freely toward the one that fits &mdash; the scattered landscape of international education resolved, at last, into a single intelligence.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POSITIONING -->
+    <section>
+      <div class="eyebrow">05 · Positioning &mdash; A System, Not a Directory</div>
+      <p>Beneath the network sits an intelligence layer of AI-driven matching, data and analytics that turns scattered information into coordinated insight &mdash; the difference between a directory you search and a system that works on your behalf. That capability is given direction and credibility by experienced international-education leaders and influential voices with deep, on-the-ground knowledge.</p>
+      <div class="positioning">Technology makes INUNI scalable; expertise makes it trusted.</div>
+      <div class="belief">
+        <div class="eb">Our Belief</div>
+        <div class="q">&ldquo;Smart systems start with smart people.&rdquo;</div>
+      </div>
+    </section>
+
+    <!-- THE MARK -->
+    <section>
+      <div class="eyebrow">06 · The Mark</div>
+      <h2>The logo renders convergence directly.</h2>
+      <div class="mark-grid">
+        <div class="mk"><span class="dot"></span><div><h4>Transatlantic globe</h4><p>Atlantic-facing &mdash; foregrounds the founding USA&ndash;UK partnerships while signalling worldwide ambition.</p></div></div>
+        <div class="mk"><span class="dot"></span><div><h4>Inward streams</h4><p>Active exchange &mdash; students, institutions and data moving across borders. Connection, not mere coverage.</p></div></div>
+        <div class="mk"><span class="dot"></span><div><h4>Orbital rings</h4><p>Signal waves and system layers &mdash; continuous expansion and the intelligence that surrounds the core.</p></div></div>
+        <div class="mk"><span class="dot"></span><div><h4>The iU diamond</h4><p>A faceted, high-value core holding the &ldquo;iU&rdquo;: intelligence (i) meeting university and unity (U) &mdash; IN&middot;UNI distilled to its essence.</p></div></div>
+      </div>
+    </section>
+
+    <!-- PRINCIPLES -->
+    <section>
+      <div class="eyebrow">07 · Brand Principles</div>
+      <div class="principles">
+        <div class="pr"><div class="num">01</div><h4>Connection over transaction</h4><p>We build relationships and routes, not one-off deals; value compounds as the network grows.</p></div>
+        <div class="pr"><div class="num">02</div><h4>Intelligence as foundation</h4><p>Data, matching and insight underpin everything &mdash; the reason INUNI is a system rather than a list.</p></div>
+        <div class="pr"><div class="num">03</div><h4>Integrity without exception</h4><p>Trust is the currency of education; we protect students and partners and earn confidence at every step.</p></div>
+        <div class="pr"><div class="num">04</div><h4>Scale with intention</h4><p>We grow deliberately, expanding the network where it serves learners and institutions best.</p></div>
+      </div>
+    </section>
+
+    <!-- PART OF GUS -->
+    <section>
+      <div class="eyebrow">08 &middot; Part of Global University Systems</div>
+      <h2>INUNI doesn&rsquo;t have to build a global network &mdash; it&rsquo;s already part of one.</h2>
+      <p>INUNI is the internationalisation division of <strong>Global University Systems (GUS)</strong> &mdash; one of the world&rsquo;s largest and most diverse private higher-education groups. The reach, data and expertise behind our promise are not aspirations to be built; they already operate, at scale, across an established global network.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);margin:24px 0">
+        <div style="background:var(--paper);padding:22px 16px;flex:1 1 130px;text-align:center">
+          <div style="font-family:var(--serif);font-size:2.1rem;color:var(--royal);font-weight:300">31</div>
+          <div style="font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:7px;font-weight:600">Institutions</div>
+        </div>
+        <div style="background:var(--paper);padding:22px 16px;flex:1 1 130px;text-align:center">
+          <div style="font-family:var(--serif);font-size:2.1rem;color:var(--royal);font-weight:300">174K+</div>
+          <div style="font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:7px;font-weight:600">Students</div>
+        </div>
+        <div style="background:var(--paper);padding:22px 16px;flex:1 1 130px;text-align:center">
+          <div style="font-family:var(--serif);font-size:2.1rem;color:var(--royal);font-weight:300">334K+</div>
+          <div style="font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:7px;font-weight:600">Alumni</div>
+        </div>
+        <div style="background:var(--paper);padding:22px 16px;flex:1 1 130px;text-align:center">
+          <div style="font-family:var(--serif);font-size:2.1rem;color:var(--royal);font-weight:300">130+</div>
+          <div style="font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:7px;font-weight:600">Academic Partners</div>
+        </div>
+        <div style="background:var(--paper);padding:22px 16px;flex:1 1 130px;text-align:center">
+          <div style="font-family:var(--serif);font-size:2.1rem;color:var(--royal);font-weight:300">6K+</div>
+          <div style="font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:7px;font-weight:600">Recruitment Partners</div>
+        </div>
+      </div>
+
+      <p>Through GUS, INUNI draws on a live network of universities and colleges across Europe, North America and beyond &mdash; their campuses, faculty, research and student communities &mdash; together with a recruitment network reaching more than 175 countries. The intelligence at INUNI&rsquo;s centre is informed by real institutions running real international education every day. That is what separates a credible system from a clever idea.</p>
+    </section>
+
+    <!-- WHAT INUNI DOES -->
+    <section>
+      <div class="eyebrow">09 &middot; What INUNI Does &amp; How It Earns</div>
+      <h2>One connected business, built on a single intelligence.</h2>
+      <p>INUNI operates as one company across seven service lines, organised into two delivery units and powered by a single technology core. Each line solves a distinct problem for a university; together they form a connected ecosystem where one engagement opens the next &mdash; and most lines earn only when the partner succeeds.</p>
+
+      <div class="brain">
+        <div class="bt">The Engine &mdash; INUNI Brain</div>
+        <h4>The AI layer beneath every line.</h4>
+        <p>INUNI Brain is the proprietary technology and data core running under all operational functions &mdash; AI-driven student&ndash;programme matching, market and demand analytics, lead scoring and conversion, compliance checks and workflow automation. It is what lets a focused expert team operate at global scale: the system carries the volume, the people carry the judgment. Every line below runs on it.</p>
+      </div>
+
+      <div class="tablewrap">
+        <table class="biztable">
+          <thead>
+            <tr><th style="width:21%">Business Line</th><th>What it does</th><th style="width:25%">How it earns</th></tr>
+          </thead>
+          <tbody>
+            <tr class="unitrow"><td colspan="3">Academic Intelligence Unit</td></tr>
+            <tr>
+              <td class="line">INUNI TNE<span class="sub">Transnational partnerships</span></td>
+              <td>Connects universities with overseas partners &mdash; from student-progression pathways to large-scale expansion: branch campuses, joint and twin programmes, articulation and research. The deepest line; the closer the partnership, the more revenue layers unlock.</td>
+              <td class="earns"><span class="tag t-comm">Compensation</span><span class="tag t-ret">Recurring</span><span class="tag t-succ">Success fee</span><div class="note">Per-student compensation + advisory fee + success fee on establishment + recurring fees. The only line with all four layers.</div></td>
+            </tr>
+            <tr>
+              <td class="line">INUNI Advisory<span class="sub">Internationalisation strategy</span></td>
+              <td>Strategic partner for universities planning international growth &mdash; bridging academic expertise, commercial strategy and government relationships, with market access, outreach visits and product curation.</td>
+              <td class="earns"><span class="tag t-ret">Fixed retainer</span><div class="note">Predictable fee regardless of deal volume.</div></td>
+            </tr>
+            <tr>
+              <td class="line">INUNI Intelligence<span class="sub">Market data &amp; insights</span></td>
+              <td>Market intelligence for universities and external clients &mdash; country reports, demand surveys and student-flow data that inform market entry, programme design and recruitment planning.</td>
+              <td class="earns"><span class="tag t-pkg">Report / subscription</span><div class="note">Pricing to be confirmed.</div></td>
+            </tr>
+            <tr class="unitrow"><td colspan="3">Growth &amp; Markets Unit</td></tr>
+            <tr>
+              <td class="line">INUNI Recruitment<span class="sub">Global student recruitment</span></td>
+              <td>A global recruitment channel for partner universities &mdash; finding, qualifying and converting international students. Earns only on enrolment, keeping incentives fully aligned with the institution.</td>
+              <td class="earns"><span class="tag t-comm">Compensation</span><div class="note">Per enrolled student &mdash; no placement, no fee.</div></td>
+            </tr>
+            <tr>
+              <td class="line">INUNI Pathways<span class="sub">Pathway-provider network</span></td>
+              <td>Brings on pathway providers &mdash; foundation colleges, English schools, pre-sessional programmes &mdash; as a channel into US and GUS university partners, connecting provider to destination.</td>
+              <td class="earns"><span class="tag t-comm">Compensation</span><div class="note">Per student placed via pathway providers.</div></td>
+            </tr>
+            <tr>
+              <td class="line">INUNI Marketing<span class="sub">Localised campaigns &middot; Talent Link</span></td>
+              <td>Localised marketing for markets where generic outreach fails &mdash; China, CIS, South Asia and beyond &mdash; with culturally and channel-appropriate campaigns run for university partners.</td>
+              <td class="earns"><span class="tag t-pkg">Tiered packages</span><div class="note">Basic or advanced, priced by scope.</div></td>
+            </tr>
+            <tr>
+              <td class="line">INUNI Immersions<span class="sub">Short-term study abroad</span></td>
+              <td>Short-term immersion programmes &mdash; study visits, summer schools and experiential learning &mdash; into universities in the US and UK, including GUS institutions and external stakeholders.</td>
+              <td class="earns"><span class="tag t-pkg">Project fee</span><div class="note">Project-management fee per programme delivered.</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#eef4fb,#e3edf9);border-left:3px solid var(--bright);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px">
+        <div style="font-size:.64rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--bright);margin-bottom:7px">Spotlight &mdash; Talent Link</div>
+        <p style="margin:0;font-size:.9rem;color:var(--ink)"><b style="color:var(--royal)">Talent Link</b> is INUNI&rsquo;s influencer and creator network, and one of its most scalable demand channels &mdash; a large and fast-growing roster of education influencers, student ambassadors and content creators across priority markets. It turns trusted voices into a primary engine of demand where audiences act on credibility, not advertising: the reach of social media with the conversion of word-of-mouth.</p>
+      </div>
+
+      <div class="legend">
+        <span><i style="background:#18509f"></i>Compensation</span>
+        <span><i style="background:#d98a30"></i>Retainer / recurring</span>
+        <span><i style="background:#1d8a5c"></i>Success fee</span>
+        <span><i style="background:#888"></i>Package / project fee</span>
+      </div>
+    </section>
+
+    <!-- PALETTE -->
+    <section>
+      <div class="eyebrow">10 · Colour Palette</div>
+      <p>Drawn from the trusted institutional blues of the international-education sector. Deep navy conveys authority, stability and academic credibility; the brighter blues add modern, technology-forward energy &mdash; the &ldquo;intelligence&rdquo; in INUNI. Together: established <em>and</em> innovative.</p>
+      <div class="palette">
+        <div class="sw"><div class="chiprow" style="background:#173A65"><span class="hex">#173A65</span></div><div class="nm">Deep Navy</div></div>
+        <div class="sw"><div class="chiprow" style="background:#18407C"><span class="hex">#18407C</span></div><div class="nm">Navy</div></div>
+        <div class="sw"><div class="chiprow" style="background:#18509F"><span class="hex">#18509F</span></div><div class="nm">Royal</div></div>
+        <div class="sw"><div class="chiprow" style="background:#1B75C2"><span class="hex">#1B75C2</span></div><div class="nm">Bright Blue</div></div>
+        <div class="sw"><div class="chiprow" style="background:#1F90C8"><span class="hex">#1F90C8</span></div><div class="nm">Light Blue</div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="closing">
+    <div class="eyebrow">11 · In Closing</div>
+    <p>INUNI Global brings the world&rsquo;s education into one place and makes sense of it. The name says it, the mark shows it, and the system delivers it:</p>
+    <div class="big">We bring the world into one intelligence.</div>
+  </div>
+
+  <footer class="foot">
+    <div>INUNI Global · Brand Concept Paper · Confidential &mdash; internal brand approval</div>
+    <div class="gold">Brand Mark v2 · 2026</div>
+  </footer>
+
+</div>
+<script>
+(function(){
+  var CANDIDATES=['INUNI_Global_iU_wcagfo.png','INUNI_Global_iU.png','INUNI Global iU.png','INUNI_Global.png','image.png','logo.png'];
+  var URL_="https://res.cloudinary.com/dn1skfuye/image/upload/v1780567344/INUNI_Global_iU_wcagfo.png";
+  function show(src){
+    ['inuniLogo','markLogo'].forEach(function(id){
+      var m=document.getElementById(id); if(!m) return;
+      m.onload=function(){ m.style.display='block';
+        var fb=document.getElementById(id==='inuniLogo'?'wmFallback':'markFallback'); if(fb) fb.style.display='none'; };
+      m.src=src;
+    });
+  }
+  async function tryFs(){
+    if(!(window.fs && window.fs.readFile)) return false;
+    for(var i=0;i<CANDIDATES.length;i++){
+      try{
+        var bytes=await window.fs.readFile(CANDIDATES[i]);
+        var bin=''; for(var j=0;j<bytes.length;j++) bin+=String.fromCharCode(bytes[j]);
+        show('data:image/png;base64,'+btoa(bin));
+        return true;
+      }catch(e){}
+    }
+    return false;
+  }
+  (async function(){
+    var ok=await tryFs();
+    if(!ok) show(URL_);
+  })();
+})();
+</script>
+</body>
+</html>
