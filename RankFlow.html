@@ -306,7 +306,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
     </nav>
     <div class="tb-right">
       <button class="music-btn" id="music-btn" onclick="toggleMusic()">&#127925; Music ON</button>
-      <span class="tb-deadline">Deadline: Jun 30 &nbsp;&bull;&nbsp; Results: Jul 3</span>
+      <span class="tb-deadline">Deadline: Jul 30 &nbsp;&bull;&nbsp; Results: Jul 31</span>
       <div class="tb-cd">
         <div class="cd-u"><div class="cd-n" id="cd-d">--</div><div class="cd-l">d</div></div>
         <div class="cd-u"><div class="cd-n" id="cd-h">--</div><div class="cd-l">h</div></div>
@@ -379,7 +379,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
           <div>
             <div class="hero-eyebrow">
               <div class="live-badge">LIVE</div>
-              <span class="eyebrow-txt">FIFA Edition &middot; Apr &ndash; Jun 2026 &middot; Top 3 Win</span>
+              <span class="eyebrow-txt">FIFA Edition &middot; Apr &ndash; Jul 2026 &middot; Top 3 Win</span>
             </div>
             <div class="hero-title">GUS <span class="gold">Canada</span> Cup 2026</div>
             <div class="hero-meta">
@@ -496,7 +496,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
           <span class="lc-w-medals">&#127865;&#127866;&#127867;</span>
         </div>
         <div class="lc-announce">
-          <div class="lc-announce-txt">&#128680; July 3rd 2026</div>
+          <div class="lc-announce-txt">&#128680; July 31st 2026</div>
         </div>
       </div>
     </aside>
@@ -1112,7 +1112,7 @@ function initBigScreen(){
 
 
 function updateCountdown(){
-  var end=new Date('2026-06-30T23:59:59');
+  var end=new Date('2026-07-30T23:59:59');
   var diff=Math.max(0,end-new Date());
   function pad(n){return String(n).padStart(2,'0');}
   document.getElementById('cd-d').textContent=pad(Math.floor(diff/86400000));
