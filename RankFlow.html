@@ -511,175 +511,252 @@ var players=[];
 function loadPlayers(){try{var d=localStorage.getItem(SK);if(d)players=JSON.parse(d);}catch(e){players=[];}}
 function savePlayers(){try{localStorage.setItem(SK,JSON.stringify(players));}catch(e){}}
 
-// ── AUDIO: OLÉ OLÉ OLÉ — Football crowd anthem ──
+// ── AUDIO: Love Me Again style — John Newman inspired synthesis ──
 var audioCtx=null,musicPlaying=false,loopTimer=null;
 function createAnthem(ctx){
   var sr=ctx.sampleRate, now=ctx.currentTime;
-  var totalDur=28.0;
+  var totalDur=32.0;
+  var BPM=128, B=60/BPM; // ~128bpm, B = one beat
 
   var master=ctx.createGain();
   master.gain.setValueAtTime(0,now);
-  master.gain.linearRampToValueAtTime(0.44,now+2.0);
-  master.gain.setValueAtTime(0.44,now+totalDur-2.5);
+  master.gain.linearRampToValueAtTime(0.42,now+2.0);
+  master.gain.setValueAtTime(0.42,now+totalDur-2.5);
   master.gain.linearRampToValueAtTime(0,now+totalDur);
   master.connect(ctx.destination);
 
   var comp=ctx.createDynamicsCompressor();
-  comp.threshold.value=-12;comp.knee.value=8;comp.ratio.value=4;comp.attack.value=0.002;comp.release.value=0.15;
+  comp.threshold.value=-14;comp.knee.value=6;comp.ratio.value=4;
+  comp.attack.value=0.002;comp.release.value=0.12;
   comp.connect(master);
 
-  // Stadium reverb
-  var revBuf=ctx.createBuffer(2,sr*3.5,sr);
-  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.6);}
-  var rev=ctx.createConvolver(); rev.buffer=revBuf;
-  var revG=ctx.createGain(); revG.gain.value=0.5; rev.connect(revG); revG.connect(master);
+  // Warm hall reverb
+  var revBuf=ctx.createBuffer(2,Math.floor(sr*3.2),sr);
+  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.5);}
+  var rev=ctx.createConvolver();rev.buffer=revBuf;
+  var revG=ctx.createGain();revG.gain.value=0.45;rev.connect(revG);revG.connect(master);
 
-  // Crowd roar — warm band-limited noise swell
-  function crowdSwell(t,dur,vol){
-    var buf=ctx.createBuffer(1,Math.floor(sr*dur),sr);
-    var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-    var src=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-    f.type='bandpass';f.frequency.value=700;f.Q.value=0.4;
-    src.buffer=buf;src.connect(f);f.connect(g);g.connect(master);
-    g.gain.setValueAtTime(0,now+t);
-    g.gain.linearRampToValueAtTime(vol,now+t+0.6);
-    g.gain.setValueAtTime(vol,now+t+dur-0.8);
-    g.gain.linearRampToValueAtTime(0,now+t+dur);
-    src.start(now+t);
-  }
+  // Short plate reverb for snare
+  var plateBuf=ctx.createBuffer(2,Math.floor(sr*0.8),sr);
+  for(var ch=0;ch<2;ch++){var rd=plateBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,2.5);}
+  var plate=ctx.createConvolver();plate.buffer=plateBuf;
+  var plateG=ctx.createGain();plateG.gain.value=0.3;plate.connect(plateG);plateG.connect(master);
 
-  // Brass stab for accent
+  // ── Instrument helpers ──
+
+  // Brass stab — punchy with harmonics
   function brass(freq,t,dur,vol){
-    [1,2,3].forEach(function(h){
+    [1,2,3,4].forEach(function(h){
       var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
       o.type='sawtooth';o.frequency.value=freq*h;
-      f.type='lowpass';f.frequency.value=Math.min(freq*h*2.5,4000);
+      f.type='lowpass';f.frequency.value=Math.min(freq*h*2,3500);f.Q.value=0.6;
+      var v=vol/Math.pow(h,1.3);
       g.gain.setValueAtTime(0,now+t);
-      g.gain.linearRampToValueAtTime((vol/(h*1.5)),now+t+0.03);
-      g.gain.setValueAtTime(vol/(h*1.5)*0.8,now+t+dur-0.05);
+      g.gain.linearRampToValueAtTime(v,now+t+0.018);
+      g.gain.setValueAtTime(v*0.75,now+t+dur*0.5);
       g.gain.linearRampToValueAtTime(0,now+t+dur);
       o.connect(f);f.connect(g);g.connect(rev);g.connect(comp);
-      o.start(now+t);o.stop(now+t+dur+0.06);
+      o.start(now+t);o.stop(now+t+dur+0.05);
     });
   }
 
-  // Choir "OLÉ" — sung note cluster
-  function ole(fund,t,dur,vol){
-    var ratios=[1,1.004,0.996,2,0.5];
-    ratios.forEach(function(r,i){
-      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-      o.type=(i<3)?'sine':'triangle';
-      o.frequency.value=fund*r;
-      f.type='bandpass';f.frequency.value=fund*r*1.5;f.Q.value=2.5;
-      var v=(i<3)?(vol*0.22):(vol*0.08);
-      g.gain.setValueAtTime(0,now+t);
-      g.gain.linearRampToValueAtTime(v,now+t+0.08);
-      g.gain.setValueAtTime(v*0.9,now+t+dur-0.1);
-      g.gain.linearRampToValueAtTime(0,now+t+dur);
-      o.connect(f);f.connect(g);g.connect(rev);
-      o.start(now+t);o.stop(now+t+dur+0.08);
+  // Soul/gospel chord pad
+  function pad(freqs,t,dur,vol){
+    freqs.forEach(function(freq){
+      [-3,0,3].forEach(function(det){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.type='triangle';o.frequency.value=freq*(1+det*0.0006);
+        g.gain.setValueAtTime(0,now+t);
+        g.gain.linearRampToValueAtTime(vol/freqs.length,now+t+0.25);
+        g.gain.setValueAtTime(vol/freqs.length*0.85,now+t+dur-0.3);
+        g.gain.linearRampToValueAtTime(0,now+t+dur);
+        o.connect(g);g.connect(rev);
+        o.start(now+t);o.stop(now+t+dur+0.1);
+      });
     });
   }
 
-  // Hand-clap
-  function clap(t){
-    var buf=ctx.createBuffer(1,Math.floor(sr*0.1),sr);
-    var d=buf.getChannelData(0);
-    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+  // Soulful lead voice — sine + slight saw mix
+  function lead(freq,t,dur,vol){
+    var o1=ctx.createOscillator(),o2=ctx.createOscillator();
+    var g=ctx.createGain(),f=ctx.createBiquadFilter();
+    o1.type='sine';o1.frequency.value=freq;
+    o2.type='sawtooth';o2.frequency.value=freq*1.002;
+    f.type='lowpass';f.frequency.value=2800;
+    var g2=ctx.createGain();g2.gain.value=0.12;
+    g.gain.setValueAtTime(0,now+t);
+    g.gain.linearRampToValueAtTime(vol,now+t+0.06);
+    g.gain.setValueAtTime(vol*0.88,now+t+dur-0.08);
+    g.gain.linearRampToValueAtTime(0,now+t+dur);
+    o1.connect(f);o2.connect(g2);g2.connect(f);f.connect(g);
+    g.connect(rev);g.connect(comp);
+    o1.start(now+t);o2.start(now+t);
+    o1.stop(now+t+dur+0.06);o2.stop(now+t+dur+0.06);
+  }
+
+  // Punchy kick (Love Me Again style — very deep, clicky attack)
+  function kick(t){
+    var o=ctx.createOscillator(),g=ctx.createGain(),click=ctx.createOscillator(),cg=ctx.createGain();
+    o.frequency.setValueAtTime(220,now+t);o.frequency.exponentialRampToValueAtTime(40,now+t+0.2);
+    g.gain.setValueAtTime(0.75,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.25);
+    o.connect(g);g.connect(comp);o.start(now+t);o.stop(now+t+0.3);
+    click.frequency.value=3000;
+    cg.gain.setValueAtTime(0.2,now+t);cg.gain.exponentialRampToValueAtTime(0.001,now+t+0.015);
+    click.connect(cg);cg.connect(comp);click.start(now+t);click.stop(now+t+0.02);
+  }
+
+  // Snappy snare
+  function snare(t){
+    var buf=ctx.createBuffer(1,Math.floor(sr*0.18),sr);
+    var d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.2);
+    var src=ctx.createBufferSource(),g=ctx.createGain(),bp=ctx.createBiquadFilter();
+    bp.type='bandpass';bp.frequency.value=2000;bp.Q.value=0.7;
+    src.buffer=buf;src.connect(bp);bp.connect(g);
+    g.gain.setValueAtTime(0.32,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.18);
+    g.connect(comp);g.connect(plate);src.start(now+t);
+  }
+
+  // Hi-hat
+  function hat(t,vol){
+    var buf=ctx.createBuffer(1,Math.floor(sr*0.06),sr);
+    var d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
     var src=ctx.createBufferSource(),g=ctx.createGain(),hp=ctx.createBiquadFilter();
-    hp.type='highpass';hp.frequency.value=1200;
-    src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(comp);g.connect(rev);
-    g.gain.setValueAtTime(0.35,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.1);
+    hp.type='highpass';hp.frequency.value=7000;
+    src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(comp);
+    g.gain.setValueAtTime(vol||0.1,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.06);
     src.start(now+t);
   }
 
-  // Kick drum
-  function kick(t,vol){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.frequency.setValueAtTime(200,now+t);o.frequency.exponentialRampToValueAtTime(45,now+t+0.15);
-    g.gain.setValueAtTime(vol||0.65,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.2);
-    o.connect(g);g.connect(comp);o.start(now+t);o.stop(now+t+0.28);
+  // Bass synth — warm, deep
+  function bass(freq,t,dur,vol){
+    var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+    o.type='sawtooth';o.frequency.value=freq;
+    f.type='lowpass';f.frequency.value=320;f.Q.value=1.2;
+    g.gain.setValueAtTime(0,now+t);
+    g.gain.linearRampToValueAtTime(vol,now+t+0.02);
+    g.gain.setValueAtTime(vol*0.6,now+t+dur-0.04);
+    g.gain.linearRampToValueAtTime(0,now+t+dur);
+    o.connect(f);f.connect(g);g.connect(comp);
+    o.start(now+t);o.stop(now+t+dur+0.05);
   }
 
-  // ── OLÉ OLÉ OLÉ melody ──
-  // The famous chant: "Olé olé olé olé… Olé… Olé…"
-  // In E major — E=329.63, F#=369.99, G#=415.30, A=440, B=493.88
-  // Pattern: short-short-LONG, short-short-LONG, short-LONG
-  // Each "olé" = one rising figure
-  // Bar = 0.5s per beat, 4/4 at ~120bpm
+  // ── CHORD PROGRESSION (A minor feel, like Love Me Again) ──
+  // Am - F - C - G repeated
+  // A=220, C=261.63, E=329.63, F=349.23, G=392, A4=440
 
-  var B=0.5; // beat duration
-
-  // ── INTRO: crowd builds (0–3s) ──
-  crowdSwell(0,6,0.12);
-  crowdSwell(6,8,0.18);
-  crowdSwell(14,14,0.22);
-  for(var i=0;i<6;i++) clap(i*0.5);
-
-  // ── VERSE 1: First OLÉ phrase (3–11s) ──
-  // "O - LÉ  O-LÉ  O-LÉ  O-LÉ"
-  var T=3.0;
-  // Phrase 1: Olé olé olé olé
-  ole(329.63,T+0*B,0.35,0.7);      // O
-  ole(415.30,T+0.4*B,0.55,0.8);    // LÉ (rise)
-  ole(329.63,T+1.0*B,0.35,0.65);   // O
-  ole(415.30,T+1.4*B,0.55,0.75);   // LÉ
-  ole(329.63,T+2.0*B,0.35,0.65);   // O
-  ole(415.30,T+2.4*B,0.55,0.75);   // LÉ
-  ole(329.63,T+3.0*B,0.35,0.65);   // O
-  ole(440,T+3.4*B,0.9,0.85);       // LÉ (higher)
-
-  // Phrase 2: Olé… Olé…
-  ole(329.63,T+4.5*B,0.35,0.7);
-  ole(493.88,T+5.0*B,1.2,0.9);     // OLÉ (top note, long hold)
-  ole(329.63,T+6.5*B,0.35,0.7);
-  ole(440,T+7.0*B,1.4,0.88);       // OLÉ
-
-  // Brass stabs under the melody
-  brass(164.81,T+0,0.3,0.32);brass(196,T+2*B,0.3,0.3);
-  brass(220,T+4*B,0.3,0.35);brass(246.94,T+6*B,0.3,0.32);
-
-  // Kick + clap rhythm through verse
-  for(var i=0;i<16;i++){
-    kick(T+i*B*0.5, 0.5);
-    if(i%4===2) clap(T+i*B*0.5+0.25*B);
-    if(i%2===1) clap(T+i*B*0.5);
+  // ── SECTION 1: Intro build (0–6s) ──
+  // Sparse — just kick and bass hinting the groove
+  var T=0;
+  for(var i=0;i<12;i++){
+    kick(T+i*B);
+    if(i%2===1) snare(T+i*B);
+    hat(T+i*0.5*B, 0.07);
   }
+  // Bass hint
+  bass(110,T,B*1.8,0.35);bass(87.31,T+B*2,B*1.8,0.32);bass(130.81,T+B*4,B*1.8,0.35);bass(98,T+B*6,B*2,0.32);
 
-  // ── BUILDUP: rising energy (11–16s) ──
-  T=11.0;
-  ole(329.63,T+0,0.3,0.75);ole(369.99,T+0.35,0.3,0.78);ole(415.30,T+0.7,0.3,0.82);ole(440,T+1.05,0.3,0.86);
-  ole(329.63,T+1.5,0.3,0.75);ole(369.99,T+1.85,0.3,0.78);ole(415.30,T+2.2,0.3,0.82);ole(493.88,T+2.55,1.0,0.92);
-  brass(261.63,T,0.4,0.4);brass(329.63,T+1.5,0.4,0.42);brass(392,T+2.5,0.6,0.45);
-  for(var i=0;i<10;i++){kick(T+i*0.4,0.6);clap(T+i*0.4+0.2);}
+  // ── SECTION 2: Verse — soulful pad + melody enters (6–14s) ──
+  T=6.0;
+  // Am chord pad
+  pad([220,261.63,329.63],T,B*4,0.35);
+  pad([174.61,220,261.63],T+B*4,B*4,0.32); // F
+  pad([261.63,329.63,392],T+B*8,B*4,0.35); // C
+  pad([196,246.94,293.66],T+B*12,B*4,0.3); // G7
 
-  // ── CHORUS CLIMAX: full OLÉ (16–24s) ──
-  T=16.0;
-  // All together now — louder, higher
-  ole(392,T+0*B,0.35,0.9);ole(493.88,T+0.4*B,0.55,0.95);
-  ole(392,T+1.0*B,0.35,0.9);ole(493.88,T+1.4*B,0.55,0.95);
-  ole(392,T+2.0*B,0.35,0.9);ole(493.88,T+2.4*B,0.55,0.95);
-  ole(392,T+3.0*B,0.35,0.88);ole(523.25,T+3.4*B,1.0,1.0);   // peak C5
+  // Soulful verse melody — "love me again" rising phrase
+  lead(440,T+0,B*0.8,0.22);          // A
+  lead(392,T+B,B*0.8,0.2);           // G
+  lead(349.23,T+B*2,B*0.8,0.22);     // F
+  lead(329.63,T+B*3,B*1.2,0.24);     // E (hold)
+  lead(440,T+B*4,B*0.8,0.22);
+  lead(392,T+B*5,B*0.6,0.2);
+  lead(440,T+B*6,B*0.6,0.22);
+  lead(523.25,T+B*7,B*1.4,0.26);     // C5 — emotional peak of verse
+  lead(493.88,T+B*8.5,B*0.7,0.22);
+  lead(440,T+B*9.5,B*0.7,0.2);
+  lead(392,T+B*10.5,B*1.5,0.22);
+  lead(349.23,T+B*12,B*0.8,0.2);
+  lead(392,T+B*13,B*0.8,0.22);
+  lead(440,T+B*14,B*0.6,0.24);
+  lead(523.25,T+B*15,B*2.0,0.26);
 
-  ole(392,T+4.5*B,0.35,0.88);ole(587.33,T+5.0*B,1.4,1.0);   // D5 long
-  ole(392,T+6.5*B,0.35,0.85);ole(523.25,T+7.0*B,1.6,0.95);  // C5 settle
-
-  brass(196,T,0.45,0.5);brass(246.94,T+2*B,0.45,0.5);brass(261.63,T+4*B,0.45,0.52);brass(329.63,T+6*B,0.45,0.5);
-
-  // Dense crowd clapping
+  // Full beat in verse
   for(var i=0;i<32;i++){
-    kick(T+i*B*0.5, 0.55);
-    clap(T+i*B*0.5);
-    if(i%4===2) clap(T+i*B*0.5+0.15);
+    kick(T+i*B*0.5);
+    if(i%4===2) snare(T+i*B*0.5);
+    hat(T+i*B*0.25,0.09);
   }
+  bass(110,T,B*2,0.4);bass(87.31,T+B*2,B*2,0.38);
+  bass(130.81,T+B*4,B*2,0.4);bass(98,T+B*6,B*2,0.38);
+  bass(110,T+B*8,B*2,0.4);bass(87.31,T+B*10,B*2,0.38);
+  bass(130.81,T+B*12,B*2,0.4);bass(98,T+B*14,B*2,0.38);
 
-  // ── OUTRO: fade with final Olé (24–28s) ──
-  T=24.0;
-  ole(329.63,T+0,0.4,0.7);ole(415.30,T+0.5,0.4,0.72);ole(440,T+1.0,0.5,0.75);
-  ole(329.63,T+2.0,0.4,0.65);ole(493.88,T+2.5,1.8,0.78);
-  brass(164.81,T,0.5,0.3);brass(196,T+2,0.5,0.28);
-  for(var i=0;i<8;i++) clap(T+i*0.5);
+  // ── SECTION 3: PRE-CHORUS — brass stabs build energy (14–20s) ──
+  T=14.0;
+  // Iconic Love Me Again brass hits on off-beats
+  brass(220,T+0,B*0.3,0.38);
+  brass(220,T+B*0.5,B*0.3,0.38);
+  brass(261.63,T+B*1,B*0.3,0.4);
+  brass(261.63,T+B*1.5,B*0.3,0.4);
+  brass(293.66,T+B*2,B*0.3,0.42);
+  brass(329.63,T+B*2.5,B*0.5,0.45);
+  brass(349.23,T+B*3,B*0.8,0.48);
+  // repeat rising
+  brass(220,T+B*4,B*0.3,0.4);brass(220,T+B*4.5,B*0.3,0.4);
+  brass(261.63,T+B*5,B*0.3,0.42);brass(293.66,T+B*5.5,B*0.3,0.44);
+  brass(349.23,T+B*6,B*0.3,0.46);brass(392,T+B*6.5,B*0.3,0.48);
+  brass(440,T+B*7,B*1.5,0.52);  // BIG hit
+
+  for(var i=0;i<24;i++){
+    kick(T+i*B*0.5);
+    if(i%4===2) snare(T+i*B*0.5);
+    hat(T+i*B*0.25,0.11);
+  }
+  bass(110,T,B*2,0.45);bass(87.31,T+B*2,B*2,0.45);
+  bass(130.81,T+B*4,B*2,0.45);bass(98,T+B*6,B*2,0.45);
+
+  // ── SECTION 4: CHORUS — full power (20–28s) ──
+  T=20.0;
+  // Big pad chords
+  pad([220,277.18,329.63,440],T,B*4,0.5);      // Am9
+  pad([174.61,220,261.63,349.23],T+B*4,B*4,0.48); // Fmaj
+  pad([261.63,329.63,392,523.25],T+B*8,B*4,0.5);  // C
+  pad([196,246.94,293.66,392],T+B*12,B*4,0.45);   // G
+
+  // Soaring chorus lead melody
+  lead(440,T,B*0.6,0.32);lead(523.25,T+B*0.7,B*0.6,0.34);
+  lead(587.33,T+B*1.4,B*0.6,0.36);lead(659.25,T+B*2.1,B*1.2,0.4);  // top note
+  lead(587.33,T+B*3.4,B*0.6,0.34);lead(523.25,T+B*4.1,B*0.6,0.32);
+  lead(440,T+B*4.8,B*0.8,0.34);lead(392,T+B*5.7,B*1.4,0.3);
+  lead(440,T+B*7.2,B*0.6,0.32);lead(523.25,T+B*7.9,B*0.6,0.34);
+  lead(587.33,T+B*8.6,B*0.6,0.36);lead(698.46,T+B*9.3,B*1.5,0.42); // F5 emotional peak
+  lead(587.33,T+B*10.9,B*0.6,0.36);lead(523.25,T+B*11.6,B*0.6,0.32);
+  lead(440,T+B*12.3,B*0.8,0.3);lead(392,T+B*13.2,B*2.8,0.28);      // resolve
+
+  // Brass power stabs on chorus
+  [0,B*4,B*8,B*12].forEach(function(off){
+    brass(220,T+off,B*0.25,0.4);brass(329.63,T+off+B*0.5,B*0.25,0.42);brass(440,T+off+B,B*0.25,0.45);
+  });
+
+  // Full driving beat
+  for(var i=0;i<64;i++){
+    kick(T+i*B*0.5);
+    if(i%4===2) snare(T+i*B*0.5);
+    hat(T+i*B*0.25,0.13);
+    if(i%8===6) hat(T+i*B*0.25+B*0.125,0.09); // 16th fill
+  }
+  bass(110,T,B*2,0.5);bass(87.31,T+B*2,B*2,0.5);
+  bass(130.81,T+B*4,B*2,0.5);bass(98,T+B*6,B*2,0.5);
+  bass(110,T+B*8,B*2,0.5);bass(87.31,T+B*10,B*2,0.5);
+  bass(130.81,T+B*12,B*2,0.5);bass(98,T+B*14,B*2,0.5);
+
+  // ── SECTION 5: Outro (28–32s) ──
+  T=28.0;
+  pad([220,261.63,329.63],T,B*4,0.3);
+  lead(440,T,B*0.8,0.22);lead(392,T+B,B*0.8,0.2);lead(349.23,T+B*2,B*2,0.18);
+  brass(220,T,B*0.4,0.28);brass(329.63,T+B*2,B*0.6,0.25);
+  for(var i=0;i<8;i++){kick(T+i*B*0.5);if(i%4===2)snare(T+i*B*0.5);hat(T+i*B*0.25,0.07);}
+  bass(110,T,B*2,0.3);bass(87.31,T+B*2,B*2,0.25);
 
   return totalDur;
 }
@@ -800,10 +877,12 @@ function renderNations(){
   var regionMap={
     'AnnyLynks':'&#127474;&#127485; Mexico',
     'PedroLameira':'&#127463;&#127479; Brazil',
+    'Ask Era':'&#127464;&#127462; Canada',
     'Bella':'&#127468;&#127469; Ghana',
     'Roge.Alex':'&#127474;&#127485; Mexico',
     'CAD':'&#127758; LATAM/MENA/S.Asia',
     'dd':'&#127464;&#127462; Canada',
+    'Luz Vergel':'&#127464;&#127476; Colombia',
     'BinodSoltee':'&#127475;&#127477; Nepal',
     'Raj':'&#127475;&#127477; Nepal',
     'Egal':'&#127481;&#127479; Türkiye',
@@ -830,9 +909,7 @@ function renderNations(){
     'Karan Bajaj (KB)':'&#127470;&#127475; India',
     'Perusito':'&#127477;&#127466; Peru',
     'Green':'&#127474;&#127485; Mexico',
-    'Luz Vergel':'&#127464;&#127476; Colombia',
-    'EstudieCanada':'&#127464;&#127462; Canada',
-    'Ask Era':'&#127464;&#127462; Canada'
+    'EstudieCanada':'&#127464;&#127462; Canada'
   };
   var map={};
   staticPlayers.forEach(function(p){
@@ -887,11 +964,11 @@ function updateStats(){
   // Use staticPlayers as the authoritative source for hero stats
   var staticGoals = staticPlayers.reduce(function(s,p){return s+p.unf+p.ucw;},0);
   var staticNations = (function(){
-    var regions=['Mexico','Brazil','Ghana','Mexico','LATAM/MENA/South Asia',
-      'Canada','Nepal','Nepal','Turkiye','El Salvador','Brazil','Canada',
+    var regions=['Mexico','Brazil','Canada','Ghana','Mexico','LATAM/MENA/South Asia',
+      'Canada','Colombia','Nepal','Nepal','Turkiye','El Salvador','Brazil','Canada',
       'Peru','India','Brazil','Vietnam','Colombia','Canada','India','Colombia',
       'Vietnam','Canada','Colombia','Ecuador','Canada','Peru','Colombia',
-      'Canada','Jamaica','India','Peru','Mexico','Colombia','Canada','Canada'];
+      'Canada','Jamaica','India','Peru','Mexico','Canada'];
     var s=new Set(regions.map(function(r){return r.split('/')[0].trim();}));
     return s.size;
   })();
@@ -904,40 +981,40 @@ function updateStats(){
 // ── STATIC PLAYER LEADERBOARD DATA ──
 var staticPlayers = [
   {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'AnnyLynks',          unf:0,  ucw:0},
-  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'PedroLameira',       unf:0,  ucw:2},
+  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'PedroLameira',       unf:0,  ucw:3},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Ask Era',            unf:1,  ucw:0},
   {region:'Ghana',                  flag:'&#127468;&#127469;', nick:'Bella',              unf:0,  ucw:0},
   {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Roge.Alex',          unf:0,  ucw:0},
   {region:'LATAM/MENA/South Asia',  flag:'&#127758;',          nick:'CAD',                unf:0,  ucw:0},
   {region:'Canada (Caribbean)',     flag:'&#127464;&#127462;', nick:'dd',                 unf:1,  ucw:0},
+  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Luz Vergel',         unf:1,  ucw:0},
   {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'BinodSoltee',        unf:0,  ucw:0},
   {region:'Nepal',                  flag:'&#127475;&#127477;', nick:'Raj',                unf:0,  ucw:0},
   {region:'Türkiye',           flag:'&#127481;&#127479;', nick:'Egal',               unf:0,  ucw:3},
   {region:'El Salvador',            flag:'&#127480;&#127483;', nick:'GabyEI',             unf:0,  ucw:0},
   {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Mie',                unf:1,  ucw:0},
   {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Couselormaple',      unf:0,  ucw:0},
-  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'GS FC',              unf:2,  ucw:1},
+  {region:'Peru',                   flag:'&#127477;&#127466;', nick:'GS FC',              unf:2,  ucw:3},
   {region:'India',                  flag:'&#127470;&#127475;', nick:'HIMS.K',             unf:1,  ucw:0},
-  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Go HB!',             unf:2,  ucw:1},
+  {region:'Brazil',                 flag:'&#127463;&#127479;', nick:'Go HB!',             unf:3,  ucw:1},
   {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'AC Vina',            unf:1,  ucw:0},
   {region:'Colombia',               flag:'&#127464;&#127476;', nick:'AngieClosingQueen',  unf:0,  ucw:1},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Immilander',         unf:4,  ucw:3},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Immilander',         unf:5,  ucw:3},
   {region:'India',                  flag:'&#127470;&#127475;', nick:'Ajay',               unf:0,  ucw:0},
   {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Maru',               unf:0,  ucw:0},
   {region:'Vietnam',                flag:'&#127483;&#127475;', nick:'Leap Warrior',       unf:0,  ucw:0},
   {region:'Canada',                 flag:'&#127464;&#127462;', nick:'El trueno',          unf:0,  ucw:0},
   {region:'Colombia',               flag:'&#127464;&#127476;', nick:'ValeG',              unf:1,  ucw:0},
   {region:'Ecuador',                flag:'&#127466;&#127464;', nick:'Encebollado',        unf:0,  ucw:2},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Maestro',            unf:15, ucw:0},
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Maestro',            unf:22, ucw:0},
   {region:'Peru',                   flag:'&#127477;&#127466;', nick:'SCCanada.',           unf:0,  ucw:0},
   {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Danny',              unf:1,  ucw:0},
   {region:'Canada',                 flag:'&#127464;&#127462;', nick:'TGD',                unf:0,  ucw:0},
   {region:'Jamaica',                flag:'&#127471;&#127474;', nick:'JamRockaz',          unf:1,  ucw:0},
-  {region:'India',                  flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:3,  ucw:0},
+  {region:'India',                  flag:'&#127470;&#127475;', nick:'Karan Bajaj (KB)',   unf:5,  ucw:0},
   {region:'Peru',                   flag:'&#127477;&#127466;', nick:'Perusito',           unf:0,  ucw:0},
   {region:'Mexico',                 flag:'&#127474;&#127485;', nick:'Green',              unf:0,  ucw:1},
-  {region:'Colombia',               flag:'&#127464;&#127476;', nick:'Luz Vergel',         unf:0,  ucw:0},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'EstudieCanada',      unf:0,  ucw:0},
-  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'Ask Era',            unf:1,  ucw:0}
+  {region:'Canada',                 flag:'&#127464;&#127462;', nick:'EstudieCanada',      unf:0,  ucw:0}
 ];
 
 function renderPlayerTables(){
