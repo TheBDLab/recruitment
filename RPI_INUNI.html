@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPI — InUni 代理参考指南</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f0efeb;display:flex;flex-direction:column;min-height:100vh;font-size:14px;color:#1a1a1a}
+  .shell{display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{width:182px;min-width:182px;background:#0f1b2d;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sb-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .sb-logo{display:flex;justify-content:center;margin-bottom:12px}
+  .sb-logo img{width:100%;max-width:140px;height:auto;display:block}
+  .sb-eye{color:rgba(255,255,255,0.35);font-size:9px;font-weight:700;letter-spacing:.06em;margin-bottom:4px}
+  .sb-name{color:white;font-size:17px;font-weight:800;letter-spacing:-.3px}
+  .sb-sub{color:rgba(255,255,255,0.4);font-size:10px;font-weight:600;letter-spacing:.04em;margin-top:2px;line-height:1.4}
+  .sb-pill{display:inline-block;background:#c8960c;color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;margin-top:9px;letter-spacing:.02em}
+  .nav-lbl{color:rgba(255,255,255,0.28);font-size:10px;font-weight:700;letter-spacing:.06em;padding:16px 16px 5px}
+  .ni{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,0.5);font-size:12px;font-weight:500}
+  .ni:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+  .ni.active{background:rgba(200,150,12,0.14);border-left-color:#c8960c;color:#f0c040}
+  .ni-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0}
+
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+  /* HEADER */
+  .hband{background:#0f1b2d;padding:22px 32px;position:relative}
+  .h-eye{color:rgba(200,150,12,0.85);font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:7px}
+  .h-title{color:white;font-size:25px;font-weight:800;line-height:1.25}
+  .h-desc{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px}
+  .h-stats{display:flex;gap:28px;margin-top:20px;flex-wrap:wrap}
+  .hs-n{color:#f0c040;font-size:20px;font-weight:800;line-height:1}
+  .hs-l{color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;letter-spacing:.02em;margin-top:3px}
+
+  /* CONTENT */
+  .ca{flex:1;padding:26px 30px 50px}
+  .sec{display:none}
+  .sec.active{display:block}
+  .sh{font-size:18px;font-weight:800;color:#0f1b2d;margin-bottom:3px}
+  .ss{font-size:13px;color:#999;margin-bottom:22px;line-height:1.6}
+  .st{font-size:14px;font-weight:700;color:#0f1b2d;margin:24px 0 12px}
+
+  /* INFO BOXES */
+  .ib{border-radius:8px;padding:11px 15px;font-size:12px;line-height:1.7;margin-bottom:16px}
+  .ib-amber{background:#fff8e6;border:1px solid #eedd88;color:#7a5200}
+  .ib-blue{background:#eef4ff;border:1px solid #b8ccf0;color:#1a3870}
+  .ib-red{background:#fff0f0;border:1px solid #f5b8b8;color:#6b0000}
+  .ib-green{background:#f0faf0;border:1px solid #a0d8a0;color:#1a5c1a}
+
+  /* USP CARDS */
+  .usp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;margin-bottom:26px}
+  .usp-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:16px}
+  .usp-icon{font-size:22px;margin-bottom:10px}
+  .usp-title{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:5px;line-height:1.4}
+  .usp-body{font-size:12px;color:#666;line-height:1.7}
+
+  /* HIGHLIGHT CARD */
+  .highlight-card{background:linear-gradient(135deg,#0f1b2d 0%,#1a3060 100%);border-radius:12px;padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;align-items:flex-start}
+  .hl-icon{font-size:32px;flex-shrink:0}
+  .hl-title{color:#f0c040;font-size:15px;font-weight:800;margin-bottom:5px;line-height:1.4}
+  .hl-body{color:rgba(255,255,255,0.75);font-size:12px;line-height:1.8}
+
+  /* LOCATION */
+  .loc-block{background:white;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#444;line-height:1.8;border:1px solid #e6e4de;border-left:4px solid #c8960c}
+
+  /* SCHOOLS */
+  .schools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+  .sc-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:14px 15px}
+  .sc-lbl{font-size:10px;font-weight:700;letter-spacing:.04em;color:#c8960c;margin-bottom:5px}
+  .sc-name{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:5px;line-height:1.4}
+  .sc-desc{font-size:11px;color:#888;line-height:1.7}
+
+  /* REQ CARDS */
+  .req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+  .rc{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden}
+  .rc-h{background:#0f1b2d;padding:10px 14px}
+  .rc-ht{color:white;font-size:12px;font-weight:700}
+  .rc-hs{color:rgba(255,255,255,0.45);font-size:10px;margin-top:2px}
+  .rr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #f4f2ee;font-size:12px}
+  .rr:last-child{border-bottom:none}
+  .rk{color:#888}
+  .rv{font-weight:600;color:#0f1b2d;text-align:right;max-width:58%}
+
+  /* SCORE CARDS */
+  .score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:420px;margin-bottom:18px}
+  .score-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:12px;text-align:center}
+  .sc-lbl2{font-size:11px;color:#999;font-weight:700;margin-bottom:4px}
+  .sc-val{font-size:22px;font-weight:800;color:#0f1b2d}
+
+  /* EXEMPT COUNTRIES */
+  .countries-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:20px}
+  .country-pill{background:white;border:1px solid #e6e4de;border-radius:6px;padding:6px 10px;font-size:11px;color:#444;display:flex;align-items:center;gap:5px}
+  .country-dot{width:6px;height:6px;border-radius:50%;background:#c8960c;flex-shrink:0}
+
+  /* PROGRAMS */
+  .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .fb{padding:5px 14px;border-radius:20px;border:1px solid #d4d2cc;background:white;font-size:11px;font-weight:600;cursor:pointer;color:#666;transition:all .15s}
+  .fb.active,.fb:hover{background:#0f1b2d;color:white;border-color:#0f1b2d}
+  .sinp{width:100%;padding:9px 13px;border:1px solid #d4d2cc;border-radius:8px;font-size:13px;background:white;color:#1a1a1a;margin-bottom:13px}
+  .prog-wrap{overflow-x:auto;background:white;border:1px solid #e6e4de;border-radius:10px}
+  table.pt{width:100%;border-collapse:collapse;font-size:12px}
+  table.pt th{text-align:left;padding:10px 13px;background:#f8f6f2;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #e6e4de;white-space:nowrap}
+  table.pt td{padding:9px 13px;border-bottom:1px solid #f2f0ec;vertical-align:middle}
+  table.pt tr:last-child td{border-bottom:none}
+  table.pt tr:hover td{background:#faf8f4}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+  .be{background:#fde8e8;color:#8b1010}
+  .bl{background:#e8f4df;color:#296010}
+  .bs{background:#e2eefa;color:#104fa0}
+  .ba{background:#fef0da;color:#7a4500}
+  .bh{background:#eeeafc;color:#3b2fa0}
+  .by{background:#e8f4df;color:#296010}
+  .bn{background:#f2f0ec;color:#999}
+  .bstem{background:#e2eefa;color:#104fa0}
+
+  /* FINANCIALS */
+  .fin-two{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:20px}
+  .fin-card{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden}
+  .fin-head{background:#f8f6f2;padding:10px 14px;font-size:12px;font-weight:700;color:#666;letter-spacing:.02em;border-bottom:1px solid #e6e4de}
+  .fin-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f4f2ee;font-size:12px}
+  .fin-row:last-child{border-bottom:none;font-weight:700;color:#0f1b2d;font-size:13px}
+  .fin-row span:last-child{font-weight:600}
+  .rtable-wrap{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden;margin-bottom:18px}
+  table.rt{width:100%;border-collapse:collapse;font-size:12px}
+  table.rt th{text-align:left;padding:9px 13px;background:#f8f6f2;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #e6e4de}
+  table.rt td{padding:9px 13px;border-bottom:1px solid #f2f0ec}
+  table.rt tr:last-child td{border-bottom:none}
+  table.rt tr:hover td{background:#faf8f4}
+  .saving{color:#296010;font-weight:700}
+
+  /* DEADLINES */
+  .dl-block{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .dl-head{background:#0f1b2d;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+  .dl-ht{color:white;font-size:13px;font-weight:700}
+  .dl-badge{background:#c8960c;color:white;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr))}
+  .dl-cell{padding:12px 14px;border-right:1px solid #f2f0ec;border-bottom:1px solid #f2f0ec}
+  .dl-cell:last-child{border-right:none}
+  .dl-lbl{font-size:10px;color:#aaa;font-weight:700;letter-spacing:.02em;margin-bottom:4px}
+  .dl-date{font-size:13px;font-weight:700;color:#0f1b2d}
+
+  /* FACTS */
+  .facts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px}
+  .fc{background:white;border:1px solid #e6e4de;border-radius:10px;padding:15px 16px;display:flex;gap:12px}
+  .fi{font-size:22px;flex-shrink:0;margin-top:1px}
+  .ft{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:4px;line-height:1.4}
+  .fb2{font-size:12px;color:#666;line-height:1.7}
+
+  /* PROCESS */
+  .proc-list{display:flex;flex-direction:column}
+  .proc-row{display:flex}
+  .proc-spine{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
+  .proc-dot{width:30px;height:30px;border-radius:50%;background:#0f1b2d;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #c8960c;flex-shrink:0}
+  .proc-line{width:2px;background:#ddd;flex:1;margin:0 auto}
+  .proc-content{padding:2px 0 22px 14px;flex:1}
+  .proc-title{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:3px}
+  .proc-desc{font-size:12px;color:#666;line-height:1.7}
+  .proc-tag{display:inline-block;background:#eef3ff;color:#1050a0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
+
+  /* ALUMNI SPOTLIGHT */
+  .alumni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+  .alumni-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:14px 15px;border-top:3px solid #c8960c}
+  .alumni-name{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:3px}
+  .alumni-role{font-size:11px;color:#c8960c;font-weight:700;margin-bottom:5px}
+  .alumni-desc{font-size:11px;color:#888;line-height:1.6}
+
+  /* RESEARCH AREAS */
+  .research-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+  .res-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+  .res-icon{font-size:18px;flex-shrink:0}
+  .res-title{font-size:12px;font-weight:700;color:#0f1b2d;margin-bottom:2px}
+  .res-desc{font-size:11px;color:#888;line-height:1.6}
+
+  /* CONTACT BAR */
+  .cbar{background:#0f1b2d;padding:12px 30px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .ci{font-size:12px;color:rgba(255,255,255,0.5)}
+  .ci a{color:#f0c040;text-decoration:none;font-weight:600}
+  .ci a:hover{text-decoration:underline}
+
+  @media(max-width:720px){
+    .sidebar{display:none}
+    .hband{padding:16px}
+    .ca{padding:16px 16px 40px}
+    .fin-two{grid-template-columns:1fr}
+    .score-grid{grid-template-columns:repeat(2,1fr)}
+    .h-stats{gap:16px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <img src="https://res.cloudinary.com/dn1skfuye/image/upload/v1781023650/INUNI_Global_iU_transparent_vvxgxz.png" alt="InUni Global logo" />
+    </div>
+    <div class="sb-eye">伦斯勒理工学院</div>
+    <div class="sb-sub">代理参考指南</div>
+    <div class="sb-pill">美国 · 纽约州特洛伊市</div>
+  </div>
+  <div class="nav-lbl">快速导航</div>
+  <div class="ni active" onclick="nav('overview',this)"><span class="ni-icon">🏛️</span> 概览与核心卖点</div>
+  <div class="ni" onclick="nav('wow',this)"><span class="ni-icon">✨</span> 亮点优势</div>
+  <div class="ni" onclick="nav('admissions',this)"><span class="ni-icon">📋</span> 录取要求</div>
+  <div class="ni" onclick="nav('docs',this)"><span class="ni-icon">📄</span> 所需材料</div>
+  <div class="ni" onclick="nav('financials',this)"><span class="ni-icon">💰</span> 学费与费用</div>
+  <div class="ni" onclick="nav('deadlines',this)"><span class="ni-icon">📅</span> 重要截止日期</div>
+  <div class="ni" onclick="nav('programs',this)"><span class="ni-icon">🔍</span> 专业查询</div>
+  <div class="ni" onclick="nav('facts',this)"><span class="ni-icon">⭐</span> 数据与排名</div>
+  <div class="ni" onclick="nav('process',this)"><span class="ni-icon">🔄</span> 申请流程</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="hband">
+  <div class="h-eye">InUni 代理参考资料 — 合作院校</div>
+  <div class="h-title">伦斯勒理工学院 (RPI)<br>代理参考指南</div>
+  <div class="h-desc">从录取要求到 I-20 签发，您所需的全部信息一应俱全。</div>
+  <div class="h-stats">
+    <div><div class="hs-n">7,800+</div><div class="hs-l">在校学生</div></div>
+    <div><div class="hs-n">145+</div><div class="hs-l">学位项目</div></div>
+    <div><div class="hs-n">60+</div><div class="hs-l">国家与地区</div></div>
+    <div><div class="hs-n">#70</div><div class="hs-l">2025 全美排名</div></div>
+    <div><div class="hs-n">1824</div><div class="hs-l">建校年份</div></div>
+    <div><div class="hs-n">110K+</div><div class="hs-l">校友总数</div></div>
+  </div>
+</div>
+
+<div class="ca">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="sec-overview" class="sec active">
+  <div class="sh">概览与核心卖点</div>
+  <div class="ss">推荐 RPI 的主要理由，以及与学生沟通时的话术切入点。</div>
+
+  <div class="usp-grid">
+    <div class="usp-card"><div class="usp-icon">⚛️</div><div class="usp-title">全球首台校园内 IBM 量子计算机</div><div class="usp-body">全球首所将 IBM Quantum System One 量子计算机引入校园的大学（2024 年揭幕）。学生可直接使用真实量子硬件，开展人工智能、化学与国家安全领域研究。全球独一无二。</div></div>
+    <div class="usp-card"><div class="usp-icon">💼</div><div class="usp-title">Lally 商学院所有项目均为 STEM</div><div class="usp-body">所有 Lally MBA 与硕士项目均获 STEM 认证。国际学生可享 3 年 OPT 延期——相较非 STEM 商学院，职业发展空间大幅拓展。</div></div>
+    <div class="usp-card"><div class="usp-icon">🏆</div><div class="usp-title">排名 #70 — 美国最古老的理工大学</div><div class="usp-body">美国历史最悠久的理工类研究型大学，建校于 1824 年，比 MIT 早 29 年。逾 200 年引领 STEM 领域、改变世界的辉煌历史。</div></div>
+    <div class="usp-card"><div class="usp-icon">💰</div><div class="usp-title">毕业生薪资中位数 10.3 万–10.5 万美元</div><div class="usp-body">Lally MBA 中位数 10.3 万美元；硕士 10.5 万美元/年。30% 的 Lally 校友晋升至高管层。对有抱负的家庭而言，投资回报不言自明。</div></div>
+    <div class="usp-card"><div class="usp-icon">🔬</div><div class="usp-title">32 个研究中心 · 746 间实验室</div><div class="usp-body">设有全美首个 NSF 资助的金融科技研究中心（CRAFT）。合作伙伴包括 IBM、NASA、DARPA。教师包括 NSF 总统级学者及美国国家科学院院士。</div></div>
+    <div class="usp-card"><div class="usp-icon">📍</div><div class="usp-title">距纽约与波士顿仅 2–3 小时</div><div class="usp-body">特洛伊市位于美国东北部核心就业市场的枢纽地带。华尔街、硅巷及波士顿 128 公路科技走廊均可通勤实习。</div></div>
+    <div class="usp-card"><div class="usp-icon">🌐</div><div class="usp-title">11 万+ 强大校友网络</div><div class="usp-body">校友遍布 60 多个国家——包括《财富》500 强 CEO、诺贝尔奖得主、NASA 宇航员及科技创始人。校友积极指导并招聘在校学生。</div></div>
+    <div class="usp-card"><div class="usp-icon">🎓</div><div class="usp-title">毕业生就业率 94%</div><div class="usp-body">绝大多数毕业生在 6 个月内就业或继续深造。依托《财富》500 强企业人脉、带薪实习项目及稳固的招聘合作关系。</div></div>
+  </div>
+
+  <div class="st">地理位置与生活方式</div>
+  <div class="loc-block"><strong>美国纽约州特洛伊市</strong>——275 英亩山顶校园，俯瞰哈德逊河。距奥尔巴尼国际机场仅 15 分钟车程。步行即达特洛伊市繁华的市中心，餐饮、艺术、现场音乐与人文氛围浓厚。临近<strong>阿迪朗达克山脉</strong>，可滑雪、徒步、亲近户外。可轻松一日往返<strong>纽约、波士顿与蒙特利尔</strong>。</div>
+
+  <div class="st">学院设置</div>
+  <div class="schools-grid">
+    <div class="sc-card"><div class="sc-lbl">学院</div><div class="sc-name">工程学院</div><div class="sc-desc">15 个项目。提供 M.S. 与 M.Eng 选项。涵盖航空、生物医学、化学、土木、电气、机械、核能、半导体、交通运输等。</div></div>
+    <div class="sc-card"><div class="sc-lbl">学院</div><div class="sc-name">Lally 管理学院</div><div class="sc-desc">全部为 STEM 认证。4 个硕士 + 5 个 MBA 方向。涵盖商业分析、量化金融、供应链、金融科技、MBA 管理、MBA 设计等。</div></div>
+    <div class="sc-card"><div class="sc-lbl">学院</div><div class="sc-name">理学院</div><div class="sc-desc">11 个项目。涵盖计算机科学、信息技术、物理、化学、数学、应用数学、天文、生物、生物化学/生物物理。</div></div>
+    <div class="sc-card"><div class="sc-lbl">学院</div><div class="sc-name">建筑学院</div><div class="sc-desc">4 个项目。M.Arch、建筑声学、建成生态、照明设计。设有全球知名的照明研究中心（LRC）。</div></div>
+    <div class="sc-card"><div class="sc-lbl">学院</div><div class="sc-name">人文艺术与社会科学学院 (HASS)</div><div class="sc-desc">涵盖批判性游戏设计、经济学、传播与修辞。科技与创意、社会科学的交汇之地。</div></div>
+  </div>
+</div>
+
+<!-- ===== WOW FACTORS ===== -->
+<div id="sec-wow" class="sec">
+  <div class="sh">亮点优势 — 让 RPI 令人难忘</div>
+  <div class="ss">最能打动顶尖学生及其家庭、令人眼前一亮的关键事实。</div>
+
+  <div class="highlight-card">
+    <div class="hl-icon">⚛️</div>
+    <div>
+      <div class="hl-title">全球唯一一所校园内拥有 IBM Quantum System One 的大学</div>
+      <div class="hl-body">2024 年，RPI 成为全球首所——且目前唯一一所——在校园内实际部署 IBM Quantum System One 量子计算机的大学。这不仅是实验室访问权限或云端使用时间，学生与研究人员可亲自动手操作前沿量子硬件，用于药物研发、材料科学、人工智能与网络安全领域的突破性研究。没有任何其他大学能提供这样的机会。</div>
+    </div>
+  </div>
+
+  <div class="highlight-card">
+    <div class="hl-icon">🏛️</div>
+    <div>
+      <div class="hl-title">美国最初的 STEM 大学——早于 MIT、加州理工与斯坦福</div>
+      <div class="hl-body">RPI 创立于 1824 年——比 MIT（1861 年开学）早 57 年，比加州理工（1891 年）早 67 年，比斯坦福（1891 年）早 71 年。当世界顶尖理工名校尚处于构想阶段时，RPI 的毕业生已在建设美国的铁路、桥梁与工业。这 200 年的传承，融入了每一个项目、每一间实验室、每一位教师之中。</div>
+    </div>
+  </div>
+
+  <div class="highlight-card">
+    <div class="hl-icon">🚀</div>
+    <div>
+      <div class="hl-title">改变世界的校友</div>
+      <div class="hl-body">RPI 校友包括建造布鲁克林大桥、金门大桥及美国首条横贯大陆铁路的工程师。在现代，校友遍布 Google、亚马逊、戴尔与 NASA 的创始人及高层。世界上第一款电子游戏（Spacewar!）的发明者亦是 RPI 校友。这些不仅是历史注脚——更是至今仍定义着这所校园的雄心文化。</div>
+    </div>
+  </div>
+
+  <div class="st">杰出校友 — 值得提及的名字</div>
+  <div class="alumni-grid">
+    <div class="alumni-card"><div class="alumni-name">George Ferris</div><div class="alumni-role">1881 届</div><div class="alumni-desc">摩天轮（费里斯轮）发明者——1893 年芝加哥世博会的标志性原型。</div></div>
+    <div class="alumni-card"><div class="alumni-name">Ivar Giaever</div><div class="alumni-role">1973 年诺贝尔物理学奖</div><div class="alumni-desc">因超导体中隧道现象研究荣获诺贝尔奖。</div></div>
+    <div class="alumni-card"><div class="alumni-name">Howard P. Anderson</div><div class="alumni-role">科技先驱</div><div class="alumni-desc">推动硅谷计算与科技领导力发展的先驱人物。</div></div>
+    <div class="alumni-card"><div class="alumni-name">NASA 工程师</div><div class="alumni-role">多位校友</div><div class="alumni-desc">RPI 毕业生参与了 NASA 多个项目，包括阿波罗、航天飞机及火星任务。</div></div>
+    <div class="alumni-card"><div class="alumni-name">布鲁克林大桥</div><div class="alumni-role">1857 届</div><div class="alumni-desc">Washington Roebling（RPI 1857 届）完成了布鲁克林大桥——史上最伟大的工程壮举之一。</div></div>
+    <div class="alumni-card"><div class="alumni-name">《财富》500 强领袖</div><div class="alumni-role">30% 进入高管层</div><div class="alumni-desc">30% 的 Lally 管理学院校友晋升至全球大型企业高管层。</div></div>
+  </div>
+
+  <div class="st">前沿研究领域 — 学生真正参与的课题</div>
+  <div class="research-grid">
+    <div class="res-card"><div class="res-icon">🧬</div><div><div class="res-title">生物技术与药物递送</div><div class="res-desc">组织工程、再生医学、生物制造——与制药巨头建立合作。</div></div></div>
+    <div class="res-card"><div class="res-icon">🤖</div><div><div class="res-title">人工智能与机器人</div><div class="res-desc">计算机视觉、机器学习、自主系统与知识图谱。</div></div></div>
+    <div class="res-card"><div class="res-icon">🔋</div><div><div class="res-title">清洁能源与可持续发展</div><div class="res-desc">太阳能、风能、储能、环境工程与城市韧性研究。</div></div></div>
+    <div class="res-card"><div class="res-icon">💻</div><div><div class="res-title">量子计算</div><div class="res-desc">校园内真实的 IBM 量子硬件——算法、密码学、量子化学。</div></div></div>
+    <div class="res-card"><div class="res-icon">💰</div><div><div class="res-title">金融科技与金融工程</div><div class="res-desc">全美首个 NSF 资助的金融科技研究中心（CRAFT）——区块链、算法交易、风险分析。</div></div></div>
+    <div class="res-card"><div class="res-icon">🏙️</div><div><div class="res-title">智慧城市与基础设施</div><div class="res-desc">交通系统、结构工程、城市规划与信息物理系统。</div></div></div>
+    <div class="res-card"><div class="res-icon">🌊</div><div><div class="res-title">材料科学</div><div class="res-desc">半导体、纳米技术、聚合物科学、航空航天与国防用复合材料。</div></div></div>
+    <div class="res-card"><div class="res-icon">🎮</div><div><div class="res-title">游戏设计与扩展现实 (XR)</div><div class="res-desc">批判性游戏设计融合 AI、VR、AR、叙事与社会正义。全球独一无二。</div></div></div>
+  </div>
+
+  <div class="st">为何 RPI 在顶尖学生竞争中脱颖而出</div>
+  <div class="ib ib-green">
+    ✅ <strong>对比其他商学院：</strong>所有 Lally 项目均为 STEM——3 年 OPT，而非他校的 1 年。薪资中位数 10.3 万–10.5 万美元。<br>
+    ✅ <strong>对比其他理工院校：</strong>全球唯一校园内拥有 IBM 量子计算机的大学。200 年传承。全美前 75 名。<br>
+    ✅ <strong>对比公立大学：</strong>私立研究型大学，更多个性化关注、更小班额、精英校友网络。<br>
+    ✅ <strong>对比英国/欧洲：</strong>美国学位打开美国就业市场。东北部区位坐拥纽约与波士顿——全球顶级金融与科技中心。
+  </div>
+</div>
+
+<!-- ===== ADMISSIONS ===== -->
+<div id="sec-admissions" class="sec">
+  <div class="sh">录取要求</div>
+  <div class="ss">各学院分别列出入学标准。所有项目均要求本科学位、成绩单及 InUni 资格评估。</div>
+
+  <div class="st">英语语言能力最低要求</div>
+  <div class="score-grid">
+    <div class="score-card"><div class="sc-lbl2">TOEFL iBT</div><div class="sc-val">88</div></div>
+    <div class="score-card"><div class="sc-lbl2">IELTS</div><div class="sc-val">6.5</div></div>
+    <div class="score-card"><div class="sc-lbl2">Duolingo</div><div class="sc-val">120</div></div>
+    <div class="score-card"><div class="sc-lbl2">PTE</div><div class="sc-val">59</div></div>
+  </div>
+  <div class="ib ib-amber">⚠️ <strong>建筑学院例外：</strong>建筑学院要求更高分数——TOEFL 90–94 &nbsp;|&nbsp; IELTS 7.0 &nbsp;|&nbsp; Duolingo 121–125<br>
+  ⚠️ <strong>计算机科学 GPA：</strong>计算机科学硕士要求 GPA 3.5+（高于标准 3.0 最低要求）<br>
+  ⚠️ <strong>生物医学工程 GPA：</strong>生物医学工程硕士要求 GPA 3.3+（非标准 3.0）</div>
+
+  <div class="st">英语语言能力 — 免试国家/地区</div>
+  <div class="ib ib-blue">📌 来自以下国家/地区的学生<strong>免除英语语言能力测试要求</strong>——无需 TOEFL、IELTS、Duolingo 或 PTE：</div>
+  <div class="countries-grid">
+    <div class="country-pill"><span class="country-dot"></span>安提瓜和巴布达</div>
+    <div class="country-pill"><span class="country-dot"></span>澳大利亚</div>
+    <div class="country-pill"><span class="country-dot"></span>巴哈马</div>
+    <div class="country-pill"><span class="country-dot"></span>巴巴多斯</div>
+    <div class="country-pill"><span class="country-dot"></span>伯利兹</div>
+    <div class="country-pill"><span class="country-dot"></span>博茨瓦纳</div>
+    <div class="country-pill"><span class="country-dot"></span>加拿大（魁北克除外）</div>
+    <div class="country-pill"><span class="country-dot"></span>斐济</div>
+    <div class="country-pill"><span class="country-dot"></span>冈比亚</div>
+    <div class="country-pill"><span class="country-dot"></span>加纳</div>
+    <div class="country-pill"><span class="country-dot"></span>格林纳达</div>
+    <div class="country-pill"><span class="country-dot"></span>圭亚那</div>
+    <div class="country-pill"><span class="country-dot"></span>爱尔兰</div>
+    <div class="country-pill"><span class="country-dot"></span>牙买加</div>
+    <div class="country-pill"><span class="country-dot"></span>肯尼亚</div>
+    <div class="country-pill"><span class="country-dot"></span>利比里亚</div>
+    <div class="country-pill"><span class="country-dot"></span>马耳他</div>
+    <div class="country-pill"><span class="country-dot"></span>马绍尔群岛</div>
+    <div class="country-pill"><span class="country-dot"></span>毛里求斯</div>
+    <div class="country-pill"><span class="country-dot"></span>密克罗尼西亚</div>
+    <div class="country-pill"><span class="country-dot"></span>新西兰</div>
+    <div class="country-pill"><span class="country-dot"></span>尼日利亚</div>
+    <div class="country-pill"><span class="country-dot"></span>圣基茨和尼维斯</div>
+    <div class="country-pill"><span class="country-dot"></span>圣卢西亚</div>
+    <div class="country-pill"><span class="country-dot"></span>圣文森特</div>
+    <div class="country-pill"><span class="country-dot"></span>塞拉利昂</div>
+    <div class="country-pill"><span class="country-dot"></span>新加坡</div>
+    <div class="country-pill"><span class="country-dot"></span>所罗门群岛</div>
+    <div class="country-pill"><span class="country-dot"></span>南非</div>
+    <div class="country-pill"><span class="country-dot"></span>坦桑尼亚</div>
+    <div class="country-pill"><span class="country-dot"></span>特立尼达和多巴哥</div>
+    <div class="country-pill"><span class="country-dot"></span>乌干达</div>
+    <div class="country-pill"><span class="country-dot"></span>英国</div>
+    <div class="country-pill"><span class="country-dot"></span>赞比亚</div>
+    <div class="country-pill"><span class="country-dot"></span>津巴布韦</div>
+  </div>
+
+  <div class="st">各学院具体要求</div>
+  <div class="req-grid">
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">工程学院</div><div class="rc-hs">15 个项目 — M.S. 与 M.Eng</div></div>
+      <div class="rr"><span class="rk">GPA 最低要求</span><span class="rv">3.0（生物医学 3.3+）</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封</span></div>
+      <div class="rr"><span class="rk">个人陈述</span><span class="rv">必需</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">所有项目均需</span></div>
+      <div class="rr"><span class="rk">作品集</span><span class="rv">无需</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">Lally 管理学院</div><div class="rc-hs">全部 STEM 认证 MBA 与硕士</div></div>
+      <div class="rr"><span class="rk">GPA 最低要求</span><span class="rv">3.0+</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封</span></div>
+      <div class="rr"><span class="rk">个人陈述</span><span class="rv">必需</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">无需</span></div>
+      <div class="rr"><span class="rk">作品集</span><span class="rv">无需</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">理学院</div><div class="rc-hs">11 个项目 — M.S.</div></div>
+      <div class="rr"><span class="rk">GPA 最低要求</span><span class="rv">3.0+（计算机科学：3.5+）⚠️</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封</span></div>
+      <div class="rr"><span class="rk">个人陈述</span><span class="rv">必需</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">无需</span></div>
+      <div class="rr"><span class="rk">IT 背景表</span><span class="rv">仅信息技术硕士 ⚠️</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">建筑学院</div><div class="rc-hs">4 个项目 — M.S. 与 M.Arch</div></div>
+      <div class="rr"><span class="rk">GPA 最低要求</span><span class="rv">3.0+</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封</span></div>
+      <div class="rr"><span class="rk">TOEFL / IELTS（更高！）</span><span class="rv">90–94 / 7.0 ⚠️</span></div>
+      <div class="rr"><span class="rk">作品集</span><span class="rv">仅 M.Arch</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">建成生态与照明</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">人文艺术与社会科学学院 (HASS)</div><div class="rc-hs">3 个项目 — M.S.</div></div>
+      <div class="rr"><span class="rk">GPA 最低要求</span><span class="rv">3.0+</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封</span></div>
+      <div class="rr"><span class="rk">个人陈述</span><span class="rv">必需</span></div>
+      <div class="rr"><span class="rk">写作样本</span><span class="rv">仅传播与修辞</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">仅传播与修辞</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REQUIRED DOCS ===== -->
+<div id="sec-docs" class="sec">
+  <div class="sh">所需材料</div>
+  <div class="ss">提交 GUS Gateway 及学生上传至 RPI 门户的完整清单。</div>
+  <div class="ib ib-blue">📌 <strong>InUni 初审最低要求：</strong>护照 + 正式成绩单 + 学位证书。转交 RPI 前需提交完整材料。</div>
+
+  <div class="req-grid">
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">核心申请材料</div><div class="rc-hs">每位申请者均需提供</div></div>
+      <div class="rr"><span class="rk">申请表</span><span class="rv">通过 GUS Gateway</span></div>
+      <div class="rr"><span class="rk">有效护照</span><span class="rv">需复印件</span></div>
+      <div class="rr"><span class="rk">本科成绩单</span><span class="rv">正式版 + 翻译件</span></div>
+      <div class="rr"><span class="rk">学位证书</span><span class="rv">正式复印件</span></div>
+      <div class="rr"><span class="rk">简历 / CV</span><span class="rv">必需</span></div>
+      <div class="rr"><span class="rk">个人陈述 (SOP)</span><span class="rv">300–1,200 字</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">学术与考试材料</div><div class="rc-hs">成绩与推荐</div></div>
+      <div class="rr"><span class="rk">英语语言能力</span><span class="rv">TOEFL/IELTS/Duolingo/PTE</span></div>
+      <div class="rr"><span class="rk">推荐信</span><span class="rv">2 封（带抬头、签名）</span></div>
+      <div class="rr"><span class="rk">GPA 评估</span><span class="rv">InUni 评估表</span></div>
+      <div class="rr"><span class="rk">研究意向 SOP</span><span class="rv">工程学院 + 部分其他</span></div>
+      <div class="rr"><span class="rk">作品集</span><span class="rv">仅 M.Arch</span></div>
+      <div class="rr"><span class="rk">写作样本</span><span class="rv">仅 HASS 传播与修辞</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">财力证明材料</div><div class="rc-hs">用于 I-20 与签证办理</div></div>
+      <div class="rr"><span class="rk">银行存款证明</span><span class="rv">近 3 个月，英文版</span></div>
+      <div class="rr"><span class="rk">最低存款金额</span><span class="rv">$92,357（奖学金前）</span></div>
+      <div class="rr"><span class="rk">需银行盖章</span><span class="rv">签字并盖章</span></div>
+      <div class="rr"><span class="rk">若非本人账户</span><span class="rv">资助声明 + 银行函件</span></div>
+      <div class="rr"><span class="rk">定期存款账户</span><span class="rv">需提取确认函</span></div>
+      <div class="rr"><span class="rk">随行家属</span><span class="rv">+$8,820 配偶 / +$4,410 子女</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><div class="rc-ht">仅信息技术硕士 (MS IT)</div><div class="rc-hs">附加表格 — 理学院</div></div>
+      <div class="rr"><span class="rk">IT 背景评估表</span><span class="rv">必填 ⚠️</span></div>
+      <div class="rr"><span class="rk">编程经验</span><span class="rv">按水平自报</span></div>
+      <div class="rr"><span class="rk">计算机课程经历</span><span class="rv">需 3 门匹配课程</span></div>
+      <div class="rr"><span class="rk">工作经验</span><span class="rv">年限 + 职责领域</span></div>
+      <div class="rr"><span class="rk">证书（如有）</span><span class="rv">ISC2 / ISACA / CompTIA</span></div>
+      <div class="rr"><span class="rk">表格提交至</span><span class="rv">submitRPI@inuniglobal.com</span></div>
+    </div>
+  </div>
+
+  <div class="st">推荐信要求</div>
+  <div class="ib ib-blue">推荐信必须：使用正式信纸抬头 · 签名并注明日期 · 包含推荐人姓名、邮箱及电话 · 为不可编辑文档 · 来自能够评估申请人研究生阶段成功可能性的学术导师、教授或科研指导老师。</div>
+
+  <div class="st">学生门户 — 如何登录</div>
+  <div class="ib ib-blue"><strong>门户网址：</strong>apply.rpi.edu/account/login<br>
+  学生使用注册邮箱 + 系统生成的 PIN 码（邮件发送）登录。首次使用者：点击「Forgot Password」→ 输入邮箱 + 出生日期，即可获取临时 PIN 码。<br><br>
+  在控制面板中可：查看状态 · 上传材料 · 跟踪清单 · 阅读 RPI 官方信息 · 查看录取结果。</div>
+</div>
+
+<!-- ===== FINANCIALS ===== -->
+<div id="sec-financials" class="sec">
+  <div class="sh">学费与费用</div>
+  <div class="ss">就读总费用与奖学金数据，助您与学生及家庭自信地沟通财务事宜。</div>
+  <div class="ib ib-amber">⚠️ <strong>请注意：</strong>以下所有数字均为约数，仅供参考。确切金额将以大学签发的正式信函为准。</div>
+
+  <div class="fin-two">
+    <div class="fin-card">
+      <div class="fin-head">就读总费用 — 2024–25 学年</div>
+      <div class="fin-row"><span>学费</span><span>$64,400</span></div>
+      <div class="fin-row"><span>杂费</span><span>$1,616</span></div>
+      <div class="fin-row"><span>医疗保险</span><span>$2,130</span></div>
+      <div class="fin-row"><span>食宿</span><span>$18,560</span></div>
+      <div class="fin-row"><span>书本与文具</span><span>$1,640</span></div>
+      <div class="fin-row"><span>个人开支</span><span>$1,230</span></div>
+      <div class="fin-row"><span>交通</span><span>$530</span></div>
+      <div class="fin-row"><span>预计总计</span><span>$90,106</span></div>
+    </div>
+    <div class="fin-card">
+      <div class="fin-head">2026–27 学年 — 用于财力证明及 I-20</div>
+      <div class="fin-row"><span>学费</span><span>$66,300</span></div>
+      <div class="fin-row"><span>杂费与医疗保险</span><span>$5,507</span></div>
+      <div class="fin-row"><span>生活费</span><span>$18,870</span></div>
+      <div class="fin-row"><span>书本与文具</span><span>$1,680</span></div>
+      <div class="fin-row"><span>就读总费用（用于 I-20）</span><span>$92,357</span></div>
+    </div>
+  </div>
+
+  <div class="st">分地区优秀奖学金（2026–27 学年学费基数：$66,300/年）</div>
+  <div class="rtable-wrap">
+    <table class="rt">
+      <thead><tr><th>地区</th><th>奖学金比例</th><th>每年节省</th><th>奖学金后所需资金</th></tr></thead>
+      <tbody>
+        <tr><td>中国</td><td>最高 40%</td><td class="saving">$26,520</td><td>$65,837</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ib ib-amber">💡 <strong>定金：</strong>录取后需缴纳 5,000 美元定金，可抵扣学费。缴纳定金后方可签发 I-20。</div>
+  <div class="ib ib-red">🏦 <strong>财力证明规则：</strong>银行存款证明须为英文 · 3 个月内开具 · 不可编辑 · 签字并加盖银行印章。定期存款须提供提取确认函。</div>
+</div>
+
+<!-- ===== DEADLINES ===== -->
+<div id="sec-deadlines" class="sec">
+  <div class="sh">重要截止日期 — 2026 年入学</div>
+  <div class="ss">2026 年秋季入学的 InUni 与 RPI 关键时间节点。</div>
+
+  <div class="dl-block">
+    <div class="dl-head"><div class="dl-ht">2026 年 8 月 — 秋季入学</div><div class="dl-badge">主要入学季</div></div>
+    <div class="dl-grid">
+      <div class="dl-cell"><div class="dl-lbl">InUni 申请</div><div class="dl-date">2026 年 7 月 14 日</div></div>
+      <div class="dl-cell"><div class="dl-lbl">录取截止</div><div class="dl-date">2026 年 10 月 8 日</div></div>
+      <div class="dl-cell"><div class="dl-lbl">I-20 签发</div><div class="dl-date">2026 年 12 月 8 日</div></div>
+      <div class="dl-cell"><div class="dl-lbl">开学日期</div><div class="dl-date">2026 年 8 月 28 日</div></div>
+    </div>
+  </div>
+  <div class="ib ib-blue">⏱ <strong>处理时间：</strong>InUni 评估约 2 天 &nbsp;|&nbsp; RPI 录取审核约 3 周 &nbsp;|&nbsp; 缴纳定金后约 2 周签发 I-20</div>
+</div>
+
+<!-- ===== PROGRAMS ===== -->
+<div id="sec-programs" class="sec">
+  <div class="sh">专业查询</div>
+  <div class="ss">通过 InUni 可申请的全部 42 个研究生项目。可按学院筛选或按名称搜索。</div>
+  <div class="filter-row">
+    <button class="fb active" onclick="fp('all',this)">全部专业</button>
+    <button class="fb" onclick="fp('eng',this)">工程</button>
+    <button class="fb" onclick="fp('lally',this)">Lally / 管理</button>
+    <button class="fb" onclick="fp('sci',this)">理学</button>
+    <button class="fb" onclick="fp('arch',this)">建筑</button>
+    <button class="fb" onclick="fp('hass',this)">人文社科</button>
+  </div>
+  <input class="sinp" type="text" placeholder="按专业名称或学位类型搜索……" oninput="sp(this.value)">
+  <div class="prog-wrap">
+    <table class="pt">
+      <thead><tr><th>专业</th><th>学位</th><th>学院</th><th>STEM</th><th>研究 SOP</th></tr></thead>
+      <tbody id="ptb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== FACTS ===== -->
+<div id="sec-facts" class="sec">
+  <div class="sh">数据与排名</div>
+  <div class="ss">用于学生及家长咨询的快速参考话术要点。</div>
+  <div class="facts-grid">
+    <div class="fc"><div class="fi">🏛️</div><div><div class="ft">美国最古老的理工大学</div><div class="fb2">建校于 1824 年——比 MIT 早 29 年，比加州理工早 67 年。当世界顶尖理工名校尚处构想阶段时，RPI 毕业生已在建设美国的基础设施。</div></div></div>
+    <div class="fc"><div class="fi">⚛️</div><div><div class="ft">IBM Quantum System One — 真正的世界首创</div><div class="fb2">全球首所校园内拥有 IBM Quantum System One 的大学（2024 年）。学生可亲手操作量子硬件，开展 AI、药物研发与网络安全研究。</div></div></div>
+    <div class="fc"><div class="fi">📊</div><div><div class="ft">#70 — 2025《美国新闻与世界报道》</div><div class="fb2">稳居全美前 75 名。美国最具选拔性的私立理工类研究型大学之一。</div></div></div>
+    <div class="fc"><div class="fi">💼</div><div><div class="ft">每位 Lally 学生享 3 年 OPT</div><div class="fb2">所有 Lally MBA 与硕士项目均为 STEM 认证。国际毕业生可获 3 年 OPT，而非标准的 1 年——在商学院比较中具有决定性优势。</div></div></div>
+    <div class="fc"><div class="fi">💰</div><div><div class="ft">薪资中位数 10.3 万–10.5 万美元</div><div class="fb2">Lally MBA 中位数 10.3 万美元；硕士 10.5 万美元/年。30% 的 Lally 校友进入高管层。对权衡成本与回报的家庭而言极具说服力。</div></div></div>
+    <div class="fc"><div class="fi">🏦</div><div><div class="ft">全美首个 NSF 金融科技研究中心</div><div class="fb2">CRAFT——任何大学中首个 NSF 资助的金融科技中心——设于 Lally 学院。为金融、银行及金融科技方向学生提供真正的产学合作。</div></div></div>
+    <div class="fc"><div class="fi">🌐</div><div><div class="ft">11 万+ 校友遍布 60 多国</div><div class="fb2">网络涵盖《财富》500 强 CEO、诺贝尔奖得主、NASA 宇航员及科技创始人。校友在全球范围内积极指导并招聘在校学生。</div></div></div>
+    <div class="fc"><div class="fi">🔬</div><div><div class="ft">32 个研究中心 · 746 间实验室</div><div class="fb2">对研究型硕士学生极具吸引力。合作伙伴包括 IBM、NASA、DARPA 及美国国家实验室。教师含美国国家科学院院士。</div></div></div>
+    <div class="fc"><div class="fi">🌉</div><div><div class="ft">校友建造了布鲁克林大桥</div><div class="fb2">Washington Roebling（RPI 1857 届）完成了布鲁克林大桥。RPI 校友还建造了美国首条横贯大陆铁路。建设世界的传承。</div></div></div>
+    <div class="fc"><div class="fi">📍</div><div><div class="ft">距纽约与波士顿 2–3 小时</div><div class="fb2">特洛伊市位于美国东北部就业市场的核心地带。华尔街、硅巷、128 公路——实习、带薪实习及全职岗位均触手可及。</div></div></div>
+    <div class="fc"><div class="fi">✈️</div><div><div class="ft">便捷的国际交通</div><div class="fb2">奥尔巴尼国际机场距校园仅 15 分钟，可连通美国各大枢纽。来自世界各地的学生及探访家庭往来便利。</div></div></div>
+    <div class="fc"><div class="fi">🎮</div><div><div class="ft">批判性游戏设计硕士 — 全球独有</div><div class="fb2">融合 AI、VR/AR、叙事设计与社会科学。是全球极少数面向科技与创意艺术交叉领域学生的项目之一。</div></div></div>
+  </div>
+</div>
+
+<!-- ===== PROCESS ===== -->
+<div id="sec-process" class="sec">
+  <div class="sh">申请流程</div>
+  <div class="ss">从提交 GUS Gateway 到入学注册的完整旅程。可用于向学生及家庭清晰设定预期。</div>
+  <div class="proc-list">
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">1</div><div class="proc-line"></div></div><div class="proc-content"><div class="proc-title">代理通过 GUS Gateway 提交申请</div><div class="proc-desc">最低材料：护照、正式成绩单、学位证书。申请录入 InUni 系统。</div><div class="proc-tag">当天完成</div></div></div>
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">2</div><div class="proc-line"></div></div><div class="proc-content"><div class="proc-title">RPI 审核 — 录取与奖学金决定</div><div class="proc-desc">RPI 研究生招生办审核完整申请。发出录取决定。符合条件者获奖学金。学生通过邮件及门户获知结果。</div><div class="proc-tag">约 3 周</div></div></div>
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">3</div><div class="proc-line"></div></div><div class="proc-content"><div class="proc-title">学生接受录取并缴纳 5,000 美元定金</div><div class="proc-desc">学生正式接受录取。缴纳 5,000 美元定金（可抵扣学费）。提交财力证明以启动 I-20 流程。</div><div class="proc-tag">接受录取时</div></div></div>
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">4</div><div class="proc-line"></div></div><div class="proc-content"><div class="proc-title">I-20 签发</div><div class="proc-desc">RPI 签发 I-20（F-1 身份资格证书）。预约美国学生签证所必需。</div></div></div>
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">5</div><div class="proc-line"></div></div><div class="proc-content"><div class="proc-title">美国 F-1 签证预约与获批</div><div class="proc-desc">学生前往最近的美国大使馆或领事馆参加签证面试。需携带：DS-160 确认页、SEVIS 费用收据、I-20、财力证明、录取通知书。</div><div class="proc-tag">学生自行办理</div></div></div>
+    <div class="proc-row"><div class="proc-spine"><div class="proc-dot">6</div></div><div class="proc-content"><div class="proc-title">学生入学 RPI — 美国纽约州特洛伊市</div><div class="proc-desc">欢迎来到美国最初的理工大学。275 英亩山顶校园与 200 年改变世界的创新传承，正等待着你。</div></div></div>
+  </div>
+</div>
+
+</div><!-- end .ca -->
+
+<div class="cbar">
+  <div class="ci">申请提交至：<a href="mailto:submitRPI@inuniglobal.com">submitRPI@inuniglobal.com</a></div>
+  <div class="ci">InUni：<a href="https://inuniglobal.com">inuniglobal.com</a></div>
+  <div class="ci">RPI：<a href="https://rpi.edu">rpi.edu</a></div>
+  <div class="ci" style="margin-left:auto;color:rgba(255,255,255,0.25);font-size:11px">仅供商务使用 — 请勿直接分享给学生</div>
+</div>
+</div><!-- end .main -->
+</div><!-- end .shell -->
+
+<script>
+var P=[
+  {n:"航空工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"生物医学工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"生物医学数据科学",d:"M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"化学工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"土木工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"计算机与系统工程",d:"M.S.",s:"eng",stem:"是",r:"是"},
+  {n:"电气工程",d:"M.S.",s:"eng",stem:"是",r:"是"},
+  {n:"环境工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"工业与管理工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"材料科学与工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"机械工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"核工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"半导体技术",d:"M.S.",s:"eng",stem:"是",r:"是"},
+  {n:"系统工程与技术管理",d:"M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"交通运输工程",d:"M.S. / M.Eng",s:"eng",stem:"是",r:"是"},
+  {n:"商业分析",d:"M.S.",s:"lally",stem:"是",r:"否"},
+  {n:"量化金融与风险分析",d:"M.S.",s:"lally",stem:"是",r:"否"},
+  {n:"供应链管理",d:"M.S.",s:"lally",stem:"是",r:"否"},
+  {n:"管理信息技术",d:"M.S.",s:"lally",stem:"是",r:"否"},
+  {n:"MBA 工商管理",d:"MBA",s:"lally",stem:"是",r:"否"},
+  {n:"MBA 设计",d:"MBA",s:"lally",stem:"是",r:"否"},
+  {n:"MBA 生命科学创业",d:"MBA",s:"lally",stem:"是",r:"否"},
+  {n:"MBA 营销分析",d:"MBA",s:"lally",stem:"是",r:"否"},
+  {n:"MBA 管理",d:"MBA",s:"lally",stem:"是",r:"否"},
+  {n:"计算机科学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"信息技术",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"数学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"应用数学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"物理",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"化学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"地质学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"天文学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"生物化学 / 生物物理",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"生物学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"应用科学",d:"M.S.",s:"sci",stem:"是",r:"否"},
+  {n:"建筑科学 — 建筑声学",d:"M.S.",s:"arch",stem:"否",r:"否"},
+  {n:"建筑科学 — 建成生态",d:"M.S.",s:"arch",stem:"否",r:"是"},
+  {n:"建筑科学 — 照明",d:"M.S.",s:"arch",stem:"否",r:"是"},
+  {n:"建筑学硕士",d:"M.Arch",s:"arch",stem:"否",r:"否"},
+  {n:"批判性游戏设计",d:"M.S.",s:"hass",stem:"否",r:"否"},
+  {n:"经济学",d:"M.S.",s:"hass",stem:"否",r:"否"},
+  {n:"传播与修辞",d:"M.S.",s:"hass",stem:"否",r:"是"}
+];
+var SL={eng:"工程",lally:"Lally / 管理",sci:"理学",arch:"建筑",hass:"人文社科"};
+var SB={eng:"be",lally:"bl",sci:"bs",arch:"ba",hass:"bh"};
+var af="all",sv="";
+function rp(list){
+  var tb=document.getElementById("ptb");
+  if(!list.length){tb.innerHTML='<tr><td colspan="5" style="padding:20px;text-align:center;color:#aaa">无匹配的专业</td></tr>';return;}
+  tb.innerHTML=list.map(function(p){
+    return "<tr><td style='font-weight:600'>"+p.n+"</td><td>"+p.d+"</td>"
+      +"<td><span class='badge "+SB[p.s]+"'>"+SL[p.s]+"</span></td>"
+      +"<td><span class='badge "+(p.stem==="是"?"bstem":"bn")+"'>"+p.stem+"</span></td>"
+      +"<td><span class='badge "+(p.r==="是"?"by":"bn")+"'>"+p.r+"</span></td>"
+      +"</tr>";
+  }).join("");
+}
+function fp(f,btn){af=f;document.querySelectorAll(".fb").forEach(function(b){b.classList.remove("active")});btn.classList.add("active");apf();}
+function sp(v){sv=v.toLowerCase();apf();}
+function apf(){rp(P.filter(function(p){return(af==="all"||p.s===af)&&(!sv||p.n.toLowerCase().includes(sv)||p.d.toLowerCase().includes(sv));}));}
+function nav(id,btn){
+  document.querySelectorAll(".sec").forEach(function(s){s.classList.remove("active")});
+  document.querySelectorAll(".ni").forEach(function(b){b.classList.remove("active")});
+  document.getElementById("sec-"+id).classList.add("active");
+  btn.classList.add("active");
+  window.scrollTo(0,0);
+}
+rp(P);
+</script>
+</body>
+</html>
