@@ -6,181 +6,184 @@
 <title>RPI — InUni 代理参考指南</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f0efeb;display:flex;flex-direction:column;min-height:100vh;font-size:14px;color:#1a1a1a}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#eef1f5;display:flex;flex-direction:column;min-height:100vh;font-size:14px;color:#111}
   .shell{display:flex;min-height:100vh}
 
   /* SIDEBAR */
-  .sidebar{width:182px;min-width:182px;background:#0f1b2d;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
-  .sb-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .sidebar{width:182px;min-width:182px;background:#000000;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sb-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.1)}
   .sb-logo{display:flex;justify-content:center;margin-bottom:12px}
   .sb-logo img{width:100%;max-width:140px;height:auto;display:block}
-  .sb-eye{color:rgba(255,255,255,0.35);font-size:9px;font-weight:700;letter-spacing:.06em;margin-bottom:4px}
+  .sb-eye{color:rgba(255,255,255,0.4);font-size:9px;font-weight:700;letter-spacing:.06em;margin-bottom:4px}
   .sb-name{color:white;font-size:17px;font-weight:800;letter-spacing:-.3px}
-  .sb-sub{color:rgba(255,255,255,0.4);font-size:10px;font-weight:600;letter-spacing:.04em;margin-top:2px;line-height:1.4}
-  .sb-pill{display:inline-block;background:#c8960c;color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;margin-top:9px;letter-spacing:.02em}
-  .nav-lbl{color:rgba(255,255,255,0.28);font-size:10px;font-weight:700;letter-spacing:.06em;padding:16px 16px 5px}
-  .ni{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,0.5);font-size:12px;font-weight:500}
-  .ni:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
-  .ni.active{background:rgba(200,150,12,0.14);border-left-color:#c8960c;color:#f0c040}
+  .sb-sub{color:rgba(255,255,255,0.45);font-size:10px;font-weight:600;letter-spacing:.04em;margin-top:2px;line-height:1.4}
+  .sb-pill{display:inline-block;background:#D6001C;color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;margin-top:9px;letter-spacing:.02em}
+  .nav-lbl{color:rgba(255,255,255,0.3);font-size:10px;font-weight:700;letter-spacing:.06em;padding:16px 16px 5px}
+  .ni{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,0.55);font-size:12px;font-weight:500}
+  .ni:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9)}
+  .ni.active{background:rgba(214,0,28,0.16);border-left-color:#D6001C;color:#ff6172}
   .ni-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0}
 
   /* MAIN */
   .main{flex:1;display:flex;flex-direction:column;min-width:0}
 
   /* HEADER */
-  .hband{background:#0f1b2d;padding:22px 32px;position:relative}
-  .h-eye{color:rgba(200,150,12,0.85);font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:7px}
+  .hband{background:#000000;padding:22px 32px;position:relative}
+  .h-eye{color:#ff5263;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:7px}
   .h-title{color:white;font-size:25px;font-weight:800;line-height:1.25}
-  .h-desc{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px}
+  .h-desc{color:rgba(255,255,255,0.55);font-size:12px;margin-top:6px}
   .h-stats{display:flex;gap:28px;margin-top:20px;flex-wrap:wrap}
-  .hs-n{color:#f0c040;font-size:20px;font-weight:800;line-height:1}
-  .hs-l{color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;letter-spacing:.02em;margin-top:3px}
+  .hs-n{color:#ff5263;font-size:20px;font-weight:800;line-height:1}
+  .hs-l{color:rgba(255,255,255,0.45);font-size:10px;font-weight:700;letter-spacing:.02em;margin-top:3px}
 
   /* CONTENT */
   .ca{flex:1;padding:26px 30px 50px}
   .sec{display:none}
   .sec.active{display:block}
-  .sh{font-size:18px;font-weight:800;color:#0f1b2d;margin-bottom:3px}
+  .sh{font-size:18px;font-weight:800;color:#000000;margin-bottom:3px}
   .ss{font-size:13px;color:#999;margin-bottom:22px;line-height:1.6}
-  .st{font-size:14px;font-weight:700;color:#0f1b2d;margin:24px 0 12px}
+  .st{font-size:14px;font-weight:700;color:#000000;margin:24px 0 12px}
 
   /* INFO BOXES */
   .ib{border-radius:8px;padding:11px 15px;font-size:12px;line-height:1.7;margin-bottom:16px}
-  .ib-amber{background:#fff8e6;border:1px solid #eedd88;color:#7a5200}
-  .ib-blue{background:#eef4ff;border:1px solid #b8ccf0;color:#1a3870}
-  .ib-red{background:#fff0f0;border:1px solid #f5b8b8;color:#6b0000}
+  .ib-amber{background:#fdf3e3;border:1px solid #e9d3a8;color:#7a5200}
+  .ib-blue{background:#e6f3fb;border:1px solid #a9d4ee;color:#0a5a8f}
+  .ib-red{background:#fdecee;border:1px solid #f3b6bd;color:#9c0014}
   .ib-green{background:#f0faf0;border:1px solid #a0d8a0;color:#1a5c1a}
+
+  /* HERO IMAGE */
+  .hero-img{width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:22px;display:block;border:1px solid #dbe1e8}
 
   /* USP CARDS */
   .usp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px;margin-bottom:26px}
-  .usp-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:16px}
+  .usp-card{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:16px}
   .usp-icon{font-size:22px;margin-bottom:10px}
-  .usp-title{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:5px;line-height:1.4}
-  .usp-body{font-size:12px;color:#666;line-height:1.7}
+  .usp-title{font-size:13px;font-weight:700;color:#000000;margin-bottom:5px;line-height:1.4}
+  .usp-body{font-size:12px;color:#555;line-height:1.7}
 
   /* HIGHLIGHT CARD */
-  .highlight-card{background:linear-gradient(135deg,#0f1b2d 0%,#1a3060 100%);border-radius:12px;padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;align-items:flex-start}
+  .highlight-card{background:linear-gradient(135deg,#D6001C 0%,#9c0014 100%);border-radius:12px;padding:20px 22px;margin-bottom:20px;display:flex;gap:16px;align-items:flex-start}
   .hl-icon{font-size:32px;flex-shrink:0}
-  .hl-title{color:#f0c040;font-size:15px;font-weight:800;margin-bottom:5px;line-height:1.4}
-  .hl-body{color:rgba(255,255,255,0.75);font-size:12px;line-height:1.8}
+  .hl-title{color:#ffffff;font-size:15px;font-weight:800;margin-bottom:5px;line-height:1.4}
+  .hl-body{color:rgba(255,255,255,0.88);font-size:12px;line-height:1.8}
 
   /* LOCATION */
-  .loc-block{background:white;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#444;line-height:1.8;border:1px solid #e6e4de;border-left:4px solid #c8960c}
+  .loc-block{background:white;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#444;line-height:1.8;border:1px solid #dbe1e8;border-left:4px solid #D6001C}
 
   /* SCHOOLS */
   .schools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-  .sc-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:14px 15px}
-  .sc-lbl{font-size:10px;font-weight:700;letter-spacing:.04em;color:#c8960c;margin-bottom:5px}
-  .sc-name{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:5px;line-height:1.4}
+  .sc-card{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:14px 15px}
+  .sc-lbl{font-size:10px;font-weight:700;letter-spacing:.04em;color:#D6001C;margin-bottom:5px}
+  .sc-name{font-size:13px;font-weight:700;color:#000000;margin-bottom:5px;line-height:1.4}
   .sc-desc{font-size:11px;color:#888;line-height:1.7}
 
   /* REQ CARDS */
   .req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
-  .rc{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden}
-  .rc-h{background:#0f1b2d;padding:10px 14px}
+  .rc{background:white;border:1px solid #dbe1e8;border-radius:10px;overflow:hidden}
+  .rc-h{background:#000000;padding:10px 14px}
   .rc-ht{color:white;font-size:12px;font-weight:700}
-  .rc-hs{color:rgba(255,255,255,0.45);font-size:10px;margin-top:2px}
-  .rr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #f4f2ee;font-size:12px}
+  .rc-hs{color:rgba(255,255,255,0.5);font-size:10px;margin-top:2px}
+  .rr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #f0f3f6;font-size:12px}
   .rr:last-child{border-bottom:none}
   .rk{color:#888}
-  .rv{font-weight:600;color:#0f1b2d;text-align:right;max-width:58%}
+  .rv{font-weight:600;color:#000000;text-align:right;max-width:58%}
 
   /* SCORE CARDS */
   .score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:420px;margin-bottom:18px}
-  .score-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:12px;text-align:center}
+  .score-card{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:12px;text-align:center}
   .sc-lbl2{font-size:11px;color:#999;font-weight:700;margin-bottom:4px}
-  .sc-val{font-size:22px;font-weight:800;color:#0f1b2d}
+  .sc-val{font-size:22px;font-weight:800;color:#000000}
 
   /* EXEMPT COUNTRIES */
   .countries-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:20px}
-  .country-pill{background:white;border:1px solid #e6e4de;border-radius:6px;padding:6px 10px;font-size:11px;color:#444;display:flex;align-items:center;gap:5px}
-  .country-dot{width:6px;height:6px;border-radius:50%;background:#c8960c;flex-shrink:0}
+  .country-pill{background:white;border:1px solid #dbe1e8;border-radius:6px;padding:6px 10px;font-size:11px;color:#444;display:flex;align-items:center;gap:5px}
+  .country-dot{width:6px;height:6px;border-radius:50%;background:#D6001C;flex-shrink:0}
 
   /* PROGRAMS */
   .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .fb{padding:5px 14px;border-radius:20px;border:1px solid #d4d2cc;background:white;font-size:11px;font-weight:600;cursor:pointer;color:#666;transition:all .15s}
-  .fb.active,.fb:hover{background:#0f1b2d;color:white;border-color:#0f1b2d}
-  .sinp{width:100%;padding:9px 13px;border:1px solid #d4d2cc;border-radius:8px;font-size:13px;background:white;color:#1a1a1a;margin-bottom:13px}
-  .prog-wrap{overflow-x:auto;background:white;border:1px solid #e6e4de;border-radius:10px}
+  .fb{padding:5px 14px;border-radius:20px;border:1px solid #cdd5dd;background:white;font-size:11px;font-weight:600;cursor:pointer;color:#555;transition:all .15s}
+  .fb.active,.fb:hover{background:#000000;color:white;border-color:#000000}
+  .sinp{width:100%;padding:9px 13px;border:1px solid #cdd5dd;border-radius:8px;font-size:13px;background:white;color:#1a1a1a;margin-bottom:13px}
+  .prog-wrap{overflow-x:auto;background:white;border:1px solid #dbe1e8;border-radius:10px}
   table.pt{width:100%;border-collapse:collapse;font-size:12px}
-  table.pt th{text-align:left;padding:10px 13px;background:#f8f6f2;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #e6e4de;white-space:nowrap}
-  table.pt td{padding:9px 13px;border-bottom:1px solid #f2f0ec;vertical-align:middle}
+  table.pt th{text-align:left;padding:10px 13px;background:#f4f6f9;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #dbe1e8;white-space:nowrap}
+  table.pt td{padding:9px 13px;border-bottom:1px solid #f0f3f6;vertical-align:middle}
   table.pt tr:last-child td{border-bottom:none}
-  table.pt tr:hover td{background:#faf8f4}
+  table.pt tr:hover td{background:#f7f9fb}
 
   /* BADGES */
   .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
-  .be{background:#fde8e8;color:#8b1010}
-  .bl{background:#e8f4df;color:#296010}
-  .bs{background:#e2eefa;color:#104fa0}
-  .ba{background:#fef0da;color:#7a4500}
-  .bh{background:#eeeafc;color:#3b2fa0}
-  .by{background:#e8f4df;color:#296010}
-  .bn{background:#f2f0ec;color:#999}
-  .bstem{background:#e2eefa;color:#104fa0}
+  .be{background:#fde0e3;color:#9c0014}
+  .bl{background:#f7eccb;color:#7a5e10}
+  .bs{background:#dcecf8;color:#0a5a8f}
+  .ba{background:#e4e9ef;color:#46535f}
+  .bh{background:#e9eef4;color:#2c3a48}
+  .by{background:#dcecf8;color:#0a5a8f}
+  .bn{background:#f0f3f6;color:#999}
+  .bstem{background:#dcecf8;color:#0a5a8f}
 
   /* FINANCIALS */
   .fin-two{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:20px}
-  .fin-card{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden}
-  .fin-head{background:#f8f6f2;padding:10px 14px;font-size:12px;font-weight:700;color:#666;letter-spacing:.02em;border-bottom:1px solid #e6e4de}
-  .fin-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f4f2ee;font-size:12px}
-  .fin-row:last-child{border-bottom:none;font-weight:700;color:#0f1b2d;font-size:13px}
+  .fin-card{background:white;border:1px solid #dbe1e8;border-radius:10px;overflow:hidden}
+  .fin-head{background:#f4f6f9;padding:10px 14px;font-size:12px;font-weight:700;color:#555;letter-spacing:.02em;border-bottom:1px solid #dbe1e8}
+  .fin-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f0f3f6;font-size:12px}
+  .fin-row:last-child{border-bottom:none;font-weight:700;color:#000000;font-size:13px}
   .fin-row span:last-child{font-weight:600}
-  .rtable-wrap{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden;margin-bottom:18px}
+  .rtable-wrap{background:white;border:1px solid #dbe1e8;border-radius:10px;overflow:hidden;margin-bottom:18px}
   table.rt{width:100%;border-collapse:collapse;font-size:12px}
-  table.rt th{text-align:left;padding:9px 13px;background:#f8f6f2;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #e6e4de}
-  table.rt td{padding:9px 13px;border-bottom:1px solid #f2f0ec}
+  table.rt th{text-align:left;padding:9px 13px;background:#f4f6f9;color:#888;font-weight:700;font-size:11px;letter-spacing:.02em;border-bottom:1px solid #dbe1e8}
+  table.rt td{padding:9px 13px;border-bottom:1px solid #f0f3f6}
   table.rt tr:last-child td{border-bottom:none}
-  table.rt tr:hover td{background:#faf8f4}
-  .saving{color:#296010;font-weight:700}
+  table.rt tr:hover td{background:#f7f9fb}
+  .saving{color:#0a6b2e;font-weight:700}
 
   /* DEADLINES */
-  .dl-block{background:white;border:1px solid #e6e4de;border-radius:10px;overflow:hidden;margin-bottom:14px}
-  .dl-head{background:#0f1b2d;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+  .dl-block{background:white;border:1px solid #dbe1e8;border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .dl-head{background:#000000;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
   .dl-ht{color:white;font-size:13px;font-weight:700}
-  .dl-badge{background:#c8960c;color:white;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .dl-badge{background:#D6001C;color:white;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
   .dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr))}
-  .dl-cell{padding:12px 14px;border-right:1px solid #f2f0ec;border-bottom:1px solid #f2f0ec}
+  .dl-cell{padding:12px 14px;border-right:1px solid #f0f3f6;border-bottom:1px solid #f0f3f6}
   .dl-cell:last-child{border-right:none}
   .dl-lbl{font-size:10px;color:#aaa;font-weight:700;letter-spacing:.02em;margin-bottom:4px}
-  .dl-date{font-size:13px;font-weight:700;color:#0f1b2d}
+  .dl-date{font-size:13px;font-weight:700;color:#000000}
 
   /* FACTS */
   .facts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px}
-  .fc{background:white;border:1px solid #e6e4de;border-radius:10px;padding:15px 16px;display:flex;gap:12px}
+  .fc{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:15px 16px;display:flex;gap:12px}
   .fi{font-size:22px;flex-shrink:0;margin-top:1px}
-  .ft{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:4px;line-height:1.4}
-  .fb2{font-size:12px;color:#666;line-height:1.7}
+  .ft{font-size:13px;font-weight:700;color:#000000;margin-bottom:4px;line-height:1.4}
+  .fb2{font-size:12px;color:#555;line-height:1.7}
 
   /* PROCESS */
   .proc-list{display:flex;flex-direction:column}
   .proc-row{display:flex}
   .proc-spine{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
-  .proc-dot{width:30px;height:30px;border-radius:50%;background:#0f1b2d;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #c8960c;flex-shrink:0}
-  .proc-line{width:2px;background:#ddd;flex:1;margin:0 auto}
+  .proc-dot{width:30px;height:30px;border-radius:50%;background:#000000;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #D6001C;flex-shrink:0}
+  .proc-line{width:2px;background:#dbe1e8;flex:1;margin:0 auto}
   .proc-content{padding:2px 0 22px 14px;flex:1}
-  .proc-title{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:3px}
-  .proc-desc{font-size:12px;color:#666;line-height:1.7}
-  .proc-tag{display:inline-block;background:#eef3ff;color:#1050a0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
+  .proc-title{font-size:13px;font-weight:700;color:#000000;margin-bottom:3px}
+  .proc-desc{font-size:12px;color:#555;line-height:1.7}
+  .proc-tag{display:inline-block;background:#e6f3fb;color:#0a5a8f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
 
   /* ALUMNI SPOTLIGHT */
   .alumni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
-  .alumni-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:14px 15px;border-top:3px solid #c8960c}
-  .alumni-name{font-size:13px;font-weight:700;color:#0f1b2d;margin-bottom:3px}
-  .alumni-role{font-size:11px;color:#c8960c;font-weight:700;margin-bottom:5px}
+  .alumni-card{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:14px 15px;border-top:3px solid #D6001C}
+  .alumni-name{font-size:13px;font-weight:700;color:#000000;margin-bottom:3px}
+  .alumni-role{font-size:11px;color:#D6001C;font-weight:700;margin-bottom:5px}
   .alumni-desc{font-size:11px;color:#888;line-height:1.6}
 
   /* RESEARCH AREAS */
   .research-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
-  .res-card{background:white;border:1px solid #e6e4de;border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+  .res-card{background:white;border:1px solid #dbe1e8;border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
   .res-icon{font-size:18px;flex-shrink:0}
-  .res-title{font-size:12px;font-weight:700;color:#0f1b2d;margin-bottom:2px}
+  .res-title{font-size:12px;font-weight:700;color:#000000;margin-bottom:2px}
   .res-desc{font-size:11px;color:#888;line-height:1.6}
 
   /* CONTACT BAR */
-  .cbar{background:#0f1b2d;padding:12px 30px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-  .ci{font-size:12px;color:rgba(255,255,255,0.5)}
-  .ci a{color:#f0c040;text-decoration:none;font-weight:600}
+  .cbar{background:#000000;padding:12px 30px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .ci{font-size:12px;color:rgba(255,255,255,0.55)}
+  .ci a{color:#ff6172;text-decoration:none;font-weight:600}
   .ci a:hover{text-decoration:underline}
 
   @media(max-width:720px){
@@ -200,7 +203,8 @@
 <div class="sidebar">
   <div class="sb-brand">
     <div class="sb-logo">
-      <img src="https://res.cloudinary.com/dn1skfuye/image/upload/v1781023650/INUNI_Global_iU_transparent_vvxgxz.png" alt="InUni Global logo" />
+      <img src="https://res.cloudinary.com/dn1skfuye/image/upload/v1781023650/INUNI_Global_iU_transparent_vvxgxz.png" alt="InUni Global" referrerpolicy="no-referrer" onerror="this.style.display='none';var f=document.getElementById('logoFallback');if(f)f.style.display='block';" />
+      <div id="logoFallback" style="display:none;color:#fff;font-size:20px;font-weight:800;letter-spacing:.04em;text-align:center"><span style="color:#3a9bd6">IN</span>UNI <span style="color:#7cbde8">GLOBAL</span></div>
     </div>
     <div class="sb-eye">伦斯勒理工学院</div>
     <div class="sb-sub">代理参考指南</div>
@@ -228,7 +232,7 @@
     <div><div class="hs-n">7,800+</div><div class="hs-l">在校学生</div></div>
     <div><div class="hs-n">145+</div><div class="hs-l">学位项目</div></div>
     <div><div class="hs-n">60+</div><div class="hs-l">国家与地区</div></div>
-    <div><div class="hs-n">#70</div><div class="hs-l">2025 全美排名</div></div>
+    <div><div class="hs-n">#64</div><div class="hs-l">2026 全美排名</div></div>
     <div><div class="hs-n">1824</div><div class="hs-l">建校年份</div></div>
     <div><div class="hs-n">110K+</div><div class="hs-l">校友总数</div></div>
   </div>
@@ -241,10 +245,12 @@
   <div class="sh">概览与核心卖点</div>
   <div class="ss">推荐 RPI 的主要理由，以及与学生沟通时的话术切入点。</div>
 
+  <img class="hero-img" src="https://res.cloudinary.com/dn1skfuye/image/upload/v1781868440/Screenshot_2026-06-19_at_12.24.09_jqmuvp.png" alt="RPI 学生在实验室协作研究" referrerpolicy="no-referrer" />
+
   <div class="usp-grid">
     <div class="usp-card"><div class="usp-icon">⚛️</div><div class="usp-title">全球首台校园内 IBM 量子计算机</div><div class="usp-body">全球首所将 IBM Quantum System One 量子计算机引入校园的大学（2024 年揭幕）。学生可直接使用真实量子硬件，开展人工智能、化学与国家安全领域研究。全球独一无二。</div></div>
     <div class="usp-card"><div class="usp-icon">💼</div><div class="usp-title">Lally 商学院所有项目均为 STEM</div><div class="usp-body">所有 Lally MBA 与硕士项目均获 STEM 认证。国际学生可享 3 年 OPT 延期——相较非 STEM 商学院，职业发展空间大幅拓展。</div></div>
-    <div class="usp-card"><div class="usp-icon">🏆</div><div class="usp-title">排名 #70 — 美国最古老的理工大学</div><div class="usp-body">美国历史最悠久的理工类研究型大学，建校于 1824 年，比 MIT 早 29 年。逾 200 年引领 STEM 领域、改变世界的辉煌历史。</div></div>
+    <div class="usp-card"><div class="usp-icon">🏆</div><div class="usp-title">排名 #64 — 美国最古老的理工大学</div><div class="usp-body">美国历史最悠久的理工类研究型大学，建校于 1824 年，比 MIT 早 29 年。逾 200 年引领 STEM 领域、改变世界的辉煌历史。</div></div>
     <div class="usp-card"><div class="usp-icon">💰</div><div class="usp-title">毕业生薪资中位数 10.3 万–10.5 万美元</div><div class="usp-body">Lally MBA 中位数 10.3 万美元；硕士 10.5 万美元/年。30% 的 Lally 校友晋升至高管层。对有抱负的家庭而言，投资回报不言自明。</div></div>
     <div class="usp-card"><div class="usp-icon">🔬</div><div class="usp-title">32 个研究中心 · 746 间实验室</div><div class="usp-body">设有全美首个 NSF 资助的金融科技研究中心（CRAFT）。合作伙伴包括 IBM、NASA、DARPA。教师包括 NSF 总统级学者及美国国家科学院院士。</div></div>
     <div class="usp-card"><div class="usp-icon">📍</div><div class="usp-title">距纽约与波士顿仅 2–3 小时</div><div class="usp-body">特洛伊市位于美国东北部核心就业市场的枢纽地带。华尔街、硅巷及波士顿 128 公路科技走廊均可通勤实习。</div></div>
@@ -535,12 +541,11 @@
     <div class="dl-head"><div class="dl-ht">2026 年 8 月 — 秋季入学</div><div class="dl-badge">主要入学季</div></div>
     <div class="dl-grid">
       <div class="dl-cell"><div class="dl-lbl">InUni 申请</div><div class="dl-date">2026 年 7 月 14 日</div></div>
-      <div class="dl-cell"><div class="dl-lbl">录取截止</div><div class="dl-date">2026 年 10 月 8 日</div></div>
-      <div class="dl-cell"><div class="dl-lbl">I-20 签发</div><div class="dl-date">2026 年 12 月 8 日</div></div>
-      <div class="dl-cell"><div class="dl-lbl">开学日期</div><div class="dl-date">2026 年 8 月 28 日</div></div>
+      <div class="dl-cell"><div class="dl-lbl">I-20 签发</div><div class="dl-date">2026 年 8 月 10 日</div></div>
+      <div class="dl-cell"><div class="dl-lbl">开学日期</div><div class="dl-date">2026 年 8 月 27 日</div></div>
     </div>
   </div>
-  <div class="ib ib-blue">⏱ <strong>处理时间：</strong>InUni 评估约 2 天 &nbsp;|&nbsp; RPI 录取审核约 3 周 &nbsp;|&nbsp; 缴纳定金后约 2 周签发 I-20</div>
+  <div class="ib ib-blue">⏱ <strong>处理时间：</strong>RPI 录取审核平均约 3 周</div>
 </div>
 
 <!-- ===== PROGRAMS ===== -->
@@ -571,7 +576,7 @@
   <div class="facts-grid">
     <div class="fc"><div class="fi">🏛️</div><div><div class="ft">美国最古老的理工大学</div><div class="fb2">建校于 1824 年——比 MIT 早 29 年，比加州理工早 67 年。当世界顶尖理工名校尚处构想阶段时，RPI 毕业生已在建设美国的基础设施。</div></div></div>
     <div class="fc"><div class="fi">⚛️</div><div><div class="ft">IBM Quantum System One — 真正的世界首创</div><div class="fb2">全球首所校园内拥有 IBM Quantum System One 的大学（2024 年）。学生可亲手操作量子硬件，开展 AI、药物研发与网络安全研究。</div></div></div>
-    <div class="fc"><div class="fi">📊</div><div><div class="ft">#70 — 2025《美国新闻与世界报道》</div><div class="fb2">稳居全美前 75 名。美国最具选拔性的私立理工类研究型大学之一。</div></div></div>
+    <div class="fc"><div class="fi">📊</div><div><div class="ft">#64 — 2026《美国新闻与世界报道》</div><div class="fb2">稳居全美前 75 名。美国最具选拔性的私立理工类研究型大学之一。</div></div></div>
     <div class="fc"><div class="fi">💼</div><div><div class="ft">每位 Lally 学生享 3 年 OPT</div><div class="fb2">所有 Lally MBA 与硕士项目均为 STEM 认证。国际毕业生可获 3 年 OPT，而非标准的 1 年——在商学院比较中具有决定性优势。</div></div></div>
     <div class="fc"><div class="fi">💰</div><div><div class="ft">薪资中位数 10.3 万–10.5 万美元</div><div class="fb2">Lally MBA 中位数 10.3 万美元；硕士 10.5 万美元/年。30% 的 Lally 校友进入高管层。对权衡成本与回报的家庭而言极具说服力。</div></div></div>
     <div class="fc"><div class="fi">🏦</div><div><div class="ft">全美首个 NSF 金融科技研究中心</div><div class="fb2">CRAFT——任何大学中首个 NSF 资助的金融科技中心——设于 Lally 学院。为金融、银行及金融科技方向学生提供真正的产学合作。</div></div></div>
@@ -601,10 +606,11 @@
 </div><!-- end .ca -->
 
 <div class="cbar">
+  <div class="ci">RPI 对接代表：<a href="mailto:roy.li@inuniglobal.com">Roy Li · roy.li@inuniglobal.com</a></div>
   <div class="ci">申请提交至：<a href="mailto:submitRPI@inuniglobal.com">submitRPI@inuniglobal.com</a></div>
   <div class="ci">InUni：<a href="https://inuniglobal.com">inuniglobal.com</a></div>
   <div class="ci">RPI：<a href="https://rpi.edu">rpi.edu</a></div>
-  <div class="ci" style="margin-left:auto;color:rgba(255,255,255,0.25);font-size:11px">仅供商务使用 — 请勿直接分享给学生</div>
+  <div class="ci" style="margin-left:auto;color:rgba(255,255,255,0.3);font-size:11px">仅供商务使用 — 请勿直接分享给学生</div>
 </div>
 </div><!-- end .main -->
 </div><!-- end .shell -->
@@ -678,7 +684,7 @@ function nav(id,btn){
   btn.classList.add("active");
   window.scrollTo(0,0);
 }
-rp(P);
+try{rp(P);}catch(e){console.warn(e);}
 </script>
 </body>
 </html>
